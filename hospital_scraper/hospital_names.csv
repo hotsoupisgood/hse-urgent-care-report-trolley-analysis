@@ -1,0 +1,167 @@
+number,facility_name,address,date_scraped
+1,Bantry Injury Unit,"Bantry General Hospital, Carrignagat, Bantry, Cork, P75  DX93",13/03/2026
+2,Beaumont Hospital Emergency Department,"Beaumont Hospital, Beaumont Road, Beaumount, Dublin 9, Dublin, D09  C562",13/03/2026
+3,Caredoc Arklow,"Arklow Primary Care Centre, Castlepark, Arklow, Wicklow, Y14  AE10",13/03/2026
+4,Caredoc Carlow,"Caredoc Carlow, District Hospital, Carlow Health Services Complex, Athy Rd, Carlow, R93  V603",13/03/2026
+5,Caredoc Cashel,"Caredoc Cashel, Our Lady’s Hospital, Lower Green, Cashel, Tipperary, E25  P407",13/03/2026
+6,Caredoc Clonmel,"Caredoc Clonmel, The County Clinic, Western Road, Clonmel, Tipperary, E91  HT96",13/03/2026
+7,Caredoc Dungarvan,"Caredoc Dungarvan, Springmount, Dungarvan, Waterford, X35  WA22",13/03/2026
+8,Caredoc Enniscorthy,"Enniscorthy Primary Care Centre, Quarry Road, Enniscorthy, Wexford, Y21  T8W7",13/03/2026
+9,Caredoc Gorey,"Caredoc Gorey, Gorey District Hospital, Gorey, Wexford, Y25  N5K6",13/03/2026
+10,Caredoc Kilkenny,"Ayrfield Medical Park, Granges Road, Kilkenny City, Kilkenny, R95  P2EF",13/03/2026
+11,Caredoc New Ross,"Caredoc New Ross, Chambersland, New Ross, Wexford, Y34  WY18",13/03/2026
+12,Caredoc Sligo,"Markievicz Primary Care Centre, Barrack Street, Sligo Town, Sligo, F91  Y8EK",13/03/2026
+13,Caredoc Tipperary Town,"Caredoc Tipperary Town, St Vincent’s Hospital, Collegeland, Tipperary, E34  DC63",13/03/2026
+14,Caredoc Waterford,"Caredoc Waterford, HSE Community Care, Cork Road, Waterford, X91  VX09",13/03/2026
+15,Caredoc Wexford,"Wexford Primary Care Centre, Grogan's Road, Townparks, Wexford Town, Wexford, Y35  DA39",13/03/2026
+16,Caredoc Wicklow,"Wicklow Town Primary Care, Glebe, Knockrobin, Wicklow, A67  K5C7",13/03/2026
+17,Cashel Injury Unit,"Cashel Injury Unit, Our Lady's Campus, Lower Green, Cashel, Tipperary, E25  P407",13/03/2026
+18,Cavan General Hospital Emergency Department,"Cavan Monaghan General Hospital, Lisdarn, Cavan Town, Cavan, H12  Y7W1",13/03/2026
+19,Cavan Monaghan Hospital Early Pregnancy Assessment Unit,"Cavan Monaghan General Hospital, Lisdarn, Cavan Town, Cavan, H12  Y7W1",13/03/2026
+20,Cavan Monaghan Maternity Emergency Service,"Cavan Monaghan General Hospital, Lisdarn, Cavan Town, Cavan, H12  Y7W1",13/03/2026
+21,Children's Health Ireland at Crumlin Emergency Department,"Children’s Health Ireland at Crumlin, Cooley Road, Crumlin, Dublin, D12  N512",13/03/2026
+22,Children's Health Ireland at Tallaght Emergency Department,"Children’s Health Ireland at Tallaght, Tallaght University Hospital, Tallaght, Dublin 24, Dublin, D24  TN3C",13/03/2026
+23,Children's Health Ireland at Temple Street Emergency Department,"Children’s Health Ireland at Temple Street, Temple Street, Dublin City, Dublin, D01  XD99",13/03/2026
+24,Connolly Hospital Blanchardstown Emergency Department,"Connolly Hospital Blanchardstown, Mill Road, Blanchardstown, Dublin 15, Dublin, D15  X40D",13/03/2026
+25,Cork University Hospital Emergency Department,"Cork University Hospital, Wilton Road, Wilton, Cork, T12  DC4A",13/03/2026
+26,Cork University Maternity Hospital Early Pregnancy Assessment Unit,"South Ring Business Park, 1st Floor Unit 3 Room 3A 4A, South Ring Business Park Kinsale Road, Cork, Cork, T12  F88X",13/03/2026
+27,Cork University Maternity Hospital Maternity emergency service,"Cork University Maternity Hospital, Wilton Road, Wilton, Cork City, Cork, T12  YE02",13/03/2026
+28,Ddoc Ballymun,"Ballymun Primary Care Centre, Main Street, Ballymun, Dublin, D09  C8P5",13/03/2026
+29,Ddoc Coolock,"Coolock Primary Care Centre, Cromcastle Road, Coolock, Dublin, D05  V026",13/03/2026
+30,Ddoc Hartstown,"Hartstown Health Centre, Cherryfield Lawn, Clonsilla, Dublin, D15  CR62",13/03/2026
+31,Ddoc North Strand,"North Strand Health Centre, 16 North Strand Road, North Strand, Dublin City, Dublin, D01  CC81",13/03/2026
+32,Ddoc Swords,"Swords Health Centre, Bridge Street, Townparks, Swords, Dublin, K67  X765",13/03/2026
+33,DL Doc,"St Michael's Hospital, George's Street Lower, Dún Laoghaire, Dublin, A96  P902",13/03/2026
+34,Dubdoc,"St James's Hospital Dublin, James's Street, Dublin 8, Dublin, D08  NHY1",13/03/2026
+35,Dundalk Injury Unit,"Louth County Hospital Dundalk, Dublin Road, Dundalk, Louth, A91  X0DP",13/03/2026
+36,Early pregnancy unit,"Cork University Maternity Hospital, Wilton Road, Wilton, Cork City, Cork, T12  YE02",13/03/2026
+37,Eastdoc,"St Vincent's University Hospital, Elm Park, Donnybrook, Dublin, D04  T6F4",13/03/2026
+38,Edoc Loughlinstown,"St Columcille's Hospital Loughlinstown, Bray Road, Loughlinstown, Dublin 18, Dublin, D18  V9K1",13/03/2026
+39,Ennis Injury Unit,"Ennis Injury Unit, Ennis Hospital, Gort Road, Ennis, Clare, V95  HN29",13/03/2026
+40,KDoc Celbridge,"Kdoc Celbridge, Shackleton Road, Celbridge, Kildare, W23  PP59",13/03/2026
+41,KDoc Naas,"Kildare & West Wicklow Doctors on call, Vista Primary Care, Ballymore Road, Naas, Kildare, W91  E6H2",13/03/2026
+42,Letterkenny University Hospital Early Pregnancy Assessment Unit,"Letterkenny University Hospital, Kilmacrennan Road, Letterkenny, Donegal, F92  AE81",13/03/2026
+43,Letterkenny University Hospital Emergency Department,"Letterkenny University Hospital, Kilmacrennan Road, Letterkenny, Donegal, F92  AE81",13/03/2026
+44,Letterkenny University Hospital Maternity Emergency Service,"Letterkenny University Hospital, Kilmacrennan Road, Letterkenny, Donegal, F92  AE81",13/03/2026
+45,Louth Hospital Early Pregnancy Assessment Unit,"Our Lady of Lourdes Hospital Drogheda, Windmill Road, Moneymore, Drogheda, Louth, A92  VW28",13/03/2026
+46,Louth Hospital Maternity Emergency Service,"Our Lady of Lourdes Hospital Drogheda, Windmill Road, Moneymore, Drogheda, Louth, A92  VW28",13/03/2026
+47,Lukedoc,"Lukedoc, Clonskeagh Hospital Campus, Vergemount, Clonskeagh, Dublin, D06  V406",13/03/2026
+48,Mallow Injury Unit,"Mallow General Hospital, Limerick Road, Kilknockan, Mallow, Cork, P51  N288",13/03/2026
+49,Mater Misericordiae University Hospital Emergency Department,"Mater Misericordiae University Hospital, Eccles Street, Dublin 7, Dublin, D07  R2WY",13/03/2026
+50,Maternity Emergency Unit (MEU),"University Maternity Hospital Limerick, Ennis Road, Limerick City, Limerick, V94  C566",13/03/2026
+51,Mater Smithfield Rapid Injury Clinic,"Mater Smithfield Rapid Injury Clinic, The Forge, Smithfield Market, Smithfield, Dublin 7, Dublin, D07  VKP9",13/03/2026
+52,Mayo University Hospital Early Pregnancy Assessment Unit,"Mayo University Hospital, Westport Road, Knockaphunta, Castlebar, Mayo, F23  H529",13/03/2026
+53,Mayo University Hospital Emergency Department,"Mayo University Hospital, Westport Road, Knockaphunta, Castlebar, Mayo, F23  H529",13/03/2026
+54,Mayo University Hospital Maternity Emergency Service,"Mayo University Hospital, Westport Road, Knockaphunta, Castlebar, Mayo, F23  H529",13/03/2026
+55,Mercy Injury Unit,"Mercy Injury Unit, Mercy University Hospital, Gurranabraher, Cork City, Cork, T23  YV52",13/03/2026
+56,Mercy University Hospital Emergency Department,"Mercy University Hospital, Grenville Place, Cork City, Cork, T12  WE28",13/03/2026
+57,Midland Regional Hospital Portlaoise Early Pregnancy Assessment Unit,"Midland Regional Hospital Portlaoise, Dublin Road, Portlaoise, Laois, R32  RW61",13/03/2026
+58,Midland Regional Hospital Portlaoise Emergency Department,"Midland Regional Hospital Portlaoise, Dublin Road, Portlaoise, Laois, R32  RW61",13/03/2026
+59,Midland Regional Hospital Portlaoise Maternity Emergency Service,"Midland Regional Hospital Portlaoise, Dublin Road, Portlaoise, Laois, R32  RW61",13/03/2026
+60,Midland Regional Hospital Tullamore Emergency Department,"Midland Regional Hospital Tullamore, Arden Road, Tullamore, Offaly, R35  NY51",13/03/2026
+61,Midoc Athlone,"Clonbrusk Primary Care Centre, Clonbrusk, Athlone, Westmeath, N37  P8P8",13/03/2026
+62,Midoc Edenderry,"Midoc Edenderry, Ofalia House, St Mary's Street, Edenderry, Offaly, R45  K726",13/03/2026
+63,Midoc Longford,"Midoc Longford, St Joseph's Hospital, Dublin Road, Longford, N39  PW72",13/03/2026
+64,Midoc Mullingar,"Regional Hospital Mullingar, Longford Road, Mullingar, Westmeath, N91  NA43",13/03/2026
+65,Midoc Portlaoise,"Midoc Portlaoise, St Fintan's, Dublin Road, Portlaoise, Laois, R32  YH98",13/03/2026
+66,Midoc Tullamore,"Midland Regional Hospital Tullamore, Arden Road, Tullamore, Offaly, R35  NY51",13/03/2026
+67,Monaghan Injury Unit,"Cavan Monaghan General Hospital, Lisdarn, Cavan Town, Cavan, H12  Y7W1",13/03/2026
+68,Naas General Hospital Emergency Department,"Naas General Hospital, Craddockstown Road, Naas East, Naas, Kildare, W91  AE76",13/03/2026
+69,Naas Hospital Injury Unit,"Naas Hospital Injury Unit, Vista Primary Care Centre, Ballymore Eustace Road, Naas, Kildare, W91  X38W",13/03/2026
+70,National Maternity Hospital Early Pregnancy Assessment Unit,"The National Maternity Hospital, Holles Street, Dublin City, Dublin, D02  YH21",13/03/2026
+71,National Maternity Hospital Maternity Emergency Service,"The National Maternity Hospital, Holles Street, Dublin City, Dublin, D02  YH21",13/03/2026
+72,Nedoc Castleblaney,"Nedoc Castleblaney, Bree Road, Castleblayney, Monaghan, A75  E627",13/03/2026
+73,Nedoc Cavan,"Cavan Monaghan General Hospital, Lisdarn, Cavan Town, Cavan, H12  Y7W1",13/03/2026
+74,Nedoc Drogheda,"Nedoc Drogheda, Cottage Hospital, Scarlet Street, Drogheda, Louth, A92  V6XE",13/03/2026
+75,Nedoc Navan,"Nedoc Navan, Unit 2, Academy Square, Academy Street, Navan, Meath, C15  DD5D",13/03/2026
+76,Nenagh Injury Unit,"Nenagh Injury Unit, Nenagh Hospital, Tyone, Nenagh, Tipperary, E45  PT86",13/03/2026
+77,Nowdoc Carndonagh,"Nowdoc Carndonagh, Carndonagh Community Hospital, Derry Road, Carndonagh, Donegal, F93  EW7T",13/03/2026
+78,Nowdoc Carrick-on-Shannon,"Carrick-on-Shannon Primary and Mental Health Care Centre, Townparks, Carrick-on-Shannon, Leitrim, N41  E3C9",13/03/2026
+79,Nowdoc Derrybeg,"Nowdoc Derrybeg, Magheragallan, Derrybeg, Donegal, F92  DN4X",13/03/2026
+80,Nowdoc Letterkenny,"Nowdoc Letterkenny, Errigal Chronic Disease Management (CDM) Hub, Kilmacrennan Road, Letterkenny, Donegal, F92  NP23",13/03/2026
+81,Nowdoc Mountcharles,"Nowdoc Mountcharles, Upper Main Street, Mountcharles, Donegal, F94  NX8C",13/03/2026
+82,Our Lady of Lourdes Hospital Drogheda Emergency Department,"Our Lady of Lourdes Hospital Drogheda, Windmill Road, Moneymore, Drogheda, Louth, A92  VW28",13/03/2026
+83,Our Lady's Hospital Navan Emergency Department,"Our Lady's Hospital Navan, Townparks, Navan, Meath, C15  RK7Y",13/03/2026
+84,Portiuncula University Hospital Early Pregnancy Assessment Unit,"Portiuncula University Hospital, Garbally Demense, Dunlo, Ballinasloe, Galway, H53  T971",13/03/2026
+85,Portiuncula University Hospital Emergency Department,"Portiuncula University Hospital, Garbally Demense, Dunlo, Ballinasloe, Galway, H53  T971",13/03/2026
+86,Portiuncula University Hospital Maternity Emergency Service,"Portiuncula University Hospital, Garbally Demense, Dunlo, Ballinasloe, Galway, H53  T971",13/03/2026
+87,Regional Hospital Mullingar Emergency Department,"Regional Hospital Mullingar, Longford Road, Mullingar, Westmeath, N91  NA43",13/03/2026
+88,Regional Hospital Mullingar Injury Unit,"Regional Hospital Mullingar Injury Unit, Charter Medical Private Hospital, Ballinderry, Mullingar, Westmeath, N91  FE40",13/03/2026
+89,Roscommon Injury Unit,"Roscommon University Hospital, Athlone Road, Ardsallagh Beg, Roscommon, F42  AX61",13/03/2026
+90,Rotunda Hospital Early Pregnancy Assessment Unit,"Rotunda Hospital Dublin, Parnell Square, Dublin City, Dublin, D01  P5W9",13/03/2026
+91,Rotunda Hospital Maternity Emergency Service,"Rotunda Hospital Dublin, Parnell Square, Dublin City, Dublin, D01  P5W9",13/03/2026
+92,Shannondoc Dooradoyle,"Dooradoyle Health Centre, St Nessan's Road, Limerick City, Limerick, V94  H662",13/03/2026
+93,Shannondoc Ennis,"Ennis Primary Care Centre, Station Road, Ennis, Clare, V95  TY4E",13/03/2026
+94,Shannondoc Ennistymon,"Shannondoc Ennistymon, Ennistymon Community Hospital, Dough, Ennistymon, Clare, V95  CD58",13/03/2026
+95,Shannondoc Hospital,"Hospital Health Centre, Knockainey Road, Hospital, Limerick, V35  EA44",13/03/2026
+96,Shannondoc Kilrush,"Kilrush Health Centre, Fahy's Road, Kilrush, Clare, V15  FV18",13/03/2026
+97,Shannondoc Miltown Malbay,"Shannondoc Miltown Malbay, Medical Centre, Spanish Point Road, Miltown Malbay, Clare, V95  X72N",13/03/2026
+98,Shannondoc Nenagh,"Shannondoc Nenagh, Wilton Medical Centre, Gortlandroe, Nenagh, Tipperary, E45  KR91",13/03/2026
+99,Shannondoc Newcastle West,"Newcastlewest Health Centre, Gortboy, Newcastlewest, Limerick, V42  AN23",13/03/2026
+100,Shannondoc Roscrea,"Roscrea Primary Care Centre, Grange, Roscrea, Tipperary, E53  X461",13/03/2026
+101,Shannondoc Shannon,"Shannon Health Centre, Shannon Town Centre, Shannon, Clare, V14  Y029",13/03/2026
+102,Shannondoc Thurles,"Thurles Primary Care Centre, 22A Mitchel Street, Thurles, Tipperary, E41  K4C2",13/03/2026
+103,Sligo University Hospital Emergency Department,"Sligo University Hospital, The Mall, Rathquarter, Sligo Town, Sligo, F91  H684",13/03/2026
+104,Southdoc Bandon,"Bandon Primary Care Centre, Market Street, Bandon, Cork, P72  WD58",13/03/2026
+105,Southdoc Bantry,"Bantry Primary Care Centre, Droumleigh South, Bantry, Cork, P75  T611",13/03/2026
+106,Southdoc Caherciveen,"Southdoc Caherciveen, Caherciveen Day Care Centre, St Anne's Community Hospital, Caherciveen, Kerry, V23  P497",13/03/2026
+107,Southdoc Castleisland,"Southdoc Castleisland, Castleisland Day Care Centre, Chapel Lane, Castleisland, Kerry, V92  K138",13/03/2026
+108,Southdoc Castletownbere,"Southdoc Castletownbeare, Castletownbeare Day Care Centre, Derrymihan West, Castletownbere, Cork, P75  PW81",13/03/2026
+109,Southdoc Clonakilty,"Clonakilty Primary Care Centre, Clarke Street, Clonakilty, Cork, P85  XE93",13/03/2026
+110,Southdoc Cork City Blackpool,"Southdoc Cork City Blackpool, Unit GE, North Valley Business Centre, Mallow Road, Cork, T23  XD56",13/03/2026
+111,Southdoc Cork City Southside,"Southdoc Cork City Southside, Unit 17/18 South Ring Business Park, Kinsale Road, Kinsale Road, Cork, T12  N6KR",13/03/2026
+112,Southdoc Dingle,"Southdoc Dingle, Dingle Community Hospital, Farran, Dingle, Kerry, V92  PF65",13/03/2026
+113,Southdoc Dunmanway,"Southdoc Dunmanway, Dunmanway Community Hospital, Ballyhalwick, Dunmanway, Cork, P47  WN27",13/03/2026
+114,Southdoc Fermoy,"Southdoc Fermoy, Fermoy Community Hospital, Courthouse Road, Fermoy, Cork, P61  VW35",13/03/2026
+115,Southdoc Kanturk,"Southdoc Kanturk, Kanturk Health Centre, Hospital Hill, Kanturk, Cork, P51  H96H",13/03/2026
+116,Southdoc Kenmare,"Kenmare Primary Care Centre, Railway Road, Kenmare, Kerry, V93  Y05C",13/03/2026
+117,Southdoc Killarney,"Southdoc Killarney, Park Shopping Centre, Upper Park Road, Killarney, Kerry, V93  CVF9",13/03/2026
+118,Southdoc Killorglin,"Southdoc Killorglin, Killorglin Health Centre, Mill Road, Killorglin, Kerry, V93  WP46",13/03/2026
+119,Southdoc Kinsale,"Kinsale Primary Care Centre, Kinsale Quarter, New Road, Kinsale, Cork, P17  RY11",13/03/2026
+120,Southdoc Listowel,"Listowel Primary Care Centre, Convent Road, Listowel, Kerry, V31  VN25",13/03/2026
+121,Southdoc Macroom,"Southdoc Macroom, Fair Green Plaza, Macroom, Cork, P12  ET82",13/03/2026
+122,Southdoc Mallow,"Mallow Primary Healthcare Centre, Mallow Business Park, Goulds Hill, Mallow, Cork, P51  Y8EC",13/03/2026
+123,Southdoc Midleton,"Southdoc Midleton, Eilmaur, Oatencake, Cork Road, Midleton, Cork, P25  D524",13/03/2026
+124,Southdoc Skibbereen,"West Cork LHO Offices Primary Care Centre, Coolnagurrane, Skibbereen, Cork, P81  YV62",13/03/2026
+125,Southdoc Tralee,"Southdoc Tralee, Limetree House, Killeen, Tralee, Kerry, V92  C927",13/03/2026
+126,Southdoc Youghal,"Southdoc Youghal, Youghal Health Centre, Millennium Court, Youghal, Cork, P36  P840",13/03/2026
+127,St Columcille's Injury Unit Loughlinstown,"St Columcille's Hospital Loughlinstown, Bray Road, Loughlinstown, Dublin 18, Dublin, D18  V9K1",13/03/2026
+128,St James's Hospital Dublin Emergency Department,"St James's Hospital Dublin, James's Street, Dublin 8, Dublin, D08  NHY1",13/03/2026
+129,St John’s Injury Unit Limerick,"St John's Hospital, St John's Square, Limerick City, Limerick, V94  H272",13/03/2026
+130,St Luke's General Hospital Carlow Kilkenny Emergency Department,"St Luke's General Hospital Carlow Kilkenny, Freshford Road, Kilkenny City, Kilkenny, R95  FY71",13/03/2026
+131,St Vincent's University Hospital Emergency Department,"St Vincent's University Hospital, Elm Park, Donnybrook, Dublin, D04  T6F4",13/03/2026
+132,Tallaght University Hospital Emergency Department,"Tallaght University Hospital, Tallaght, Dublin 24, Dublin, D24  NR0A",13/03/2026
+133,The Coombe Hospital Early Pregnancy Assessment Unit,"The Coombe Hospital, Cork Street, Dublin City, Dublin, D08  XW7X",13/03/2026
+134,The Coombe Hospital Maternity Emergency Service,"The Coombe Hospital, Cork Street, Dublin City, Dublin, D08  XW7X",13/03/2026
+135,Tipperary University Hospital Emergency Department,"Tipperary University Hospital, Western Road, Clonmel, Tipperary, E91  VY40",13/03/2026
+136,TLC Doc Tallaght,"TLC Doc Tallaght, Carbury House, Tallaght, Dublin, D24  FKT7",13/03/2026
+137,University Hospital Galway Early Pregnancy Assessment Unit,"University Hospital Galway, Newcastle Road, Galway City, Galway, H91  YR71",13/03/2026
+138,University Hospital Galway Emergency Department,"University Hospital Galway, Newcastle Road, Galway City, Galway, H91  YR71",13/03/2026
+139,University Hospital Galway Maternity Emergency Service,"University Hospital Galway, Newcastle Road, Galway City, Galway, H91  YR71",13/03/2026
+140,University Hospital Kerry Early Pregnancy Assessment Unit,"University Hospital Kerry, Rathass, Tralee, Kerry, V92  NX94",13/03/2026
+141,University Hospital Kerry Emergency Department,"University Hospital Kerry, Rathass, Tralee, Kerry, V92  NX94",13/03/2026
+142,University Hospital Kerry Maternity Emergency Service,"University Hospital Kerry, Rathass, Tralee, Kerry, V92  NX94",13/03/2026
+143,University Hospital Limerick Early Pregnancy Assessment Unit,"University Maternity Hospital Limerick, Ennis Road, Limerick City, Limerick, V94  C566",13/03/2026
+144,University Hospital Limerick Emergency Department,"University Hospital Limerick, St Nessan's Road, Dooradoyle, Limerick, V94  F858",13/03/2026
+145,University Hospital Limerick Maternity Emergency Service,"University Maternity Hospital Limerick, Ennis Road, Limerick City, Limerick, V94  C566",13/03/2026
+146,University Hospital Sligo Early Pregnancy Assessment Unit,"Sligo University Hospital, The Mall, Rathquarter, Sligo Town, Sligo, F91  H684",13/03/2026
+147,University Hospital Sligo Maternity Emergency Service,"Sligo University Hospital, The Mall, Rathquarter, Sligo Town, Sligo, F91  H684",13/03/2026
+148,University Hospital Waterford Early Pregnancy Assessment Unit,"University Hospital Waterford, Dunmore Road, Waterford City, Waterford, X91  ER8E",13/03/2026
+149,University Hospital Waterford Emergency Department,"University Hospital Waterford, Dunmore Road, Waterford City, Waterford, X91  ER8E",13/03/2026
+150,University Hospital Waterford Maternity Emergency Service,"University Hospital Waterford, Dunmore Road, Waterford City, Waterford, X91  ER8E",13/03/2026
+151,Westdoc Achill,"Achill Health Centre, Achill Sound, Oileán Acla, Achill Island, Mayo, F28  E142",13/03/2026
+152,Westdoc Ballina,"Westdoc Ballina, St Joseph's District Hospital, Mercy Road, Ballina, Mayo, F26  PP92",13/03/2026
+153,Westdoc Ballinrobe,"Ballinrobe Primary Care Centre, Kilmaine Road, Ballinrobe, Mayo, F31  RW66",13/03/2026
+154,Westdoc Belmullet,"Westdoc Belmullet, Tallagh, Belmullet, Mayo, F26  K1H9",13/03/2026
+155,Westdoc Castlebar,"Castlebar Primary Care Centre, Moneenbradagh, Moneen Road, Castlebar, Mayo, F23  XV04",13/03/2026
+156,Westdoc Craughwell,"Craughwell Health Centre, Killora, Craughwell, Galway, H91  WF30",13/03/2026
+157,Westdoc East Galway,"Eyrecourt Health Centre, Market Street, The Squre, Eurecourt, Ballinasloe, Galway, H53  FX94",13/03/2026
+158,Westdoc Galway,"Westdoc Galway, Unit 18a, Liosban Business Park, Tuam Road, Galway, H91  FW13",13/03/2026
+159,Westdoc Glenamaddy,"Glenamaddy Health Centre, Kilkerrin Road, Glenamaddy, Galway, F45  E449",13/03/2026
+160,Westdoc Knock,"Westdoc Knock, Knock Medical Centre, Drum, Knock, Mayo, F12  E166",13/03/2026
+161,Westdoc North Connemara,"Clifden Health Centre, Galway Road, Clifden, Galway, H71  XP84",13/03/2026
+162,Westdoc Roscommon,"Roscommon Primary Care Centre, Golf Links Road, Roscommon Town, Roscommon, F42  HY97",13/03/2026
+163,Westdoc South Connemara,"Kilkerrin Health Centre, Kilkerrin, Connemara, Galway, H91  C803",13/03/2026
+164,Westdoc Tuam,"Tuam Primary Care Centre, Sean Purcell Road, Tuam, Galway, H54  DT61",13/03/2026
+165,Westdoc Westport,"Westdoc Westport, Crannóg House, Quay Road, Westport, Mayo, F28  TX39",13/03/2026
+166,Wexford General Hospital Emergency Department,"Wexford General Hospital, Newtown Road, Carricklawn, Wexford Town, Wexford, Y35  Y17D",13/03/2026

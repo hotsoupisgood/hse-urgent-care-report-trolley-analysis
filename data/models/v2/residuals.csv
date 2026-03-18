@@ -1,0 +1,907 @@
+Region,time,residual
+HSE Dublin and Midlands,1,-0.4098
+HSE Dublin and North East,1,-0.1341
+HSE Dublin and South East,1,-2.9602
+HSE Mid West,1,-8.4864
+HSE South West,1,-2.9946
+HSE West and North West,1,-4.9885
+HSE Dublin and Midlands,2,7.0391
+HSE Dublin and North East,2,2.408
+HSE Dublin and South East,2,-2.8709
+HSE Mid West,2,3.0943
+HSE South West,2,0.9373
+HSE West and North West,2,7.3249
+HSE Dublin and Midlands,3,5.067
+HSE Dublin and North East,3,-4.5928
+HSE Dublin and South East,3,-0.5638
+HSE Mid West,3,-1.5663
+HSE South West,3,0.4475
+HSE West and North West,3,4.4692
+HSE Dublin and Midlands,4,0.8739
+HSE Dublin and North East,4,-1.2893
+HSE Dublin and South East,4,-3.88
+HSE Mid West,4,0.6871
+HSE South West,4,1.3188
+HSE West and North West,4,5.5813
+HSE Dublin and Midlands,5,2.2212
+HSE Dublin and North East,5,-4.7246
+HSE Dublin and South East,5,-0.7899
+HSE Mid West,5,1.8832
+HSE South West,5,1.8569
+HSE West and North West,5,-2.0761
+HSE Dublin and Midlands,6,1.3667
+HSE Dublin and North East,6,-2.3605
+HSE Dublin and South East,6,1.7575
+HSE Mid West,6,3.0964
+HSE South West,6,-3.1814
+HSE West and North West,6,3.4227
+HSE Dublin and Midlands,7,0.6724
+HSE Dublin and North East,7,0.6534
+HSE Dublin and South East,7,1.9029
+HSE Mid West,7,-1.4716
+HSE South West,7,-1.3176
+HSE West and North West,7,0.4875
+HSE Dublin and Midlands,8,1.7787
+HSE Dublin and North East,8,1.3065
+HSE Dublin and South East,8,-3.66
+HSE Mid West,8,2.666
+HSE South West,8,-0.0808
+HSE West and North West,8,4.808
+HSE Dublin and Midlands,9,2.1171
+HSE Dublin and North East,9,-4.7877
+HSE Dublin and South East,9,-1.1219
+HSE Mid West,9,2.4222
+HSE South West,9,1.551
+HSE West and North West,9,6.2587
+HSE Dublin and Midlands,10,-0.2453
+HSE Dublin and North East,10,-1.1591
+HSE Dublin and South East,10,-2.4094
+HSE Mid West,10,3.9695
+HSE South West,10,1.4511
+HSE West and North West,10,4.2462
+HSE Dublin and Midlands,11,2.7286
+HSE Dublin and North East,11,-5.173
+HSE Dublin and South East,11,3.3927
+HSE Mid West,11,5.091
+HSE South West,11,3.3608
+HSE West and North West,11,-0.8865
+HSE Dublin and Midlands,12,0.988
+HSE Dublin and North East,12,-2.2766
+HSE Dublin and South East,12,4.5527
+HSE Mid West,12,5.0608
+HSE South West,12,-3.2307
+HSE West and North West,12,6.4472
+HSE Dublin and Midlands,13,0.9072
+HSE Dublin and North East,13,1.9591
+HSE Dublin and South East,13,3.9709
+HSE Mid West,13,0.9625
+HSE South West,13,1.6902
+HSE West and North West,13,3.6137
+HSE Dublin and Midlands,14,2.4014
+HSE Dublin and North East,14,0.8275
+HSE Dublin and South East,14,-0.2946
+HSE Mid West,14,3.9667
+HSE South West,14,1.2065
+HSE West and North West,14,6.5677
+HSE Dublin and Midlands,15,-0.6029
+HSE Dublin and North East,15,-6.9043
+HSE Dublin and South East,15,0.4097
+HSE Mid West,15,0.9764
+HSE South West,15,2.5063
+HSE West and North West,15,7.4846
+HSE Dublin and Midlands,16,-1.9973
+HSE Dublin and North East,16,-1.5596
+HSE Dublin and South East,16,0.08
+HSE Mid West,16,3.743
+HSE South West,16,4.2014
+HSE West and North West,16,6.2212
+HSE Dublin and Midlands,17,-0.7079
+HSE Dublin and North East,17,-3.9778
+HSE Dublin and South East,17,-0.416
+HSE Mid West,17,5.8103
+HSE South West,17,4.2202
+HSE West and North West,17,-0.2044
+HSE Dublin and Midlands,18,-3.3055
+HSE Dublin and North East,18,-2.562
+HSE Dublin and South East,18,1.1728
+HSE Mid West,18,6.0484
+HSE South West,18,-0.9612
+HSE West and North West,18,4.7493
+HSE Dublin and Midlands,19,1.4224
+HSE Dublin and North East,19,1.9671
+HSE Dublin and South East,19,1.0589
+HSE Mid West,19,1.4801
+HSE South West,19,3.1425
+HSE West and North West,19,2.6905
+HSE Dublin and Midlands,20,4.1633
+HSE Dublin and North East,20,0.1207
+HSE Dublin and South East,20,-2.4841
+HSE Mid West,20,3.6862
+HSE South West,20,1.8233
+HSE West and North West,20,6.2542
+HSE Dublin and Midlands,21,0.575
+HSE Dublin and North East,21,-6.3667
+HSE Dublin and South East,21,-2.5316
+HSE Mid West,21,1.1044
+HSE South West,21,3.7658
+HSE West and North West,21,6.0852
+HSE Dublin and Midlands,22,-0.6395
+HSE Dublin and North East,22,0.1548
+HSE Dublin and South East,22,-2.5589
+HSE Mid West,22,5.6985
+HSE South West,22,4.5479
+HSE West and North West,22,5.3154
+HSE Dublin and Midlands,23,-0.9068
+HSE Dublin and North East,23,-3.209
+HSE Dublin and South East,23,-2.3289
+HSE Mid West,23,5.3098
+HSE South West,23,3.1951
+HSE West and North West,23,-2.8085
+HSE Dublin and Midlands,24,-2.9788
+HSE Dublin and North East,24,-3.5463
+HSE Dublin and South East,24,-0.2482
+HSE Mid West,24,5.3577
+HSE South West,24,-4.5012
+HSE West and North West,24,4.43
+HSE Dublin and Midlands,25,-0.6882
+HSE Dublin and North East,25,-0.5902
+HSE Dublin and South East,25,0.4083
+HSE Mid West,25,-1.1223
+HSE South West,25,1.2587
+HSE West and North West,25,0.783
+HSE Dublin and Midlands,26,1.9493
+HSE Dublin and North East,26,-1.3994
+HSE Dublin and South East,26,-5.1541
+HSE Mid West,26,4.7659
+HSE South West,26,0.4605
+HSE West and North West,26,4.43
+HSE Dublin and Midlands,27,1.5456
+HSE Dublin and North East,27,-8.028
+HSE Dublin and South East,27,-4.2626
+HSE Mid West,27,3.4869
+HSE South West,27,-2.2693
+HSE West and North West,27,4.2919
+HSE Dublin and Midlands,28,-0.7038
+HSE Dublin and North East,28,-3.2437
+HSE Dublin and South East,28,-4.3896
+HSE Mid West,28,6.327
+HSE South West,28,-2.0173
+HSE West and North West,28,2.3715
+HSE Dublin and Midlands,29,-0.4319
+HSE Dublin and North East,29,-5.1153
+HSE Dublin and South East,29,-1.9631
+HSE Mid West,29,6.4787
+HSE South West,29,-0.7492
+HSE West and North West,29,-1.364
+HSE Dublin and Midlands,30,-5.0155
+HSE Dublin and North East,30,-1.6941
+HSE Dublin and South East,30,-0.8456
+HSE Mid West,30,6.2814
+HSE South West,30,-4.474
+HSE West and North West,30,3.0868
+HSE Dublin and Midlands,31,-1.7619
+HSE Dublin and North East,31,-0.3801
+HSE Dublin and South East,31,0.0512
+HSE Mid West,31,0.3429
+HSE South West,31,-0.798
+HSE West and North West,31,0.2316
+HSE Dublin and Midlands,32,0.3548
+HSE Dublin and North East,32,-1.5796
+HSE Dublin and South East,32,-4.8285
+HSE Mid West,32,4.4587
+HSE South West,32,-1.8969
+HSE West and North West,32,4.1071
+HSE Dublin and Midlands,33,-0.8875
+HSE Dublin and North East,33,-6.3734
+HSE Dublin and South East,33,-3.4648
+HSE Mid West,33,2.7501
+HSE South West,33,-1.6959
+HSE West and North West,33,6.5139
+HSE Dublin and Midlands,34,-1.2271
+HSE Dublin and North East,34,-1.7018
+HSE Dublin and South East,34,-3.8472
+HSE Mid West,34,4.4922
+HSE South West,34,1.6248
+HSE West and North West,34,4.7034
+HSE Dublin and Midlands,35,-2.0707
+HSE Dublin and North East,35,-4.1993
+HSE Dublin and South East,35,-1.9306
+HSE Mid West,35,6.0968
+HSE South West,35,2.3276
+HSE West and North West,35,-2.8831
+HSE Dublin and Midlands,36,-2.7012
+HSE Dublin and North East,36,-1.5078
+HSE Dublin and South East,36,-0.9093
+HSE Mid West,36,6.0977
+HSE South West,36,-2.649
+HSE West and North West,36,3.3453
+HSE Dublin and Midlands,37,0.0453
+HSE Dublin and North East,37,0.5106
+HSE Dublin and South East,37,-1.0294
+HSE Mid West,37,-0.3816
+HSE South West,37,0.717
+HSE West and North West,37,1.6432
+HSE Dublin and Midlands,38,2.4051
+HSE Dublin and North East,38,-1.4629
+HSE Dublin and South East,38,-6.014
+HSE Mid West,38,5.0007
+HSE South West,38,-2.325
+HSE West and North West,38,3.4718
+HSE Dublin and Midlands,39,1.0764
+HSE Dublin and North East,39,-6.9462
+HSE Dublin and South East,39,-3.1123
+HSE Mid West,39,3.5159
+HSE South West,39,0.0654
+HSE West and North West,39,3.8605
+HSE Dublin and Midlands,40,-0.7207
+HSE Dublin and North East,40,-1.8499
+HSE Dublin and South East,40,-2.9845
+HSE Mid West,40,7.1043
+HSE South West,40,3.4179
+HSE West and North West,40,3.5703
+HSE Dublin and Midlands,41,0.3574
+HSE Dublin and North East,41,-3.8009
+HSE Dublin and South East,41,-2.2326
+HSE Mid West,41,8.4719
+HSE South West,41,1.9646
+HSE West and North West,41,-2.5886
+HSE Dublin and Midlands,42,-0.575
+HSE Dublin and North East,42,-0.2584
+HSE Dublin and South East,42,0.1449
+HSE Mid West,42,6.7787
+HSE South West,42,-4.9758
+HSE West and North West,42,2.883
+HSE Dublin and Midlands,43,-0.6411
+HSE Dublin and North East,43,1.0962
+HSE Dublin and South East,43,-0.258
+HSE Mid West,43,0.4531
+HSE South West,43,-1.7155
+HSE West and North West,43,-0.3558
+HSE Dublin and Midlands,44,2.8916
+HSE Dublin and North East,44,-0.3446
+HSE Dublin and South East,44,-6.1593
+HSE Mid West,44,4.2721
+HSE South West,44,-2.1775
+HSE West and North West,44,3.4002
+HSE Dublin and Midlands,45,1.9743
+HSE Dublin and North East,45,-5.1297
+HSE Dublin and South East,45,-3.559
+HSE Mid West,45,0.87
+HSE South West,45,1.3692
+HSE West and North West,45,4.3052
+HSE Dublin and Midlands,46,-0.4066
+HSE Dublin and North East,46,-1.1914
+HSE Dublin and South East,46,-2.8341
+HSE Mid West,46,4.8923
+HSE South West,46,2.7141
+HSE West and North West,46,4.477
+HSE Dublin and Midlands,47,1.669
+HSE Dublin and North East,47,-3.5587
+HSE Dublin and South East,47,-0.5582
+HSE Mid West,47,7.9904
+HSE South West,47,2.5766
+HSE West and North West,47,0.0249
+HSE Dublin and Midlands,48,-1.4892
+HSE Dublin and North East,48,-0.0717
+HSE Dublin and South East,48,0.6275
+HSE Mid West,48,6.9024
+HSE South West,48,-5.0135
+HSE West and North West,48,1.6331
+HSE Dublin and Midlands,49,-0.956
+HSE Dublin and North East,49,0.4845
+HSE Dublin and South East,49,0.6515
+HSE Mid West,49,0.3468
+HSE South West,49,-0.3382
+HSE West and North West,49,0.0308
+HSE Dublin and Midlands,50,3.3777
+HSE Dublin and North East,50,0.5581
+HSE Dublin and South East,50,-6.3947
+HSE Mid West,50,5.4881
+HSE South West,50,-2.7334
+HSE West and North West,50,5.7115
+HSE Dublin and Midlands,51,2.743
+HSE Dublin and North East,51,-5.0807
+HSE Dublin and South East,51,-0.974
+HSE Mid West,51,4.1652
+HSE South West,51,2.5598
+HSE West and North West,51,7.4601
+HSE Dublin and Midlands,52,-5.1068
+HSE Dublin and North East,52,-1.9553
+HSE Dublin and South East,52,-3.7089
+HSE Mid West,52,2.6403
+HSE South West,52,-0.0964
+HSE West and North West,52,2.5688
+HSE Dublin and Midlands,53,-4.4751
+HSE Dublin and North East,53,-6.9752
+HSE Dublin and South East,53,-3.8783
+HSE Mid West,53,1.0544
+HSE South West,53,-2.5826
+HSE West and North West,53,-5.8865
+HSE Dublin and Midlands,54,-3.3055
+HSE Dublin and North East,54,-1.6987
+HSE Dublin and South East,54,-1.5833
+HSE Mid West,54,4.9789
+HSE South West,54,-1.536
+HSE West and North West,54,4.6875
+HSE Dublin and Midlands,55,-1.7393
+HSE Dublin and North East,55,1.1409
+HSE Dublin and South East,55,-1.3415
+HSE Mid West,55,-0.1303
+HSE South West,55,0.4439
+HSE West and North West,55,-0.365
+HSE Dublin and Midlands,56,1.2209
+HSE Dublin and North East,56,0.5242
+HSE Dublin and South East,56,-7.6756
+HSE Mid West,56,5.9754
+HSE South West,56,-0.3342
+HSE West and North West,56,3.2136
+HSE Dublin and Midlands,57,1.6272
+HSE Dublin and North East,57,-4.4509
+HSE Dublin and South East,57,-1.6055
+HSE Mid West,57,4.3925
+HSE South West,57,2.8736
+HSE West and North West,57,5.1474
+HSE Dublin and Midlands,58,-4.0903
+HSE Dublin and North East,58,-1.1015
+HSE Dublin and South East,58,-3.3944
+HSE Mid West,58,7.7504
+HSE South West,58,1.0219
+HSE West and North West,58,3.9072
+HSE Dublin and Midlands,59,-0.7835
+HSE Dublin and North East,59,-3.0513
+HSE Dublin and South East,59,0.1002
+HSE Mid West,59,10.3409
+HSE South West,59,0.4946
+HSE West and North West,59,-1.7055
+HSE Dublin and Midlands,60,-3.682
+HSE Dublin and North East,60,-0.8479
+HSE Dublin and South East,60,1.4604
+HSE Mid West,60,7.6995
+HSE South West,60,-5.1724
+HSE West and North West,60,4.3425
+HSE Dublin and Midlands,61,-0.7006
+HSE Dublin and North East,61,1.5021
+HSE Dublin and South East,61,-1.0726
+HSE Mid West,61,4.9014
+HSE South West,61,-2.5027
+HSE West and North West,61,-0.482
+HSE Dublin and Midlands,62,2.4896
+HSE Dublin and North East,62,-0.2873
+HSE Dublin and South East,62,-6.5177
+HSE Mid West,62,6.8062
+HSE South West,62,-3.9079
+HSE West and North West,62,2.4846
+HSE Dublin and Midlands,63,0.8505
+HSE Dublin and North East,63,-5.333
+HSE Dublin and South East,63,-1.1502
+HSE Mid West,63,3.9388
+HSE South West,63,-0.6994
+HSE West and North West,63,2.9452
+HSE Dublin and Midlands,64,-3.0263
+HSE Dublin and North East,64,-2.1107
+HSE Dublin and South East,64,-3.7642
+HSE Mid West,64,5.8652
+HSE South West,64,0.724
+HSE West and North West,64,2.1286
+HSE Dublin and Midlands,65,-0.9087
+HSE Dublin and North East,65,-3.4895
+HSE Dublin and South East,65,-1.8862
+HSE Mid West,65,8.7159
+HSE South West,65,1.0912
+HSE West and North West,65,-3.3875
+HSE Dublin and Midlands,66,-2.0061
+HSE Dublin and North East,66,-1.3537
+HSE Dublin and South East,66,0.164
+HSE Mid West,66,8.0934
+HSE South West,66,-5.2514
+HSE West and North West,66,1.5067
+HSE Dublin and Midlands,67,-1.8135
+HSE Dublin and North East,67,0.6203
+HSE Dublin and South East,67,0.9224
+HSE Mid West,67,7.9243
+HSE South West,67,0.3486
+HSE West and North West,67,0.1487
+HSE Dublin and Midlands,68,2.8089
+HSE Dublin and North East,68,0.4481
+HSE Dublin and South East,68,-5.6479
+HSE Mid West,68,5.1558
+HSE South West,68,-3.2564
+HSE West and North West,68,6.2496
+HSE Dublin and Midlands,69,0.6108
+HSE Dublin and North East,69,-5.3236
+HSE Dublin and South East,69,-0.2119
+HSE Mid West,69,4.3583
+HSE South West,69,-1.3148
+HSE West and North West,69,4.57
+HSE Dublin and Midlands,70,-4.4173
+HSE Dublin and North East,70,-3.0253
+HSE Dublin and South East,70,-3.0659
+HSE Mid West,70,7.4039
+HSE South West,70,0.3111
+HSE West and North West,70,1.8058
+HSE Dublin and Midlands,71,-2.9133
+HSE Dublin and North East,71,-4.3054
+HSE Dublin and South East,71,-2.1049
+HSE Mid West,71,6.0547
+HSE South West,71,2.2382
+HSE West and North West,71,-3.3008
+HSE Dublin and Midlands,72,-4.2485
+HSE Dublin and North East,72,-1.6387
+HSE Dublin and South East,72,-0.0233
+HSE Mid West,72,5.0044
+HSE South West,72,-6.0293
+HSE West and North West,72,2.4996
+HSE Dublin and Midlands,73,-1.4224
+HSE Dublin and North East,73,1.2053
+HSE Dublin and South East,73,-0.9472
+HSE Mid West,73,6.6747
+HSE South West,73,-1.9177
+HSE West and North West,73,0.4706
+HSE Dublin and Midlands,74,1.4473
+HSE Dublin and North East,74,0.8919
+HSE Dublin and South East,74,-7.4156
+HSE Mid West,74,7.6634
+HSE South West,74,-2.8419
+HSE West and North West,74,0.9384
+HSE Dublin and Midlands,75,0.8809
+HSE Dublin and North East,75,-7.002
+HSE Dublin and South East,75,-3.0321
+HSE Mid West,75,5.0867
+HSE South West,75,-0.5633
+HSE West and North West,75,3.045
+HSE Dublin and Midlands,76,-3.5241
+HSE Dublin and North East,76,-2.9854
+HSE Dublin and South East,76,-3.2408
+HSE Mid West,76,4.2984
+HSE South West,76,1.8795
+HSE West and North West,76,2.558
+HSE Dublin and Midlands,77,-1.734
+HSE Dublin and North East,77,-4.42
+HSE Dublin and South East,77,-2.375
+HSE Mid West,77,5.2734
+HSE South West,77,1.4275
+HSE West and North West,77,1.1775
+HSE Dublin and Midlands,78,-4.6155
+HSE Dublin and North East,78,-1.3792
+HSE Dublin and South East,78,0.0146
+HSE Mid West,78,4.1198
+HSE South West,78,-5.6425
+HSE West and North West,78,3.016
+HSE Dublin and Midlands,79,-3.0369
+HSE Dublin and North East,79,1.2969
+HSE Dublin and South East,79,-0.3477
+HSE Mid West,79,2.0318
+HSE South West,79,-1.276
+HSE West and North West,79,-1.0547
+HSE Dublin and Midlands,80,-0.2978
+HSE Dublin and North East,80,-0.243
+HSE Dublin and South East,80,-7.0847
+HSE Mid West,80,6.0163
+HSE South West,80,-3.6541
+HSE West and North West,80,2.4563
+HSE Dublin and Midlands,81,-1.637
+HSE Dublin and North East,81,-7.2114
+HSE Dublin and South East,81,-1.457
+HSE Mid West,81,5.9801
+HSE South West,81,-0.0655
+HSE West and North West,81,3.8242
+HSE Dublin and Midlands,82,-5.6029
+HSE Dublin and North East,82,-2.8024
+HSE Dublin and South East,82,-3.2575
+HSE Mid West,82,6.5126
+HSE South West,82,1.2526
+HSE West and North West,82,3.3069
+HSE Dublin and Midlands,83,-2.1192
+HSE Dublin and North East,83,-4.4502
+HSE Dublin and South East,83,-3.0806
+HSE Mid West,83,5.4589
+HSE South West,83,1.4179
+HSE West and North West,83,-2.9297
+HSE Dublin and Midlands,84,-5.2895
+HSE Dublin and North East,84,-2.3119
+HSE Dublin and South East,84,-0.958
+HSE Mid West,84,4.9245
+HSE South West,84,-7.2872
+HSE West and North West,84,2.57
+HSE Dublin and Midlands,85,-2.7404
+HSE Dublin and North East,85,-0.1996
+HSE Dublin and South East,85,-1.066
+HSE Mid West,85,3.1872
+HSE South West,85,-1.5384
+HSE West and North West,85,-1.8809
+HSE Dublin and Midlands,86,0.3748
+HSE Dublin and North East,86,-2.1538
+HSE Dublin and South East,86,-6.8584
+HSE Mid West,86,0.6897
+HSE South West,86,-4.7592
+HSE West and North West,86,2.2739
+HSE Dublin and Midlands,87,-1.0396
+HSE Dublin and North East,87,-6.9358
+HSE Dublin and South East,87,-2.0308
+HSE Mid West,87,-5.1911
+HSE South West,87,-1.6296
+HSE West and North West,87,2.9161
+HSE Dublin and Midlands,88,-5.1418
+HSE Dublin and North East,88,-2.9042
+HSE Dublin and South East,88,-2.3948
+HSE Mid West,88,0.0431
+HSE South West,88,0.4903
+HSE West and North West,88,2.2168
+HSE Dublin and Midlands,89,-3.339
+HSE Dublin and North East,89,-3.2408
+HSE Dublin and South East,89,-1.4522
+HSE Mid West,89,2.5231
+HSE South West,89,-0.3608
+HSE West and North West,89,-3.9581
+HSE Dublin and Midlands,90,-6.0367
+HSE Dublin and North East,90,-2.5841
+HSE Dublin and South East,90,0.9043
+HSE Mid West,90,2.7204
+HSE South West,90,-3.9957
+HSE West and North West,90,1.6386
+HSE Dublin and Midlands,91,-1.2091
+HSE Dublin and North East,91,-0.1293
+HSE Dublin and South East,91,0.4801
+HSE Mid West,91,0.13
+HSE South West,91,0.8228
+HSE West and North West,91,-0.6185
+HSE Dublin and Midlands,92,1.0555
+HSE Dublin and North East,92,-0.1721
+HSE Dublin and South East,92,-6.5644
+HSE Mid West,92,3.049
+HSE South West,92,-2.3431
+HSE West and North West,92,4.2051
+HSE Dublin and Midlands,93,1.5562
+HSE Dublin and North East,93,-5.9143
+HSE Dublin and South East,93,-1.2115
+HSE Mid West,93,3.8019
+HSE South West,93,1.7249
+HSE West and North West,93,5.0072
+HSE Dublin and Midlands,94,-4.0633
+HSE Dublin and North East,94,-3.3635
+HSE Dublin and South East,94,-2.5638
+HSE Mid West,94,5.481
+HSE South West,94,1.728
+HSE West and North West,94,3.4944
+HSE Dublin and Midlands,95,-2.0564
+HSE Dublin and North East,95,-3.0748
+HSE Dublin and South East,95,-1.047
+HSE Mid West,95,5.8272
+HSE South West,95,0.4771
+HSE West and North West,95,-3.1701
+HSE Dublin and Midlands,96,-5.163
+HSE Dublin and North East,96,-2.4362
+HSE Dublin and South East,96,0.1086
+HSE Mid West,96,3.3975
+HSE South West,96,-5.3826
+HSE West and North West,96,0.6929
+HSE Dublin and Midlands,97,-1.8504
+HSE Dublin and North East,97,0.3668
+HSE Dublin and South East,97,-0.9518
+HSE Mid West,97,1.9507
+HSE South West,97,0.031
+HSE West and North West,97,-2.0583
+HSE Dublin and Midlands,98,1.7383
+HSE Dublin and North East,98,0.0586
+HSE Dublin and South East,98,-6.3301
+HSE Mid West,98,6.3338
+HSE South West,98,-1.5266
+HSE West and North West,98,3.8972
+HSE Dublin and Midlands,99,0.7327
+HSE Dublin and North East,99,-6.7075
+HSE Dublin and South East,99,-1.0779
+HSE Mid West,99,3.2107
+HSE South West,99,-0.1023
+HSE West and North West,99,4.5974
+HSE Dublin and Midlands,100,-4.1207
+HSE Dublin and North East,100,-2.0414
+HSE Dublin and South East,100,-2.4149
+HSE Mid West,100,6.4726
+HSE South West,100,1.8644
+HSE West and North West,100,2.96
+HSE Dublin and Midlands,101,-0.9155
+HSE Dublin and North East,101,-2.1135
+HSE Dublin and South East,101,-0.3782
+HSE Mid West,101,6.0488
+HSE South West,101,2.7025
+HSE West and North West,101,-2.1371
+HSE Dublin and Midlands,102,-3.6469
+HSE Dublin and North East,102,-1.2555
+HSE Dublin and South East,102,2.0228
+HSE Mid West,102,7.2162
+HSE South West,102,-2.7957
+HSE West and North West,102,1.9575
+HSE Dublin and Midlands,103,-0.3101
+HSE Dublin and North East,103,1.0097
+HSE Dublin and South East,103,0.293
+HSE Mid West,103,1.1174
+HSE South West,103,-0.4853
+HSE West and North West,103,-2.0147
+HSE Dublin and Midlands,104,2.7105
+HSE Dublin and North East,104,-0.2443
+HSE Dublin and South East,104,-6.5431
+HSE Mid West,104,5.8288
+HSE South West,104,-0.0998
+HSE West and North West,104,2.7935
+HSE Dublin and Midlands,105,-2.184
+HSE Dublin and North East,105,-7.2144
+HSE Dublin and South East,105,-3.8707
+HSE Mid West,105,-1.6777
+HSE South West,105,-1.9836
+HSE West and North West,105,0.6077
+HSE Dublin and Midlands,106,-4.3991
+HSE Dublin and North East,106,-3.4281
+HSE Dublin and South East,106,-3.1653
+HSE Mid West,106,6.8055
+HSE South West,106,2.8146
+HSE West and North West,106,3.7787
+HSE Dublin and Midlands,107,-0.2121
+HSE Dublin and North East,107,-2.8414
+HSE Dublin and South East,107,-1.2721
+HSE Mid West,107,8.7136
+HSE South West,107,5.3779
+HSE West and North West,107,-0.4531
+HSE Dublin and Midlands,108,-3.0718
+HSE Dublin and North East,108,-1.0762
+HSE Dublin and South East,108,1.0872
+HSE Mid West,108,7.6704
+HSE South West,108,-2.0658
+HSE West and North West,108,4.631
+HSE Dublin and Midlands,109,-1.5568
+HSE Dublin and North East,109,1.1601
+HSE Dublin and South East,109,1.9072
+HSE Mid West,109,-0.2579
+HSE South West,109,1.9293
+HSE West and North West,109,1.6529
+HSE Dublin and Midlands,110,2.5301
+HSE Dublin and North East,110,0.9786
+HSE Dublin and South East,110,-4.7196
+HSE Mid West,110,4.4022
+HSE South West,110,0.2434
+HSE West and North West,110,7.2813
+HSE Dublin and Midlands,111,0.0331
+HSE Dublin and North East,111,-4.2612
+HSE Dublin and South East,111,-0.6682
+HSE Mid West,111,2.7091
+HSE South West,111,1.829
+HSE West and North West,111,7.6814
+HSE Dublin and Midlands,112,-4.0681
+HSE Dublin and North East,112,-1.0604
+HSE Dublin and South East,112,-5.2799
+HSE Mid West,112,4.3999
+HSE South West,112,1.472
+HSE West and North West,112,4.5294
+HSE Dublin and Midlands,113,-0.7473
+HSE Dublin and North East,113,-1.9242
+HSE Dublin and South East,113,-0.8365
+HSE Mid West,113,7.8312
+HSE South West,113,2.4905
+HSE West and North West,113,-1.2757
+HSE Dublin and Midlands,114,-2.4899
+HSE Dublin and North East,114,-2.1141
+HSE Dublin and South East,114,0.0322
+HSE Mid West,114,6.6183
+HSE South West,114,-3.3377
+HSE West and North West,114,4.1229
+HSE Dublin and Midlands,115,-2.0948
+HSE Dublin and North East,115,-0.7925
+HSE Dublin and South East,115,-0.2803
+HSE Mid West,115,0.5189
+HSE South West,115,-0.6162
+HSE West and North West,115,1.8242
+HSE Dublin and Midlands,116,0.7722
+HSE Dublin and North East,116,-1.4761
+HSE Dublin and South East,116,-7.0663
+HSE Mid West,116,3.7261
+HSE South West,116,-3.3975
+HSE West and North West,116,3.3572
+HSE Dublin and Midlands,117,-1.6368
+HSE Dublin and North East,117,-6.7907
+HSE Dublin and South East,117,-1.5557
+HSE Mid West,117,0.1939
+HSE South West,117,0.2081
+HSE West and North West,117,1.6153
+HSE Dublin and Midlands,118,-5.4555
+HSE Dublin and North East,118,-2.6065
+HSE Dublin and South East,118,-4.8301
+HSE Mid West,118,5.8892
+HSE South West,118,3.0586
+HSE West and North West,118,3.3132
+HSE Dublin and Midlands,119,-2.6774
+HSE Dublin and North East,119,-2.7398
+HSE Dublin and South East,119,-1.9774
+HSE Mid West,119,5.0682
+HSE South West,119,2.0844
+HSE West and North West,119,-4.6727
+HSE Dublin and Midlands,120,-4.6054
+HSE Dublin and North East,120,-3.8634
+HSE Dublin and South East,120,-0.865
+HSE Mid West,120,4.1886
+HSE South West,120,-5.683
+HSE West and North West,120,-0.1435
+HSE Dublin and Midlands,121,-2.1234
+HSE Dublin and North East,121,-0.5029
+HSE Dublin and South East,121,-1.3649
+HSE Mid West,121,0.8313
+HSE South West,121,-0.63
+HSE West and North West,121,-0.8002
+HSE Dublin and Midlands,122,1.5309
+HSE Dublin and North East,122,-1.9957
+HSE Dublin and South East,122,-7.657
+HSE Mid West,122,5.9129
+HSE South West,122,-2.5079
+HSE West and North West,122,2.5883
+HSE Dublin and Midlands,123,-1.2549
+HSE Dublin and North East,123,-5.8189
+HSE Dublin and South East,123,-2.0075
+HSE Mid West,123,2.6172
+HSE South West,123,-1.88
+HSE West and North West,123,2.6059
+HSE Dublin and Midlands,124,-5.5328
+HSE Dublin and North East,124,-4.4652
+HSE Dublin and South East,124,-2.8293
+HSE Mid West,124,5.0595
+HSE South West,124,0.4555
+HSE West and North West,124,2.447
+HSE Dublin and Midlands,125,-2.6855
+HSE Dublin and North East,125,-4.9545
+HSE Dublin and South East,125,-1.7746
+HSE Mid West,125,6.6914
+HSE South West,125,0.3665
+HSE West and North West,125,-0.9262
+HSE Dublin and Midlands,126,-4.8937
+HSE Dublin and North East,126,-4.3091
+HSE Dublin and South East,126,0.364
+HSE Mid West,126,5.7525
+HSE South West,126,-6.5304
+HSE West and North West,126,-0.3966
+HSE Dublin and Midlands,127,-1.5942
+HSE Dublin and North East,127,-1.1128
+HSE Dublin and South East,127,-0.5731
+HSE Mid West,127,1.5049
+HSE South West,127,-1.2763
+HSE West and North West,127,-0.8289
+HSE Dublin and Midlands,128,-0.3971
+HSE Dublin and North East,128,-1.8772
+HSE Dublin and South East,128,-5.9065
+HSE Mid West,128,4.5922
+HSE South West,128,-3.2557
+HSE West and North West,128,3.6256
+HSE Dublin and Midlands,129,-0.4014
+HSE Dublin and North East,129,-6.2478
+HSE Dublin and South East,129,-3.0083
+HSE Mid West,129,3.1247
+HSE South West,129,-2.1225
+HSE West and North West,129,4.657
+HSE Dublin and Midlands,130,-4.1099
+HSE Dublin and North East,130,-4.0628
+HSE Dublin and South East,130,-2.9696
+HSE Mid West,130,3.1946
+HSE South West,130,0.9936
+HSE West and North West,130,2.7836
+HSE Dublin and Midlands,131,-2.4484
+HSE Dublin and North East,131,-5.2443
+HSE Dublin and South East,131,-1.4006
+HSE Mid West,131,6.855
+HSE South West,131,1.2885
+HSE West and North West,131,0.8188
+HSE Dublin and Midlands,132,-4.5832
+HSE Dublin and North East,132,-3.7693
+HSE Dublin and South East,132,-0.5019
+HSE Mid West,132,6.2581
+HSE South West,132,-6.3251
+HSE West and North West,132,0.216
+HSE Dublin and Midlands,133,-2.4756
+HSE Dublin and North East,133,-1.5416
+HSE Dublin and South East,133,-0.3688
+HSE Mid West,133,-1.8623
+HSE South West,133,0.2793
+HSE West and North West,133,-0.6787
+HSE Dublin and Midlands,134,-0.3374
+HSE Dublin and North East,134,-2.2047
+HSE Dublin and South East,134,-5.5337
+HSE Mid West,134,4.0807
+HSE South West,134,-3.3536
+HSE West and North West,134,4.5428
+HSE Dublin and Midlands,135,-1.1635
+HSE Dublin and North East,135,-7.2464
+HSE Dublin and South East,135,-0.6652
+HSE Mid West,135,3.3609
+HSE South West,135,0.3484
+HSE West and North West,135,5.3134
+HSE Dublin and Midlands,136,-6.6995
+HSE Dublin and North East,136,-4.9388
+HSE Dublin and South East,136,-3.7624
+HSE Mid West,136,5.77
+HSE South West,136,1.6688
+HSE West and North West,136,3.8419
+HSE Dublin and Midlands,137,-2.7317
+HSE Dublin and North East,137,-5.6002
+HSE Dublin and South East,137,-2.0683
+HSE Mid West,137,3.7561
+HSE South West,137,0.2935
+HSE West and North West,137,1.0046
+HSE Dublin and Midlands,138,-4.2799
+HSE Dublin and North East,138,-2.6642
+HSE Dublin and South East,138,-0.153
+HSE Mid West,138,2.0979
+HSE South West,138,-5.5674
+HSE West and North West,138,3.1856
+HSE Dublin and Midlands,139,-2.4678
+HSE Dublin and North East,139,-1.0526
+HSE Dublin and South East,139,0.6494
+HSE Mid West,139,-0.3923
+HSE South West,139,0.0267
+HSE West and North West,139,2.443
+HSE Dublin and Midlands,140,0.928
+HSE Dublin and North East,140,-1.9398
+HSE Dublin and South East,140,-7.2488
+HSE Mid West,140,4.2596
+HSE South West,140,-1.6226
+HSE West and North West,140,5.0226
+HSE Dublin and Midlands,141,0.4685
+HSE Dublin and North East,141,-6.8848
+HSE Dublin and South East,141,-0.5386
+HSE Mid West,141,3.0112
+HSE South West,141,1.7986
+HSE West and North West,141,5.1689
+HSE Dublin and Midlands,142,-6.2518
+HSE Dublin and North East,142,-3.3999
+HSE Dublin and South East,142,-3.1833
+HSE Mid West,142,3.9953
+HSE South West,142,1.7617
+HSE West and North West,142,5.5482
+HSE Dublin and Midlands,143,-1.5569
+HSE Dublin and North East,143,-3.73
+HSE Dublin and South East,143,-0.0469
+HSE Mid West,143,6.187
+HSE South West,143,1.007
+HSE West and North West,143,1.8166
+HSE Dublin and Midlands,144,-4.2313
+HSE Dublin and North East,144,-2.5759
+HSE Dublin and South East,144,-0.3226
+HSE Mid West,144,6.2104
+HSE South West,144,-4.3154
+HSE West and North West,144,-0.9957
+HSE Dublin and Midlands,145,-0.8248
+HSE Dublin and North East,145,-0.2828
+HSE Dublin and South East,145,-0.0785
+HSE Mid West,145,1.7766
+HSE South West,145,1.5258
+HSE West and North West,145,-0.0267
+HSE Dublin and Midlands,146,1.6005
+HSE Dublin and North East,146,-2.3212
+HSE Dublin and South East,146,-7.1262
+HSE Mid West,146,3.0631
+HSE South West,146,-0.5237
+HSE West and North West,146,3.6089
+HSE Dublin and Midlands,147,-0.4412
+HSE Dublin and North East,147,-6.7931
+HSE Dublin and South East,147,-0.978
+HSE Mid West,147,-1.9431
+HSE South West,147,2.6727
+HSE West and North West,147,2.3931
+HSE Dublin and Midlands,148,-6.4451
+HSE Dublin and North East,148,-4.5256
+HSE Dublin and South East,148,-1.6945
+HSE Mid West,148,-0.0993
+HSE South West,148,3.0937
+HSE West and North West,148,1.3924
+HSE Dublin and Midlands,149,-0.5233
+HSE Dublin and North East,149,-4.124
+HSE Dublin and South East,149,-1.366
+HSE Mid West,149,1.1069
+HSE South West,149,3.0705
+HSE West and North West,149,-0.6212
+HSE Dublin and Midlands,150,-3.7996
+HSE Dublin and North East,150,-3.8709
+HSE Dublin and South East,150,2.5768
+HSE Mid West,150,0.9506
+HSE South West,150,-2.8484
+HSE West and North West,150,0.6463
+HSE Dublin and Midlands,151,-1.1269
+HSE Dublin and North East,151,-1.1533
+HSE Dublin and South East,151,1.8009
+HSE Mid West,151,-4.9925
+HSE South West,151,0.0236
+HSE West and North West,151,-0.7932

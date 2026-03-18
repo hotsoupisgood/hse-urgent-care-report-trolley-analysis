@@ -1,0 +1,16 @@
+Region1,Region2,MeanDiff,0.17%,99.83%,Sig
+HSE Dublin and Midlands,HSE Dublin and North East,-0.603,-2.1396,0.9752,No
+HSE Dublin and Midlands,HSE Dublin and South East,-0.7359,-2.7908,1.2349,No
+HSE Dublin and Midlands,HSE Mid West,0.5627,-4.8297,2.7254,No
+HSE Dublin and Midlands,HSE South West,-0.7485,-3.3212,1.4766,No
+HSE Dublin and Midlands,HSE West and North West,-0.0884,-4.7877,2.6155,No
+HSE Dublin and North East,HSE Dublin and South East,-0.1329,-2.1282,1.7419,No
+HSE Dublin and North East,HSE Mid West,1.1657,-4.2116,3.2053,No
+HSE Dublin and North East,HSE South West,-0.1455,-2.6563,2.0269,No
+HSE Dublin and North East,HSE West and North West,0.5146,-4.1399,3.1091,No
+HSE Dublin and South East,HSE Mid West,1.2986,-4.2693,3.8725,No
+HSE Dublin and South East,HSE South West,-0.0125,-2.6706,2.5168,No
+HSE Dublin and South East,HSE West and North West,0.6476,-4.2056,3.6189,No
+HSE Mid West,HSE South West,-1.3112,-4.2888,4.4453,No
+HSE Mid West,HSE West and North West,-0.6511,-6.022,5.9444,No
+HSE South West,HSE West and North West,0.6601,-4.3272,4.0357,No

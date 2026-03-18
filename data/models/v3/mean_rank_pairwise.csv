@@ -1,0 +1,16 @@
+,Average,Interval,Overlap
+0,HSE Dublin and Midlands,HSE Dublin and North East,False
+1,HSE Dublin and Midlands,HSE Dublin and South East,False
+2,HSE Dublin and Midlands,HSE Mid West,False
+3,HSE Dublin and Midlands,HSE South West,True
+4,HSE Dublin and Midlands,HSE West and North West,False
+5,HSE Dublin and North East,HSE Dublin and South East,False
+6,HSE Dublin and North East,HSE Mid West,False
+7,HSE Dublin and North East,HSE South West,False
+8,HSE Dublin and North East,HSE West and North West,False
+9,HSE Dublin and South East,HSE Mid West,False
+10,HSE Dublin and South East,HSE South West,False
+11,HSE Dublin and South East,HSE West and North West,False
+12,HSE Mid West,HSE South West,False
+13,HSE Mid West,HSE West and North West,False
+14,HSE South West,HSE West and North West,False

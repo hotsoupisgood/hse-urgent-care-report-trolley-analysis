@@ -1,3 +1,29 @@
+# Python
 venv/
-data/.DS_Store
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# R session files
+.RData
+.RDataTmp
+.Rhistory
+
+# IDE
+.vscode/
+.idea/
+
+# Environment / secrets
+.env
+.env.*
+*.secret
+
+# macOS
+.DS_Store
+
+# Claude
+.claude/
+CLAUDE.md
+
+# Project-specific
 ~$Poster_Presentation.pptx

@@ -1,0 +1,156 @@
+---
+output: 
+  bookdown::pdf_document2:
+    toc: no
+    number_sections: true
+bibliography: sample.bib
+---
+
+\begin{titlepage}
+\begin{center}
+	\includegraphics[width=7cm]{./logo.jpg}    
+\vspace{0.5in}
+
+	\LARGE{Final Year Project}      
+
+	\Huge{Title}    
+	
+	\Large{Author: Student Name and ID}    
+	
+	\Large{Supervisor: Dr. Emma Holian}    
+	
+	\Large{April 2020}     
+	
+\end{center}
+\end{titlepage}
+
+\clearpage
+\newpage
+
+\underline{Declaration}
+
+I herby certify that this material, which I now submit for assessment on the programme of study leading to the award of (degree or higher diploma or masters) is entirely my own work and had not been taken from the work of others save and to the extent that such work has been cited and acknowledged with the text of my work.      
+
+ID: 
+
+Date:
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction \label{chap:intro}
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+## Example Bibliography {#sect:bib}
+
+1. Adapt the provided example bibliography document (sample.bib). You can open and edit the .bib file in Rstudio. Add any citations to this .bib file. Don't forget to save any changes and make sure it is saved in the same folder as your .Rmd document.  
+
+2. Notice in the YAML above in the .Rmd file that there is the addition of:       bibliography: sample.bib     
+This tells the .Rmd file where to look for your citations.
+
+3. To reference a citation type @ followed by the reference name.
+
+Here are some examples of citation styles:
+
+@jrnl:jones
+
+If you want to refer to a chapter/section @jrnl:jones, chap. 9
+
+If you want to refer to pages @book:davisonhinkley, pp. 20-25
+
+Example of proceedings @proc:leadbetter
+
+Example of a collection @coll:thomsonchave
+
+Example of a PhD thesis @thesis:cjs
+
+Example of a miscellaneous type of document @leaf:wylfa
+
+Example of a technical report @rep:coolleak2
+
+Example of a manual @rep:Pmanual
+
+Example of being careful with capitalised letters in title @rep:coolleak2
+
+Example of using special characters @jrnl:besag and @jrnl:jfunc2
+
+
+4. This will automatically add citations to the end of your document for anything you reference.
+
+You can also add references when not cited (not a good idea, but can be done)
+
+---
+nocite: |
+  @R:base
+...
+
+5. If you want move the references to earlier in the document, for example before the appendix, you can enforce the position using the code in the References section below.
+
+\newpage
+
+## Equations, Section, Tables, Figures and Referencing
+
+Equations can be inline $K^3_1=\frac{\displaystyle t_{max}-t_1}{\displaystyle t_{ins}-t_1}$ or on seperate line:
+$$  K^3_1=\frac{t_{max}-t_1}{t_{ins}-t_1}.$$
+Notice that equations form part of the sentence, to must be punctuated.
+
+Equations should only be numbered if you need to explicitly refer to them in the text:
+\begin{equation}
+  K_2=\frac{t-t_1}{t_{ins}-t_1}.  \label{eqn:example}
+\end{equation}
+If numbered then they can be referred to, e.g. see equation (\ref{eqn:example}). Keep equation numbering to a minimum.
+
+You can refer to sections using Chapter \ref{chap:intro} and Section \ref{sect:bib}.
+
+Never just report text output from \texttt{R}, make the effort to tabulate results. Here is an example using \texttt{kable} with a caption included. You can refer to Table \ref{tab:lifecycle} in the text.
+
+
+```{r lifecycle, echo = FALSE}
+knitr::kable(head(LifeCycleSavings),
+             caption = "The first 6 rows of the dataset")
+```
+
+\newpage
+
+Figures should also be provided with a caption.
+
+```{r plot-lifecycle, echo = FALSE, fig.cap = "Lifecycle data plot. Include more details here!", message = FALSE}
+library(ggplot2)
+library(GGally)
+
+ggpairs(LifeCycleSavings)
+```
+
+
+You can also include figures from other sources, with a caption included. Figure \ref{fig:plot-logo} can also be referenced in the text.
+
+```{r plot-logo, echo = FALSE, fig.align = 'center', out.width = "50%", fig.cap = "NUIG logo."}
+knitr::include_graphics("./logo.jpg") 
+```
+
+
+
+# Conclusions
+
+In this research...
+
+\newpage
+
+# References
+
+
+<div id="refs"></div>
+
+\newpage
+
+# Appendix
+
+something to add as Appendix ...

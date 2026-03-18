@@ -1,0 +1,181 @@
+---
+output:
+  bookdown::pdf_document2:
+    toc: no
+    number_sections: true
+bibliography: thesis.bib
+---
+
+\begin{titlepage}
+\begin{center}
+	\includegraphics[width=7cm]{./logo.jpg}
+\vspace{0.5in}
+
+	\LARGE{MSc Thesis for Health Data Science}
+
+	\Huge{A Bayesian Time-Series Framework for Comparing Hospital Pressure Across Irish HSE Health Regions}
+
+	\Large{Evan Bergin, Lucas Henry}
+
+	\Large{Supervisor: Dr. Carl Scarrott}
+
+	\Large{XXXX 2026}
+
+\end{center}
+\end{titlepage}
+
+\clearpage
+\newpage
+
+\underline{Declaration}
+
+We hereby certify that this material, which we now submit for assessment on the programme of study leading to the award of Master of Science is entirely our own work and had not been taken from the work of others or Artificial Intelligence, save and to the extent that such work has been cited and acknowledged within the text of our work.
+
+ID: 25252089
+
+Date:
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction \label{chap:intro}
+
+Hospital overcrowding has become a persistent challenge for healthcare systems worldwide. When hospitals operate close to or beyond their intended capacity, delays in treatment, increased waiting times, and strain on healthcare staff can occur. Numerous studies have shown that overcrowding in emergency departments is associated with reduced quality of care, longer patient waiting times, and increased pressure on healthcare resources [@Asplin2003; @Morley2018].
+
+In Ireland, hospital congestion is commonly monitored using the number of patients recorded on hospital trolleys. These patients have been admitted through emergency departments but remain without an available inpatient bed, often receiving care in temporary spaces such as corridors or emergency wards. As a result, trolley counts are widely used as a daily indicator of hospital system pressure and are frequently referenced in public reporting and policy discussions concerning hospital capacity and healthcare performance [@HSE2026].
+
+The Health Service Executive (HSE) publishes daily trolley counts across hospitals nationwide. These data provide an important source of information on hospital activity and congestion within the Irish healthcare system. Despite their widespread use, trolley counts are typically presented as simple daily totals. While these counts provide a useful snapshot of hospital pressure at a given moment, they provide limited insight into the underlying dynamics of hospital demand. Raw counts do not account for temporal patterns such as weekly admission cycles or seasonal fluctuations in illness, nor do they quantify uncertainty or allow systematic comparisons between different healthcare regions.
+
+Hospital demand is influenced by multiple factors including population demographics, seasonal illness patterns, healthcare infrastructure, and patterns of emergency department admissions. These factors generate complex temporal dynamics in hospital congestion that cannot be fully understood through descriptive statistics alone. Time-series modelling provides a useful framework for analysing such data, as it allows researchers to examine how system pressure evolves over time while accounting for temporal dependence and recurring seasonal patterns [@Shumway2017].
+
+In addition to temporal modelling, statistical approaches that incorporate uncertainty are particularly valuable when analysing healthcare data. Bayesian statistical methods provide a natural framework for this purpose. Rather than producing single point estimates for model parameters, Bayesian models treat parameters as probability distributions and update these distributions using observed data. This allows uncertainty in both the observed data and the model parameters to be explicitly incorporated into the analysis, producing probabilistic estimates that are often more informative than traditional deterministic approaches [@Gelman2013].
+
+This project develops a Bayesian time-series modelling framework for analysing hospital trolley counts across Irish HSE health regions. The approach treats trolley counts as a stochastic process with temporal dependence and seasonal structure. By modelling these dynamics within a Bayesian framework, the analysis allows uncertainty in both observed trolley counts and model parameters to propagate through to estimates of hospital pressure across regions.
+
+To facilitate meaningful comparisons between regions with different population sizes, trolley counts are standardised by regional population and expressed as rates per 10,000 residents. This population scaling allows the analysis to focus on relative hospital pressure rather than absolute patient numbers, making comparisons across healthcare regions more interpretable.
+
+The primary objective of this research is to develop a statistical framework capable of comparing hospital pressure across Irish HSE regions in a rigorous and probabilistic manner. Specifically, the study aims to explore temporal patterns in trolley data, estimate baseline levels of hospital pressure across regions, and quantify the persistence of congestion within the hospital system over time. By modelling trolley data within a Bayesian time-series framework, this research aims to provide a more robust analytical approach for understanding hospital overcrowding in Ireland.
+
+Understanding regional differences in hospital congestion has important implications for healthcare policy and resource allocation. Statistical models capable of identifying persistent or extreme pressure within hospital catchment areas may support more informed decision making regarding hospital capacity planning and healthcare system management.
+
+\newpage
+
+# Data \label{chap:data}
+
+## Data Collection \label{sect:data-collection}
+
+The data used in this study consist of publicly available hospital trolley counts published by the Health Service Executive (HSE). These data record the number of patients who have been admitted to hospital but remain without an available inpatient bed and are therefore accommodated on trolleys within emergency departments or other temporary locations.
+
+Daily trolley count data were collected for hospitals across Ireland over a three-year period using automated web scraping techniques. The dataset provides daily observations for individual hospitals, which were subsequently aggregated into the seven HSE health regions. Aggregating the data at the regional level allows comparisons of hospital pressure across broader healthcare catchment areas rather than individual hospitals.
+
+To reduce high frequency noise and highlight long term temporal patterns, daily trolley counts were initially aggregated to weekly totals. Weekly aggregation also reduces the influence of strong daily effects that commonly appear in healthcare activity data.
+
+## Data Processing \label{sect:data-processing}
+
+[Placeholder — standardisation by regional population, scaling to rate per 10,000.]
+
+\newpage
+
+# Methods \label{chap:methods}
+
+[Placeholder]
+
+## Likelihood \label{sect:likelihood}
+
+[Placeholder. Three Bayesian models with an annual cycle mean and AR(1) errors. Let $y_{i,t}$ be the scaled trolley count for region $i$ at week $t$.]
+
+$$y_{i,1} \sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1})$$
+
+$$y_{i,t} \sim \mathcal{N}(\mu_{i,t} + \phi(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}), \quad t = 2, \ldots, T$$
+
+## Model 1 \label{sect:m1}
+
+[Placeholder]
+
+\begin{equation}
+  \mu_{i,t} = \alpha_i
+            + \beta_i  \cos(2\pi t / 52)
+            + \gamma_i \sin(2\pi t / 52)
+  \label{eqn:m1}
+\end{equation}
+
+Priors:
+
+$$\alpha_i,\ \beta_i,\ \gamma_i \sim \mathcal{N}(0,\ 0.001), \qquad \tau_i \sim \text{Gamma}(0.001,\ 0.001), \qquad \phi \sim \text{Uniform}(-1,\ 1)$$
+
+## Model 2 \label{sect:m2}
+
+[Placeholder]
+
+\begin{align}
+  \mu_{i,t} &= \alpha_i
+               + \beta_i  \cos(2\pi t / 52)
+               + \gamma_i \sin(2\pi t / 52) \nonumber \\
+            &\quad + \delta_\text{pre}  \cdot 1(t \bmod 52 = 0)
+               +    \delta_\text{mid}  \cdot 1(t \bmod 52 = 1)
+               +    \delta_\text{post} \cdot 1(t \bmod 52 = 2) \nonumber \\
+            &\quad + \sigma_\text{pre}  \cdot 1(t = 86) \cdot \text{mw}[i]
+               +    \sigma_\text{mid}  \cdot 1(t = 87) \cdot \text{mw}[i]
+               +    \sigma_\text{post} \cdot 1(t = 88) \cdot \text{mw}[i]
+  \label{eqn:m2}
+\end{align}
+
+Priors (additional to Model 1):
+
+$$\delta_\text{pre},\ \delta_\text{mid},\ \delta_\text{post},\ \sigma_\text{pre},\ \sigma_\text{mid},\ \sigma_\text{post} \sim \mathcal{N}(0,\ 0.001)$$
+
+## Model 3 \label{sect:m3}
+
+[Placeholder]
+
+\begin{align}
+  \mu_{i,t} &= \alpha_i
+               + \beta_i  \cos(2\pi t / 52)
+               + \gamma_i \sin(2\pi t / 52) \nonumber \\
+            &\quad + \delta_{\text{pre},i}  \cdot 1(t \bmod 52 = 0)
+               +    \delta_{\text{mid},i}  \cdot 1(t \bmod 52 = 1)
+               +    \delta_{\text{post},i} \cdot 1(t \bmod 52 = 2) \nonumber \\
+            &\quad + \sigma_\text{pre}  \cdot 1(t = 86) \cdot \text{mw}[i]
+               +    \sigma_\text{mid}  \cdot 1(t = 87) \cdot \text{mw}[i]
+               +    \sigma_\text{post} \cdot 1(t = 88) \cdot \text{mw}[i]
+  \label{eqn:m3}
+\end{align}
+
+Priors (additional to Model 1):
+
+$$\delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i},\ \sigma_\text{pre},\ \sigma_\text{mid},\ \sigma_\text{post} \sim \mathcal{N}(0,\ 0.001)$$
+
+## Ranking \label{sect:ranking}
+
+A Bayesian approach to ranking uses the full posterior distribution of each region's baseline parameter $\alpha_i$ to compare regions probabilistically, naturally propagating estimation uncertainty into any ranking statement. @MacDermott2025 demonstrate this methodology in the context of Olympic medal tables, showing that posterior-based rankings are more robust to sample size and variance differences than naive point-estimate orderings.
+
+\newpage
+
+# Results \label{chap:results}
+
+[Placeholder — present DIC comparison, posterior summaries for each model, fitted values plots, and regional rankings.]
+
+\newpage
+
+# Conclusions \label{chap:conclusions}
+
+In this research...
+
+\newpage
+
+# References
+
+<div id="refs"></div>
+
+\newpage
+
+# Appendix
+
+[Placeholder — full posterior trace plots, Gelman--Rubin statistics, residual diagnostics.]

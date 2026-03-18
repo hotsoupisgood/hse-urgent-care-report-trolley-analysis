@@ -1,0 +1,229 @@
+---
+title: "Model 1"
+output:
+  pdf_document: default
+---
+
+```{r}
+library('rjags')
+library(dplyr)
+library(tibble)
+library(stringr)
+library(ggplot2)
+library(tidyr)
+```
+
+```{r}
+output_folder = "../data/models/v1/"
+save_output   = TRUE
+if (save_output) dir.create(output_folder, recursive = TRUE, showWarnings = FALSE)
+```
+
+### Preprocess
+
+#### Load data
+
+Loading data in as a wide data frame
+
+With \~ rows (regions) x columns (weeks)
+
+1st column is the region names
+
+```{r}
+uecDf    = read.csv('../data/wide_weekly_scaledPer10k.csv')
+regions  = uecDf$Region # saving region names
+n.region = length(uecDf$Region) # number of regions
+uecDf    = uecDf %>% select(-Region) # remove region col
+n.weeks  = length(names(uecDf))
+head(uecDf)
+```
+
+#### Reformat Dataframe to Matrix
+
+Formatting as matrix with \~ rows (regions) x columns (weeks)
+
+```{r}
+uecMat = as.matrix(uecDf)
+```
+
+### Model 1 Specification
+
+```{r}
+model=
+"
+model{
+  # Iterate through the regions
+  for(i in 1:I){
+    #------------
+    #Likelihood
+    #------------
+    # Set first data point in region i to normal
+    y[i,1] ~ dnorm(mu[i,1], tau[i])
+    # Set second on data points to the AR1 model with a mean with a seasonal component
+    for(t in 2:T){
+      y[i,t] ~ dnorm(mu[i,t] +
+      (phi * (y[i,t-1] - mu[i,t-1])), tau[i])
+    }
+    # Assign mean to each time point
+    # Beta  ~ cosine coeffecient scaler
+    # Gamma ~ sine coeffecient scaler
+    for(t in 1:T){
+      mu[i,t] <- alpha[i] +
+                 beta[i]  * cos((2 * pi) * (t/52)) +
+                 gamma[i] * sin((2 * pi) * (t/52))
+    }
+    #Full conditional  mean used in the likelihood
+    fullmod[i,1] <- mu[i,1]
+    for(t in 2:T){
+      fullmod[i,t] <- mu[i,t] + phi * (y[i,t-1] - mu[i,t-1])
+    }
+    #Residuals
+    for(t in 1:T){
+      resid[i,t] <- y[i,t] - fullmod[i,t]
+    }
+    #------------
+    #Uninformative Priors
+    #------------
+    alpha[i] ~ dnorm(0, 0.001)
+    beta[i]  ~ dnorm(0, 0.001)
+    gamma[i] ~ dnorm(0, 0.001)
+    tau[i]   ~ dgamma(0.001, 0.001)
+  }
+  phi ~ dunif(-1, 1)
+}
+"
+# Model setup (insert vars, set chains)
+v1_jags_model = jags.model(textConnection(model),
+                      list(y  = uecMat,
+                           I  = n.region,
+                           T  = n.weeks,
+                           pi = pi), n.chains = 4)
+# Burn in
+update(v1_jags_model, n.iter = 10000)
+# Parameters to watch
+model_parameters =  c("alpha","beta","gamma","tau","phi","fullmod", "resid")
+# sample
+v1_sim=coda.samples(model=v1_jags_model,
+                     variable.names=model_parameters,
+                     n.iter=20000)
+# extract values to something useable
+jags_sum <- summary(v1_sim)
+df.stats = cbind(as.data.frame(jags_sum$statistics), as.data.frame(jags_sum$quantiles)) %>%
+  rownames_to_column(var = "index")
+```
+
+#### Save fitted values
+
+```{r}
+fullmod_rows = df.stats %>%
+  filter(grepl("fullmod", index)) %>%
+  mutate(
+    i = as.integer(str_extract(index, "(?<=\\[)\\d+")),
+    t = as.integer(str_extract(index, "\\d+(?=\\])"))
+  ) %>%
+  arrange(i, t)
+matrix_fullmod = matrix(fullmod_rows$Mean, nrow = n.region, ncol = n.weeks, byrow = TRUE)
+df_fitted = as.data.frame(t(matrix_fullmod))
+colnames(df_fitted) = regions
+df_fitted$time = seq_len(n.weeks)
+df_fitted = df_fitted %>% pivot_longer(-time, names_to = "Region", values_to = "fitted")
+if (save_output) write.csv(df_fitted, paste0(output_folder, "fitted.csv"), row.names = FALSE)
+```
+
+### Check Residuals
+
+```{r}
+# residuals = observed - fitted
+fullmod_vector = as.vector(df.stats %>% filter(grepl("fullmod", index)) %>% pull(Mean))
+matrix_fullmod = matrix(fullmod_vector, nrow = length(fullmod_vector)/n.region, ncol = n.region, byrow = T)
+matrix_resid = uecMat - t(matrix_fullmod)
+matrix_resid = t(matrix_resid)
+df_resid = as.data.frame(matrix_resid)
+colnames(df_resid) = regions
+df_resid$time = seq_len(nrow(df_resid))
+# turn it into a df
+df_resid %>%
+  pivot_longer(-time, names_to="Region", values_to="Residual") %>%
+  ggplot(aes(x=time, y=Residual, color=Region)) +
+  geom_line() +
+  labs(title="Residuals over time", x="Time", y="Residual") +
+  theme_minimal()
+# resid outlier df
+df_outliers = df_resid %>%
+  pivot_longer(-time, names_to="Region", values_to="Residual") %>%
+  filter(Residual < -3)
+df_outliers
+# acf
+pacf(matrix_resid[,1], lag.max=55, main="ACF of residuals")  # check remaining autocorrelation
+# qq
+qqnorm(matrix_resid[,1]); qqline(matrix_resid[,1])
+```
+
+#### DIC
+
+```{r}
+dic_v1 = dic.samples(v1_jags_model, n.iter = 20000)
+dic_v1
+df_dic = data.frame(
+  deviance = sum(dic_v1$deviance),
+  penalty  = sum(dic_v1$penalty),
+  DIC      = sum(dic_v1$deviance) + sum(dic_v1$penalty)
+)
+if (save_output) write.csv(df_dic, paste0(output_folder, "dic.csv"), row.names = FALSE)
+```
+
+### Check Residuals
+
+```{r}
+# residuals = observed - fitted
+resid_vector = as.vector(df.stats %>% filter(grepl("resid", index)) %>% pull(Mean))
+matrix_resid = matrix(resid_vector, nrow = length(resid_vector)/6, ncol = 6, byrow = T)
+df_resid = as.data.frame(matrix_resid)
+colnames(df_resid) = regions                                                                    
+df_resid$time = seq_len(nrow(df_resid))
+# turn it into a df 
+df_resid %>%
+  pivot_longer(-time, names_to="Region", values_to="Residual") %>%
+  ggplot(aes(x=time, y=Residual, color=Region)) +
+  geom_line() +
+  labs(title="Residuals over time", x="Time", y="Residual") +
+  theme_minimal()
+# resid outlier df 
+df_outliers = df_resid %>%
+  pivot_longer(-time, names_to="Region", values_to="Residual") %>%
+  filter(abs(Residual) > 3)
+df_outliers
+# acf
+pacf(matrix_resid[,1], lag.max=55, main="ACF of residuals")  # check remaining autocorrelation
+# qq
+qqnorm(matrix_resid[,1]); qqline(matrix_resid[,1]) # normality check
+# gelman stat check
+#gelman.diag(exp_sim, multivariate = FALSE)
+```
+
+#### Gelman Rubin Statistic
+
+```{r}
+# Refit with scalar params only for gelman diagnostic
+v1_jags_gelman = jags.model(textConnection(model),
+                      list(y  = uecMat,
+                           I  = n.region,
+                           T  = n.weeks,
+                           pi = pi), n.chains = 4)
+update(v1_jags_gelman, n.iter = 10000)
+v1_sim_gelman = coda.samples(model=v1_jags_gelman,
+                     variable.names=c("alpha","beta","gamma","tau","phi"),
+                     n.iter=20000)
+gelman_results = gelman.diag(v1_sim_gelman, multivariate = FALSE)
+gelman_results
+```
+
+#### Save raw values w/o residuals
+
+```{r}
+if (save_output) {
+  write.csv(as.matrix(v1_sim),
+            paste0(output_folder, "raw_samples.csv"),
+            row.names = FALSE)
+}
+```
