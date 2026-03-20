@@ -1,0 +1,180 @@
+---
+title: "Model V4 — Hierarchical Cost-Per-Person Baseline"
+output:
+  pdf_document: default
+---
+
+Model V4 extends V3 by placing a hierarchical prior on the region-specific intercept $\alpha_i$:
+
+$$\alpha_i \sim \mathcal{N}(\mu_\lambda \cdot c_i,\; \tau_\alpha)$$
+
+where $c_i$ is the per-person HR cost for region $i$ (known constant from
+`hr_cost_per_person.csv`), $\mu_\lambda$ is a global cost coefficient estimated from the
+data, and $\tau_\alpha$ captures residual region-level variation not explained by cost.
+
+This is identifiable (unlike placing $c_i \cdot \lambda_i$ directly in the mean alongside a
+free intercept): $\mu_\lambda$ measures the global cost–burden relationship while $\alpha_i$
+retains the flexibility to deviate from the cost-scaled expectation.
+
+```{r setup}
+library(rjags)
+library(dplyr)
+library(tibble)
+library(stringr)
+library(ggplot2)
+library(tidyr)
+
+output_folder <- "../data/models/v4b/"
+save_output   <- TRUE
+if (save_output) dir.create(output_folder, recursive = TRUE, showWarnings = FALSE)
+```
+
+### Load Data
+
+```{r load-data}
+uecDf    <- read.csv('../data/wide_weekly_scaledPer10k.csv')
+regions  <- uecDf$Region
+n.region <- length(regions)
+uecDf    <- uecDf %>% select(-Region)
+n.weeks  <- length(names(uecDf))
+uecMat   <- as.matrix(uecDf)
+```
+
+### Cost Per Person
+
+```{r cost-per-person}
+cpp_df <- read.csv('../data/hr_cost_per_person.csv')
+
+# Align to region order from uecDf
+cost_per_person <- cpp_df$CostPerPerson[match(regions, cpp_df$Region)]
+
+data.frame(Region = regions, CostPerPerson = round(cost_per_person, 4))
+```
+
+### Model V4 Specification
+Hierarchical prior (V4 key change):
+$$\alpha_i \sim \mathcal{N}(\mu_\lambda \cdot c_i,\; \tau_\alpha)$$
+
+```{r model-spec}
+model <-
+"
+model{
+  for(i in 1:I){
+    #------------
+    # Likelihood
+    #------------
+    y[i,1] ~ dnorm(mu[i,1], tau[i])
+    for(t in 2:T){
+      y[i,t] ~ dnorm(mu[i,t] + (phi * (y[i,t-1] - mu[i,t-1])), tau[i])
+    }
+
+    # Mean: alpha[i] has hierarchical prior centred on mu_lambda * c_i
+    for(t in 1:T){
+      mu[i,t] <- alpha[i] * cost_per_person[i] +
+                 beta[i]       * cos((2 * pi) * (t/52)) +
+                 gamma[i]      * sin((2 * pi) * (t/52)) +
+                 delta_pre[i]  * ny_pre[t]  +
+                 delta_mid[i]  * ny_mid[t]  +
+                 delta_post[i] * ny_post[t] +
+                 sigma_pre     * fr_pre[t]  * mw[i] +
+                 sigma_mid     * fr_mid[t]  * mw[i] +
+                 sigma_post    * fr_post[t] * mw[i]
+    }
+    # Hierarchical prior: alpha[i] shrinks toward mu_lambda * cost_per_person[i]
+    alpha[i] ~ dnorm(mu_lambda, tau_alpha)
+    beta[i]   ~ dnorm(0, 0.001)
+    gamma[i]  ~ dnorm(0, 0.001)
+    tau[i]    ~ dgamma(0.001, 0.001)
+    delta_pre[i]  ~ dnorm(0, 0.001)
+    delta_mid[i]  ~ dnorm(0, 0.001)
+    delta_post[i] ~ dnorm(0, 0.001)
+  }
+  phi        ~ dunif(-1, 1)
+  sigma_pre  ~ dnorm(0, 0.001)
+  sigma_mid  ~ dnorm(0, 0.001)
+  sigma_post ~ dnorm(0, 0.001)
+  # Hyperpriors
+  mu_lambda  ~ dnorm(0, 0.001)
+  tau_alpha  ~ dgamma(0.001, 0.001)
+}
+"
+
+# Event indicators
+week_mod <- (1:n.weeks) %% 52
+ny_pre   <- as.numeric(week_mod == 0)
+ny_mid   <- as.numeric(week_mod == 1)
+ny_post  <- as.numeric(week_mod == 2)
+fr_pre   <- as.numeric((1:n.weeks) == 86)
+fr_mid   <- as.numeric((1:n.weeks) == 87)
+fr_post  <- as.numeric((1:n.weeks) == 88)
+mw       <- as.numeric(regions == "HSE Mid West")
+```
+
+### Fit
+
+```{r fit}
+exp_jags <- jags.model(
+  textConnection(model),
+  data = list(
+    y           = uecMat,
+    I           = n.region,
+    T           = n.weeks,
+    pi          = pi,
+    cost_per_person = cost_per_person,
+    ny_pre      = ny_pre,
+    ny_mid      = ny_mid,
+    ny_post     = ny_post,
+    fr_pre      = fr_pre,
+    fr_mid      = fr_mid,
+    fr_post     = fr_post,
+    mw          = mw
+  ),
+  n.chains = 4
+)
+
+update(exp_jags, n.iter = 10000)
+
+model_parameters <- c(
+  "alpha", "beta", "gamma", "tau", "phi",
+  "delta_pre", "delta_mid", "delta_post",
+  "sigma_pre", "sigma_mid", "sigma_post",
+  "mu_lambda", "tau_alpha"
+)
+
+exp_sim <- coda.samples(
+  model          = exp_jags,
+  variable.names = model_parameters,
+  n.iter         = 20000
+)
+```
+
+### Convergence
+
+```{r convergence}
+gelman_results <- gelman.diag(exp_sim, multivariate = FALSE)
+gelman_results
+
+if (save_output) {
+  write.csv(
+    as.data.frame(gelman_results$psrf) %>% rownames_to_column("param"),
+    paste0(output_folder, "gelman.csv"),
+    row.names = FALSE
+  )
+}
+```
+
+### DIC
+
+```{r dic}
+dic_v4 <- dic.samples(exp_jags, n.iter = 20000)
+dic_v4
+
+df_dic <- data.frame(
+  deviance = sum(dic_v4$deviance),
+  penalty  = sum(dic_v4$penalty),
+  DIC      = sum(dic_v4$deviance) + sum(dic_v4$penalty)
+)
+df_dic
+
+if (save_output) write.csv(df_dic, paste0(output_folder, "dic.csv"), row.names = FALSE)
+```

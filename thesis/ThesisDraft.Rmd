@@ -154,7 +154,18 @@ $$\delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i},\ \sigm
 
 ## Ranking \label{sect:ranking}
 
-A Bayesian approach to ranking uses the full posterior distribution of each region's baseline parameter $\alpha_i$ to compare regions probabilistically, naturally propagating estimation uncertainty into any ranking statement. @MacDermott2025 demonstrate this methodology in the context of Olympic medal tables, showing that posterior-based rankings are more robust to sample size and variance differences than naive point-estimate orderings.
+A Bayesian approach to ranking uses the full posterior distribution of each region's baseline parameter $\alpha_i$.
+Put formulas here****
+ @MacDermott2025 demonstrate this methodology in the context of Olympic medal tables, showing that posterior based rankings are more stable to sample size and variance differences than naive ordering.
+$$
+  A =
+  \left[ {\begin{array}{ccc}
+    \alpha_{1,1} & \cdots & \alpha_{1,6}\\
+    \vdots  &        & \vdots\\
+    \alpha_{n,1} & \cdots & \alpha_{n,6}\\
+  \end{array} } \right]
+$$
+Where $\alpha_{i,j}$ is a baseline at sample $i$, and health region $j$. $j\in \{1,...,6\}$
 
 \newpage
 
