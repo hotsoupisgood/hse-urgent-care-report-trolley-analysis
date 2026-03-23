@@ -1,7 +1,7 @@
-Region,NHospitals
-HSE Dublin and North East,8
-HSE Dublin and Midlands,10
-HSE Dublin and South East,8
-HSE South West,6
-HSE Mid West,4
-HSE West and North West,6
+Region,EDHospitalsPer10k
+HSE Dublin and Midlands,0.08351590838861622
+HSE Dublin and North East,0.05896812520112343
+HSE Dublin and South East,0.05148837443993521
+HSE Mid West,0.09683846617553424
+HSE South West,0.06751155122641483
+HSE West and North West,0.07898353456582752

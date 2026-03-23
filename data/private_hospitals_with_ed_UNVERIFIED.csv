@@ -1,0 +1,12 @@
+name,address,county,region,lat,lon,has_ed,rationale
+Blackrock Clinic Dublin,"Blackrock Clinic, Rock Road, Blackrock, Dublin, A94 E4X7",Dublin,HSE Dublin and South East,53.3038908,-6.1881443,YES,Consultant-led ED advertised on blackrockhealth.com
+Hermitage Clinic Dublin,"Hermitage Clinic, Old Lucan Road, Dublin, D20 W722",Dublin,HSE Dublin and Midlands,53.3591678,-6.4060230,YES,Consultant-led ED advertised on blackrockhealth.com (same group as Blackrock)
+Galway Clinic,"Galway Clinic, Doughiska, Galway, H91 HHT0",Galway,HSE West and North West,53.2819707,-8.9733521,YES,ED advertised on blackrockhealth.com (same group as Blackrock)
+Mater Private Hospital Dublin,"Mater Private Hospital, Eccles Street, Dublin 7, D07 WKW8",Dublin,HSE Dublin and North East,53.3580893,-6.2644724,YES,24hr ED advertised on materprivate.ie
+Bon Secours Hospital Cork,"Bon Secours Hospital, College Road, Cork, T12 DV56",Cork,HSE South West,51.8922940,-8.4975029,YES,Rapid assessment/urgent care unit on bonsecourshealth.ie
+Bon Secours Hospital Dublin,"Bon Secours Hospital, Glasnevin Hill, Dublin, D09 YN97",Dublin,HSE Dublin and North East,53.3758125,-6.2672998,VERIFY,Smaller facility — check if urgent care or full ED
+Bon Secours Hospital Galway,"Bon Secours Hospital, Renmore, Galway, H91 KC7H",Galway,HSE West and North West,53.2778434,-9.0194261,VERIFY,Check if rapid assessment unit operates as de facto ED
+Bon Secours Hospital Tralee,"Bon Secours Hospital, Strand Street, Tralee, V92 VH68",Kerry,HSE South West,52.2699406,-9.7131602,VERIFY,Check if rapid assessment unit operates as de facto ED
+St Vincent's Private Hospital,"St Vincent's Private Hospital, Merrion Road, Dublin 4, D04 YN26",Dublin,HSE Dublin and South East,53.3178,-6.2198,YES,Emergency/urgent care on svph.ie — shares campus with SVUH
+Aut Even Hospital,"Aut Even Hospital, Freshford Road, Kilkenny, R95 P96W",Kilkenny,HSE Dublin and South East,52.6766346,-7.2702373,VERIFY,UPMC Aut Even — has injury clinic but unclear if full ED
+Mater Private Hospital Cork,"Mater Private Cork, City Gate, Mahon, Cork, T12 CR23",Cork,HSE South West,51.8863178,-8.4061349,VERIFY,Newer facility — check if ED operational

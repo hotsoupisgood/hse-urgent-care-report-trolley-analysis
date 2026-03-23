@@ -85,11 +85,11 @@ To reduce high frequency noise and highlight long term temporal patterns, daily 
 
 # Methods \label{chap:methods}
 
-[Placeholder]
 
 ## Likelihood \label{sect:likelihood}
 
-[Placeholder. Three Bayesian models with an annual cycle mean and AR(1) errors. Let $y_{i,t}$ be the scaled trolley count for region $i$ at week $t$.]
+1. Three Bayesian models with an annual cycle and AR(1) compoenets. 
+2. Let $y_{i,t}$ be the scaled trolley count for region $i$ at week $t$.
 
 $$y_{i,1} \sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1})$$
 
@@ -97,7 +97,6 @@ $$y_{i,t} \sim \mathcal{N}(\mu_{i,t} + \phi(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-
 
 ## Model 1 \label{sect:m1}
 
-[Placeholder]
 
 \begin{equation}
   \mu_{i,t} = \alpha_i
@@ -110,28 +109,7 @@ Priors:
 
 $$\alpha_i,\ \beta_i,\ \gamma_i \sim \mathcal{N}(0,\ 0.001), \qquad \tau_i \sim \text{Gamma}(0.001,\ 0.001), \qquad \phi \sim \text{Uniform}(-1,\ 1)$$
 
-## Model 2 \label{sect:m2}
-
-[Placeholder]
-
-\begin{align}
-  \mu_{i,t} &= \alpha_i
-               + \beta_i  \cos(2\pi t / 52)
-               + \gamma_i \sin(2\pi t / 52) \nonumber \\
-            &\quad + \delta_\text{pre}  \cdot 1(t \bmod 52 = 0)
-               +    \delta_\text{mid}  \cdot 1(t \bmod 52 = 1)
-               +    \delta_\text{post} \cdot 1(t \bmod 52 = 2) \nonumber \\
-            &\quad + \sigma_\text{pre}  \cdot 1(t = 86) \cdot \text{mw}[i]
-               +    \sigma_\text{mid}  \cdot 1(t = 87) \cdot \text{mw}[i]
-               +    \sigma_\text{post} \cdot 1(t = 88) \cdot \text{mw}[i]
-  \label{eqn:m2}
-\end{align}
-
-Priors (additional to Model 1):
-
-$$\delta_\text{pre},\ \delta_\text{mid},\ \delta_\text{post},\ \sigma_\text{pre},\ \sigma_\text{mid},\ \sigma_\text{post} \sim \mathcal{N}(0,\ 0.001)$$
-
-## Model 3 \label{sect:m3}
+## Model 2 \label{sect:m3}
 
 [Placeholder]
 
@@ -152,26 +130,51 @@ Priors (additional to Model 1):
 
 $$\delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i},\ \sigma_\text{pre},\ \sigma_\text{mid},\ \sigma_\text{post} \sim \mathcal{N}(0,\ 0.001)$$
 
-## Ranking \label{sect:ranking}
-
-A Bayesian approach to ranking uses the full posterior distribution of each region's baseline parameter $\alpha_i$.
-Put formulas here****
- @MacDermott2025 demonstrate this methodology in the context of Olympic medal tables, showing that posterior based rankings are more stable to sample size and variance differences than naive ordering.
+## Posterior Sampling and Bayesian Ranking \label{sect:ranking}
+The *Just another Gibbs sampler* (*rJAGs*), package was used to draw 20,000 samples from the posteior distribution, $A$, illistrated below. Health region baselines, $\alpha^s_j$, were used for ranking. Where $j$ is one of the 6 HSE health regions, $j\in\{1,...,6\}$, and $s$ is the draw index, for $s\in\{1,...,n\}$ and total samples is defined as $n=20,000$.
 $$
   A =
-  \left[ {\begin{array}{ccc}
-    \alpha_{1,1} & \cdots & \alpha_{1,6}\\
+  \left[ {\begin{array}{cccc}
+    \alpha_1^1 & \cdots & \alpha_j^1 & \cdots & \alpha_6^1\\
     \vdots  &        & \vdots\\
-    \alpha_{n,1} & \cdots & \alpha_{n,6}\\
+    \alpha_1^s & \cdots & \alpha_j^s& \cdots & \alpha_6^s\\
+    \vdots  &        & \vdots\\
+    \alpha_1^n & \cdots & \alpha_j^n & \cdots & \alpha_6^n\\
   \end{array} } \right]
 $$
-Where $\alpha_{i,j}$ is a baseline at sample $i$, and health region $j$. $j\in \{1,...,6\}$
-
+Ranks were calculated using the same methodology as @MacDermott2025. Where each sample is ranked to form rank distribution, $R$.
+$$
+  R =
+  \left[ {\begin{array}{cccc}
+    r_1^1 & \cdots & r_j^1 & \cdots & r_6^1\\
+    \vdots  &        & \vdots\\
+    r_1^s & \cdots & r_j^s& \cdots & r_6^s\\
+    \vdots  &        & \vdots\\2
+    r_1^n & \cdots & r_j^n & \cdots & r_6^n\\
+  \end{array} } \right]
+$$
 \newpage
-
+Where $r_j^s=rank(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s>\alpha_i^s)$. Given a tie, $r^s_j=rank(\alpha_j^s) + 0.5$. Then posterior rank averages are calculated, so that $\hat{r}_j=\frac{1}{n}\sum^n_{s=1}\big(r_j^s\big)$
+$$
+  \hat{R} =
+  \left[ {\begin{array}{cccc}
+    \hat{r}_1, \hat{r}_2, \hat{r}_3, \hat{r}_4, \hat{r}_5,  \hat{r}_6
+  \end{array} } \right]
+$$
+Then posterior ranked averages are ranked once again to achieve ranked posterior ranked averages.
+$$
+  R^* =
+  \left[ {\begin{array}{cccc}
+    r^*_1, r^*_2, r^*_3, r^*_4, r^*_5, r^*_6
+  \end{array} } \right]
+$$  
+Where $r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j>\hat{r}_i)$.
 # Results \label{chap:results}
 
-[Placeholder — present DIC comparison, posterior summaries for each model, fitted values plots, and regional rankings.]
+1. DIC comparison
+2. Posterior summaries for each model
+3. Fitted values plots
+4. Regional rankings.
 
 \newpage
 

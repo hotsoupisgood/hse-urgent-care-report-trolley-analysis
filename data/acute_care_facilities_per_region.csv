@@ -1,0 +1,7 @@
+Region,NHospitals_ED,NInjuryUnits,NPrivateHospitals,NTotalPublic,NTotalAll,Population,EDPer10k,InjuryUnitsPer10k,PrivatePer10k,TotalPublicPer10k,TotalAllPer10k
+HSE Dublin and Midlands,9,2,1,11,12,1077639,0.0835,0.0186,0.0093,0.1021,0.1113
+HSE Dublin and North East,7,3,2,10,12,1187082,0.0590,0.0253,0.0168,0.0842,0.1011
+HSE Dublin and South East,5,2,3,7,10,971093,0.0515,0.0206,0.0309,0.0721,0.1030
+HSE Mid West,4,3,0,7,7,413059,0.0968,0.0726,0.0000,0.1695,0.1695
+HSE South West,5,3,3,8,11,740614,0.0675,0.0405,0.0405,0.1080,0.1485
+HSE West and North West,6,1,2,7,9,759652,0.0790,0.0132,0.0263,0.0921,0.1185
