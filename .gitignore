@@ -30,3 +30,4 @@ CLAUDE.md
 data/models/**/raw_samples.csv
 bayes_models/**_files
 bayes_models/**.html
+bayes_models/**.rmarkdown

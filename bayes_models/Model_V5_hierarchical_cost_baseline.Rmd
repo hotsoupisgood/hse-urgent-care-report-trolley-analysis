@@ -4,17 +4,17 @@ output:
   pdf_document: default
 ---
 
-Model V4 extends V3 by placing a hierarchical prior on the region-specific intercept $\alpha_i$:
+Model V5 extends V3 by placing a hierarchical prior on the region-specific intercept $\alpha_i$:
 
 $$\alpha_i \sim \mathcal{N}(\mu_\lambda \cdot c_i,\; \tau_\alpha)$$
 
-where $c_i$ is the per-person HR cost for region $i$ (known constant from
+where $c_i$ is the HR budget per 10k population for region $i$ (from
 `hr_cost_per_person.csv`), $\mu_\lambda$ is a global cost coefficient estimated from the
 data, and $\tau_\alpha$ captures residual region-level variation not explained by cost.
 
-This is identifiable (unlike placing $c_i \cdot \lambda_i$ directly in the mean alongside a
-free intercept): $\mu_\lambda$ measures the global cost–burden relationship while $\alpha_i$
-retains the flexibility to deviate from the cost-scaled expectation.
+The mean function is identical to V3 (additive $\alpha_i$). Cost enters only
+through the hierarchical prior, shrinking each region's baseline toward a
+cost-predicted value while allowing deviations via $\tau_\alpha$.
 
 ```{r setup}
 library(rjags)
@@ -68,9 +68,9 @@ model{
       y[i,t] ~ dnorm(mu[i,t] + (phi * (y[i,t-1] - mu[i,t-1])), tau[i])
     }
 
-    # Mean: alpha[i] has hierarchical prior centred on mu_lambda * c_i
+    # Mean function (same as V3)
     for(t in 1:T){
-      mu[i,t] <- alpha[i] * cost_per_person[i] +
+      mu[i,t] <- alpha[i] +
                  beta[i]       * cos((2 * pi) * (t/52)) +
                  gamma[i]      * sin((2 * pi) * (t/52)) +
                  delta_pre[i]  * ny_pre[t]  +
@@ -80,8 +80,8 @@ model{
                  sigma_mid     * fr_mid[t]  * mw[i] +
                  sigma_post    * fr_post[t] * mw[i]
     }
-    # Hierarchical prior: alpha[i] shrinks toward mu_lambda * cost_per_person[i]
-    alpha[i] ~ dnorm(mu_lambda, tau_alpha)
+    # Hierarchical prior: alpha[i] shrinks toward cost-predicted baseline
+    alpha[i] ~ dnorm(mu_lambda * cost_per_person[i], tau_alpha)
     beta[i]   ~ dnorm(0, 0.001)
     gamma[i]  ~ dnorm(0, 0.001)
     tau[i]    ~ dgamma(0.001, 0.001)
