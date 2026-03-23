@@ -27,3 +27,5 @@ CLAUDE.md
 
 # Project-specific
 ~$Poster_Presentation.pptx
+data/models/**/raw_samples.csv
+bayes_models/**_files
