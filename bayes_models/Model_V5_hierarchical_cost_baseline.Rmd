@@ -9,7 +9,7 @@ Model V5 extends V3 by placing a hierarchical prior on the region-specific inter
 $$\alpha_i \sim \mathcal{N}(\mu_\lambda \cdot c_i,\; \tau_\alpha)$$
 
 where $c_i$ is the HR budget per 10k population for region $i$ (from
-`hr_cost_per_person.csv`), $\mu_\lambda$ is a global cost coefficient estimated from the
+`hr_budget_scaledPer10k.csv`), $\mu_\lambda$ is a global cost coefficient estimated from the
 data, and $\tau_\alpha$ captures residual region-level variation not explained by cost.
 
 The mean function is identical to V3 (additive $\alpha_i$). Cost enters only
@@ -43,12 +43,12 @@ uecMat   <- as.matrix(uecDf)
 ### Cost Per Person
 
 ```{r cost-per-person}
-cpp_df <- read.csv('../data/hr_cost_per_person.csv')
+cpp_df <- read.csv('../data/hseBudget_scaledPer10k.csv')
 
 # Align to region order from uecDf
-cost_per_person <- cpp_df$CostPerPerson[match(regions, cpp_df$Region)]
+budget_scaledPer10k <- cpp_df$CostPerPerson[match(regions, cpp_df$Region)]
 
-data.frame(Region = regions, CostPerPerson = round(cost_per_person, 4))
+data.frame(Region = regions, CostPerPerson = round(budget_scaledPer10k, 4))
 ```
 
 ### Model V4 Specification
@@ -81,7 +81,7 @@ model{
                  sigma_post    * fr_post[t] * mw[i]
     }
     # Hierarchical prior: alpha[i] shrinks toward cost-predicted baseline
-    alpha[i] ~ dnorm(mu_lambda * cost_per_person[i], tau_alpha)
+    alpha[i] ~ dnorm(mu_lambda * budget_scaledPer10k[i], tau_alpha)
     beta[i]   ~ dnorm(0, 0.001)
     gamma[i]  ~ dnorm(0, 0.001)
     tau[i]    ~ dgamma(0.001, 0.001)
@@ -120,7 +120,7 @@ exp_jags <- jags.model(
     I           = n.region,
     T           = n.weeks,
     pi          = pi,
-    cost_per_person = cost_per_person,
+    budget_scaledPer10k = budget_scaledPer10k,
     ny_pre      = ny_pre,
     ny_mid      = ny_mid,
     ny_post     = ny_post,
@@ -177,4 +177,14 @@ df_dic <- data.frame(
 df_dic
 
 if (save_output) write.csv(df_dic, paste0(output_folder, "dic.csv"), row.names = FALSE)
+```
+
+### Save
+
+```{r save}
+if (save_output) {
+  write.csv(as.matrix(exp_sim),
+            paste0(output_folder, "raw_samples.csv"),
+            row.names = FALSE)
+}
 ```
