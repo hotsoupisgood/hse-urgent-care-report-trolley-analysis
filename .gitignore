@@ -31,3 +31,14 @@ data/models/**/raw_samples.csv
 bayes_models/**_files
 bayes_models/**.html
 bayes_models/**.rmarkdown
+
+bayes_models/*.pdf
+bayes_models/*.md
+data/models/*.nc
+bayes_models/tex_formulas/*.pdf
+bayes_models/~$*.xlsx
+bayes_models/tex_formulas/*.log
+thesis/_bookdown_files
+out
+.DS_Store
+bayes_models/tex_formulas/*.aux
