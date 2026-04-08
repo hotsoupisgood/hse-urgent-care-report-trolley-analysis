@@ -1,0 +1,58 @@
+% Model V5 — Hierarchical Cost-Per-Person Baseline
+
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\begin{document}
+
+\section*{Model V5 --- Hierarchical Cost-Per-Person Baseline}
+
+\subsection*{Likelihood}
+
+\begin{align}
+  y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[6pt]
+  y_{i,t} &\sim \mathcal{N}\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
+\end{align}
+
+\subsection*{$\mu$}
+
+\begin{multline}
+  \mu_{i,t} = \alpha_i
+    + \beta_i \cos\left(\tfrac{2\pi t}{52}\right)
+    + \gamma_i \sin\left(\tfrac{2\pi t}{52}\right) \\
+    + \delta_{\text{pre},i} \cdot \mathbf{1}(t \bmod 52 = 0)
+    + \delta_{\text{mid},i} \cdot \mathbf{1}(t \bmod 52 = 1)
+    + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2) \\
+    + \sigma_{\text{pre}} \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
+    + \sigma_{\text{mid}} \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
+    + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+\end{multline}
+
+\subsection*{Hierarchical Prior}
+
+\begin{equation}
+  \alpha_i \sim \mathcal{N}(\mu_\lambda \cdot c_i,\ \tau_\alpha^{-1})
+\end{equation}
+
+where $c_i$ is the HR budget per 10k population for region $i$.
+
+\subsection*{Hyperpriors}
+
+\begin{equation}
+  \mu_\lambda \sim \mathcal{N}(0,\ 0.001) \qquad \tau_\alpha \sim \Gamma(0.001,\ 0.001)
+\end{equation}
+
+\subsection*{Priors (region-level)}
+
+\begin{align}
+  \beta_i,\ \gamma_i,\ \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\
+  \tau_i &\sim \Gamma(0.001,\ 0.001)
+\end{align}
+
+\subsection*{Priors (global)}
+
+\begin{align}
+  \phi &\sim \mathrm{Uniform}(-1,\ 1) \\
+  \sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
+\end{align}
+
+\end{document}

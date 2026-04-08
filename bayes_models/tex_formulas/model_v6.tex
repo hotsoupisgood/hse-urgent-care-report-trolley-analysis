@@ -1,0 +1,60 @@
+% Model V6 — Hospital Density Moderating Seasonal Amplitude
+
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\begin{document}
+
+\section*{Model V6 --- Seasonal Hospital Density}
+
+\subsection*{Likelihood}
+
+\begin{align}
+  y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[6pt]
+  y_{i,t} &\sim \mathcal{N}\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
+\end{align}
+
+\subsection*{$\mu$}
+
+\begin{multline}
+  \mu_{i,t} = \alpha_i
+    + \beta_i \cos\left(\tfrac{2\pi t}{52}\right)
+    + \gamma_i \sin\left(\tfrac{2\pi t}{52}\right) \\
+    + \delta_{\text{pre},i} \cdot \mathbf{1}(t \bmod 52 = 0)
+    + \delta_{\text{mid},i} \cdot \mathbf{1}(t \bmod 52 = 1)
+    + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2) \\
+    + \sigma_{\text{pre}} \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
+    + \sigma_{\text{mid}} \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
+    + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+\end{multline}
+
+\subsection*{Hierarchical Seasonal Priors}
+
+\begin{align}
+  \beta_i  &\sim \mathcal{N}(\mu_\beta + \eta_\beta \cdot \tilde{h}_i,\ \tau_\beta^{-1}) \\
+  \gamma_i &\sim \mathcal{N}(\mu_\gamma + \eta_\gamma \cdot \tilde{h}_i,\ \tau_\gamma^{-1})
+\end{align}
+
+where $\tilde{h}_i = h_i - \bar{h}$ is the centered ED hospital density per 10k population for region $i$.
+
+\subsection*{Hyperpriors}
+
+\begin{align}
+  \mu_\beta,\ \mu_\gamma,\ \eta_\beta,\ \eta_\gamma &\sim \mathcal{N}(0,\ 0.001) \\
+  \tau_\beta,\ \tau_\gamma &\sim \Gamma(0.001,\ 0.001)
+\end{align}
+
+\subsection*{Priors (region-level)}
+
+\begin{align}
+  \alpha_i,\ \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\
+  \tau_i &\sim \Gamma(0.001,\ 0.001)
+\end{align}
+
+\subsection*{Priors (global)}
+
+\begin{align}
+  \phi &\sim \mathrm{Uniform}(-1,\ 1) \\
+  \sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
+\end{align}
+
+\end{document}
