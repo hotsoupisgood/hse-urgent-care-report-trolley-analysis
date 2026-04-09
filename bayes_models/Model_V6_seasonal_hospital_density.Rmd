@@ -222,7 +222,12 @@ hospital density.
 
 ```{r save}
 if (save_output) {
-  write.csv(as.matrix(exp_sim),
+  samples_with_chain = do.call(rbind, lapply(seq_along(exp_sim), function(ch) {
+    df = as.data.frame(exp_sim[[ch]])
+    df$chain = ch
+    df
+  }))
+  write.csv(samples_with_chain,
             paste0(output_folder, "raw_samples.csv"),
             row.names = FALSE)
 }

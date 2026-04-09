@@ -46,9 +46,15 @@ uecMat   <- as.matrix(uecDf)
 cpp_df <- read.csv('../data/hseBudget_scaledPer10k.csv')
 
 # Align to region order from uecDf
-budget_scaledPer10k <- cpp_df$CostPerPerson[match(regions, cpp_df$Region)]
+budget_scaledPer10k_raw <- cpp_df$BudgetPer10k[match(regions, cpp_df$Region)]
 
-data.frame(Region = regions, CostPerPerson = round(budget_scaledPer10k, 4))
+# Rescale: divide by 1000 so units = thousands of euro per 10k population
+# This puts mu_lambda on an interpretable scale and improves MCMC mixing
+budget_scaledPer10k <- budget_scaledPer10k_raw / 1000
+
+data.frame(Region = regions,
+           BudgetPer10k_raw = round(budget_scaledPer10k_raw, 4),
+           BudgetPer10k_k   = round(budget_scaledPer10k, 4))
 ```
 
 ### Model V4 Specification
@@ -81,7 +87,9 @@ model{
                  sigma_post    * fr_post[t] * mw[i]
     }
     # Hierarchical prior: alpha[i] shrinks toward cost-predicted baseline
-    alpha[i] ~ dnorm(mu_lambda * budget_scaledPer10k[i], tau_alpha)
+    alpha[i] ~ dnorm(mu_lambda[i] * budget_scaledPer10k[i], tau_alpha)
+    # Per-region cost coefficient with partial pooling toward global mean
+    mu_lambda[i] ~ dnorm(mu_global, tau_mu)
     beta[i]   ~ dnorm(0, 0.001)
     gamma[i]  ~ dnorm(0, 0.001)
     tau[i]    ~ dgamma(0.001, 0.001)
@@ -94,7 +102,8 @@ model{
   sigma_mid  ~ dnorm(0, 0.001)
   sigma_post ~ dnorm(0, 0.001)
   # Hyperpriors
-  mu_lambda  ~ dnorm(0, 0.001)
+  mu_global  ~ dnorm(0, 0.01)    # global cost coefficient (SD = 10)
+  tau_mu     ~ dgamma(0.001, 0.001)  # precision of per-region cost deviations
   tau_alpha  ~ dgamma(0.001, 0.001)
 }
 "
@@ -132,19 +141,19 @@ exp_jags <- jags.model(
   n.chains = 4
 )
 
-update(exp_jags, n.iter = 10000)
+update(exp_jags, n.iter = 10000) # burn-in
 
 model_parameters <- c(
   "alpha", "beta", "gamma", "tau", "phi",
   "delta_pre", "delta_mid", "delta_post",
   "sigma_pre", "sigma_mid", "sigma_post",
-  "mu_lambda", "tau_alpha"
+  "mu_lambda", "mu_global", "tau_mu", "tau_alpha"
 )
 
 exp_sim <- coda.samples(
   model          = exp_jags,
   variable.names = model_parameters,
-  n.iter         = 20000
+  n.iter         = 30000
 )
 ```
 
@@ -183,7 +192,12 @@ if (save_output) write.csv(df_dic, paste0(output_folder, "dic.csv"), row.names =
 
 ```{r save}
 if (save_output) {
-  write.csv(as.matrix(exp_sim),
+  samples_with_chain = do.call(rbind, lapply(seq_along(exp_sim), function(ch) {
+    df = as.data.frame(exp_sim[[ch]])
+    df$chain = ch
+    df
+  }))
+  write.csv(samples_with_chain,
             paste0(output_folder, "raw_samples.csv"),
             row.names = FALSE)
 }
