@@ -55,6 +55,8 @@ div.csl-indent {
 <script src="ThesisDraft_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="ThesisDraft_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="ThesisDraft_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+</head><body class="fullcontent quarto-light">\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -86,9 +88,9 @@ window.Quarto = {
 };
 </script>
 
-</head>
 
-<body class="fullcontent quarto-light">
+
+
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
 
@@ -105,103 +107,110 @@ window.Quarto = {
 <div style="page-break-after: always;"></div>
 <section id="introduction" class="level1">
 <h1>Introduction </h1>
-<p>Hospital overcrowding has become a persistent challenge for healthcare systems worldwide. When hospitals operate close to or beyond their intended capacity, delays in treatment, increased waiting times, and strain on healthcare staff can occur. Numerous studies have shown that overcrowding in emergency departments is associated with reduced quality of care, longer patient waiting times, and increased pressure on healthcare resources <span class="citation" data-cites="Asplin2003 Morley2018">(<a href="#ref-Asplin2003" role="doc-biblioref">Asplin et al. 2003</a>; <a href="#ref-Morley2018" role="doc-biblioref">Morley et al. 2018</a>)</span>.</p>
-<p>In Ireland, hospital congestion is commonly monitored using the number of patients recorded on hospital trolleys. These patients have been admitted through emergency departments but remain without an available inpatient bed, often receiving care in temporary spaces such as corridors or emergency wards. As a result, trolley counts are widely used as a daily indicator of hospital system pressure and are frequently referenced in public reporting and policy discussions concerning hospital capacity and healthcare performance <span class="citation" data-cites="HSE2026">(<a href="#ref-HSE2026" role="doc-biblioref">Health Service Executive 2026</a>)</span>.</p>
-<p>The Health Service Executive (HSE) publishes daily trolley counts across hospitals nationwide. These data provide an important source of information on hospital activity and congestion within the Irish healthcare system. Despite their widespread use, trolley counts are typically presented as simple daily totals. While these counts provide a useful snapshot of hospital pressure at a given moment, they provide limited insight into the underlying dynamics of hospital demand. Raw counts do not account for temporal patterns such as weekly admission cycles or seasonal fluctuations in illness, nor do they quantify uncertainty or allow systematic comparisons between different healthcare regions.</p>
-<p>Hospital demand is influenced by multiple factors including population demographics, seasonal illness patterns, healthcare infrastructure, and patterns of emergency department admissions. These factors generate complex temporal dynamics in hospital congestion that cannot be fully understood through descriptive statistics alone. Time-series modelling provides a useful framework for analysing such data, as it allows researchers to examine how system pressure evolves over time while accounting for temporal dependence and recurring seasonal patterns <span class="citation" data-cites="Shumway2017">(<a href="#ref-Shumway2017" role="doc-biblioref">Shumway and Stoffer 2017</a>)</span>.</p>
-<p>In addition to temporal modelling, statistical approaches that incorporate uncertainty are particularly valuable when analysing healthcare data. Bayesian statistical methods provide a natural framework for this purpose. Rather than producing single point estimates for model parameters, Bayesian models treat parameters as probability distributions and update these distributions using observed data. This allows uncertainty in both the observed data and the model parameters to be explicitly incorporated into the analysis, producing probabilistic estimates that are often more informative than traditional deterministic approaches <span class="citation" data-cites="Gelman2013">(<a href="#ref-Gelman2013" role="doc-biblioref">Gelman et al. 2013</a>)</span>.</p>
-<p>This project develops a Bayesian time-series modelling framework for analysing hospital trolley counts across Irish HSE health regions. The approach treats trolley counts as a stochastic process with temporal dependence and seasonal structure. By modelling these dynamics within a Bayesian framework, the analysis allows uncertainty in both observed trolley counts and model parameters to propagate through to estimates of hospital pressure across regions.</p>
-<p>To facilitate meaningful comparisons between regions with different population sizes, trolley counts are standardised by regional population and expressed as rates per 10,000 residents. This population scaling allows the analysis to focus on relative hospital pressure rather than absolute patient numbers, making comparisons across healthcare regions more interpretable.</p>
-<p>The primary objective of this research is to develop a statistical framework capable of comparing hospital pressure across Irish HSE regions in a rigorous and probabilistic manner. Specifically, the study aims to explore temporal patterns in trolley data, estimate baseline levels of hospital pressure across regions, and quantify the persistence of congestion within the hospital system over time. By modelling trolley data within a Bayesian time-series framework, this research aims to provide a more robust analytical approach for understanding hospital overcrowding in Ireland.</p>
-<p>Understanding regional differences in hospital congestion has important implications for healthcare policy and resource allocation. Statistical models capable of identifying persistent or extreme pressure within hospital catchment areas may support more informed decision making regarding hospital capacity planning and healthcare system management.</p>
-<div style="page-break-after: always;"></div>
 </section>
 <section id="data" class="level1">
 <h1>Data </h1>
 <section id="data-collection" class="level2">
 <h2 class="anchored" data-anchor-id="data-collection">Data Collection </h2>
-<p>The data used in this study consist of publicly available hospital trolley counts published by the Health Service Executive (HSE). These data record the number of patients who have been admitted to hospital but remain without an available inpatient bed and are therefore accommodated on trolleys within emergency departments or other temporary locations.</p>
-<p>Daily trolley count data were collected for hospitals across Ireland over a three-year period using automated web scraping techniques. The dataset provides daily observations for individual hospitals, which were subsequently aggregated into the seven HSE health regions. Aggregating the data at the regional level allows comparisons of hospital pressure across broader healthcare catchment areas rather than individual hospitals.</p>
-<p>To reduce high frequency noise and highlight long term temporal patterns, daily trolley counts were initially aggregated to weekly totals. Weekly aggregation also reduces the influence of strong daily effects that commonly appear in healthcare activity data.</p>
-</section>
-<section id="data-processing" class="level2">
-<h2 class="anchored" data-anchor-id="data-processing">Data Processing </h2>
-<p>[Placeholder — standardisation by regional population, scaling to rate per 10,000.]</p>
 <div style="page-break-after: always;"></div>
 </section>
 </section>
 <section id="methods" class="level1">
 <h1>Methods </h1>
-<section id="likelihood" class="level2">
-<h2 class="anchored" data-anchor-id="likelihood">Likelihood </h2>
-<ol type="1">
-<li>Three Bayesian models with an annual cycle and AR(1) compoenets.</li>
-<li>Let <span class="math inline">\(y_{i,t}\)</span> be the scaled trolley count for region <span class="math inline">\(i\)</span> at week <span class="math inline">\(t\)</span>.</li>
-</ol>
-<p><span class="math display">\[y_{i,1} \sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1})\]</span></p>
-<p><span class="math display">\[y_{i,t} \sim \mathcal{N}(\mu_{i,t} + \phi(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}), \quad t = 2, \ldots, T\]</span></p>
+<section id="standardisation" class="level2">
+<h2 class="anchored" data-anchor-id="standardisation">Standardisation </h2>
+<p>Raw trolley counts vary across regions primarily because of population size rather than differences in hospital pressure. To enable fair comparison, counts were standardised to a rate per 10,000 catchment population.</p>
+<p><span class="math display">\[
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region catchment population}_i} \times 10{,}000
+\]</span></p>
+<p>This transforms the outcome into patients on trolley per 10,000 population per week, removing the confounding effect of region size and allowing direct comparison of hospital pressure across the six HSE regions.</p>
 </section>
-<section id="model-1" class="level2">
-<h2 class="anchored" data-anchor-id="model-1">Model 1 </h2>
-<p><span class="math display">\[\begin{equation}
-  \mu_{i,t} = \alpha_i
-            + \beta_i  \cos(2\pi t / 52)
-            + \gamma_i \sin(2\pi t / 52)
-  \label{eqn:m1}
-\end{equation}\]</span></p>
-<p>Priors:</p>
-<p><span class="math display">\[\alpha_i,\ \beta_i,\ \gamma_i \sim \mathcal{N}(0,\ 0.001), \qquad \tau_i \sim \text{Gamma}(0.001,\ 0.001), \qquad \phi \sim \text{Uniform}(-1,\ 1)\]</span></p>
-</section>
-<section id="model-2" class="level2">
-<h2 class="anchored" data-anchor-id="model-2">Model 2 </h2>
-<p>[Placeholder]</p>
-<p><span class="math display">\[\begin{align}
+<section id="model" class="level2">
+<h2 class="anchored" data-anchor-id="model">Model </h2>
+<p>Let <span class="math inline">\(y_{i,t}\)</span> denote the scaled trolley count for region <span class="math inline">\(i\)</span> at week <span class="math inline">\(t\)</span>, for <span class="math inline">\(i \in \{1,\ldots,6\}\)</span> and <span class="math inline">\(t \in \{1,\ldots,T\}\)</span>.</p>
+<p><strong>Likelihood</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+y_{i,1} &amp;\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t &gt; 1
+\end{aligned}
+\]</span></p>
+<p><strong>Mean function</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
   \mu_{i,t} &amp;= \alpha_i
-               + \beta_i  \cos(2\pi t / 52)
-               + \gamma_i \sin(2\pi t / 52) \nonumber \\
-            &amp;\quad + \delta_{\text{pre},i}  \cdot 1(t \bmod 52 = 0)
-               +    \delta_{\text{mid},i}  \cdot 1(t \bmod 52 = 1)
-               +    \delta_{\text{post},i} \cdot 1(t \bmod 52 = 2) \nonumber \\
-            &amp;\quad + \sigma_\text{pre}  \cdot 1(t = 86) \cdot \text{mw}[i]
-               +    \sigma_\text{mid}  \cdot 1(t = 87) \cdot \text{mw}[i]
-               +    \sigma_\text{post} \cdot 1(t = 88) \cdot \text{mw}[i]
-  \label{eqn:m3}
-\end{align}\]</span></p>
-<p>Priors (additional to Model 1):</p>
-<p><span class="math display">\[\delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i},\ \sigma_\text{pre},\ \sigma_\text{mid},\ \sigma_\text{post} \sim \mathcal{N}(0,\ 0.001)\]</span></p>
+               + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
+               + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \nonumber \\
+            &amp;\quad + \delta_{\text{pre},i}  \cdot \mathbf{1}(t \bmod 52 = 0)
+               +    \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
+               +    \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2) \nonumber \\
+            &amp;\quad + \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
+               +    \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
+               +    \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+\end{aligned}
+  (\#eq:model)
+\]</span></p>
+<div style="text-align:center; font-size:0.9em; color:#666; margin-top:-0.75em; margin-bottom:1em;"><em>Model V4 mean function</em></div>
+<p>Where <span class="math inline">\(\mathrm{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})\)</span>. The <span class="math inline">\(\beta_i\)</span> and <span class="math inline">\(\gamma_i\)</span> coefficients capture the annual seasonal cycle, <span class="math inline">\(\frac{\gamma_i}{\beta_i}\)</span>. The <span class="math inline">\(\delta_{\text{pre/mid/post},i}\)</span> components are region level new year effects. The <span class="math inline">\(\sigma_{\cdot}\)</span> component captures the Mid West funding reset.</p>
+<p>The term <span class="math inline">\(\phi\,(y_{i,t-1} - \mu_{i,t-1})\)</span> in Equation @ref(eq:model) adds an AR(1) component, allowing each weeks observation to depend on the previous week’s derivation from the mean.</p>
+<p><strong>Priors</strong></p>
+<p>The baseline parameters <span class="math inline">\(\alpha_i\)</span> are given a hierarchical prior, treating the six HSE regions as exchangeable within the same national health system:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha_i &amp;\sim \mathcal{N}(\mu_\alpha,\ \tau_\alpha^{-1}) \\[4pt]
+\mu_\alpha &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_\alpha &amp;\sim \Gamma(0.001,\ 0.001)
+\end{aligned}
+(\#eq:alpha-prior)
+\]</span></p>
+<p>Remaining priors are independent and uninformative:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\beta_i,\ \gamma_i,\ \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi &amp;\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
+\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001)
+\end{aligned}
+\]</span></p>
 </section>
 <section id="posterior-sampling-and-bayesian-ranking" class="level2">
 <h2 class="anchored" data-anchor-id="posterior-sampling-and-bayesian-ranking">Posterior Sampling and Bayesian Ranking </h2>
-<p>The <em>Just another Gibbs sampler</em> (<em>rJAGs</em>), package was used to draw 20,000 samples from the posteior distribution, <span class="math inline">\(A\)</span>, illistrated below. Health region baselines, <span class="math inline">\(\alpha^s_j\)</span>, were used for ranking. Where <span class="math inline">\(j\)</span> is one of the 6 HSE health regions, <span class="math inline">\(j\in\{1,...,6\}\)</span>, and <span class="math inline">\(s\)</span> is the draw index, for <span class="math inline">\(s\in\{1,...,n\}\)</span> and total samples is defined as <span class="math inline">\(n=20,000\)</span>. <span class="math display">\[
+<p>The <em>Just another Gibbs sampler</em> (<em>rJAGs</em>), package was used to draw 20,000 samples from the posteior distribution, <span class="math inline">\(A\)</span>, illistrated below. Health region baselines, <span class="math inline">\(\alpha^s_j\)</span>, were used for ranking. Where <span class="math inline">\(j\)</span> is one of the 6 HSE health regions, <span class="math inline">\(j\in\{1,...,6\}\)</span>, and <span class="math inline">\(s\)</span> is the draw index, for <span class="math inline">\(s\in\{1,...,n\}\)</span> and total samples is defined as <span class="math inline">\(n=20{,}000\)</span>. <span class="math display">\[
   A =
-  \left[ {\begin{array}{cccc}
+  \left[ {\begin{array}{ccccc}
     \alpha_1^1 &amp; \cdots &amp; \alpha_j^1 &amp; \cdots &amp; \alpha_6^1\\
     \vdots  &amp;        &amp; \vdots\\
     \alpha_1^s &amp; \cdots &amp; \alpha_j^s&amp; \cdots &amp; \alpha_6^s\\
     \vdots  &amp;        &amp; \vdots\\
     \alpha_1^n &amp; \cdots &amp; \alpha_j^n &amp; \cdots &amp; \alpha_6^n\\
   \end{array} } \right]
-\]</span> Ranks were calculated using the same methodology as <span class="citation" data-cites="MacDermott2025">MacDermott, Scarrott, and Ferguson (<a href="#ref-MacDermott2025" role="doc-biblioref">2025</a>)</span>. Where each sample is ranked to form rank distribution, <span class="math inline">\(R\)</span>. <span class="math display">\[
+\]</span> Ranks follow the posterior ranking approach of <span class="citation" data-cites="Laird1989">Laird &amp; Louis (<a href="#ref-Laird1989" role="doc-biblioref">1989</a>)</span>, as applied by <span class="citation" data-cites="MacDermott2025">MacDermott et al. (<a href="#ref-MacDermott2025" role="doc-biblioref">2025</a>)</span>. Where each sample is posterior sample is ranked to form rank distribution, <span class="math inline">\(R\)</span>. <span class="math display">\[
   R =
-  \left[ {\begin{array}{cccc}
+  \left[ {\begin{array}{ccccc}
     r_1^1 &amp; \cdots &amp; r_j^1 &amp; \cdots &amp; r_6^1\\
     \vdots  &amp;        &amp; \vdots\\
     r_1^s &amp; \cdots &amp; r_j^s&amp; \cdots &amp; r_6^s\\
-    \vdots  &amp;        &amp; \vdots\\2
+    \vdots  &amp;        &amp; \vdots\\
     r_1^n &amp; \cdots &amp; r_j^n &amp; \cdots &amp; r_6^n\\
   \end{array} } \right]
-\]</span> Where <span class="math inline">\(r_j^s=rank(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s&gt;\alpha_i^s)\)</span>. Given a tie, <span class="math inline">\(r^s_j=rank(\alpha_j^s) + 0.5\)</span>. Then posterior rank averages are calculated, so that <span class="math inline">\(\hat{r}_j=\frac{1}{n}\sum^n_{s=1}\big(r_j^s\big)\)</span> <span class="math display">\[
+\]</span> Where <span class="math inline">\(r_j^s=\text{rank}(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s&gt;\alpha_i^s)\)</span>. Given a tie, ranks are increased by <span class="math inline">\(\frac{1}{2}\)</span> steps for each tied value. <span class="math display">\[r^s_j= \sum_{i=1}^{6} \left[ \mathbf{1}(\alpha_j^s &gt; \alpha_i^s) + \tfrac{1}{2}\mathbf{1}(\alpha_j^s = \alpha_i^s) \right]\]</span> Then posterior rank averages, <span class="math inline">\(\hat{r}_i\)</span>, are calculated taking the mean across samples. <span class="math display">\[\hat{r}_j=\displaystyle \frac{1}{n}\sum^n_{s=1} r_j^s\]</span> <span class="math display">\[
   \hat{R} =
-  \left[ {\begin{array}{cccc}
+  \left[ {\begin{array}{ccccc}
     \hat{r}_1, \hat{r}_2, \hat{r}_3, \hat{r}_4, \hat{r}_5,  \hat{r}_6
   \end{array} } \right]
-\]</span> Then posterior ranked averages are ranked once again to achieve ranked posterior ranked averages. <span class="math display">\[
+\]</span> Then posterior ranked averages are ranked once again to achieve ranked posterior ranked averages are calculated. <span class="math display">\[
+r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*&gt;\alpha_i^*)
+\]</span> <span class="math display">\[
   R^* =
-  \left[ {\begin{array}{cccc}
+  \left[ {\begin{array}{ccccc}
     r^*_1, r^*_2, r^*_3, r^*_4, r^*_5, r^*_6
   \end{array} } \right]
 \]</span><br>
-Where <span class="math inline">\(r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j&gt;\hat{r}_i)\)</span>. # Results </p>
+Where <span class="math inline">\(r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j&gt;\hat{r}_i)\)</span>.</p>
+</section>
+</section>
+<section id="results" class="level1">
+<h1>Results </h1>
 <ol type="1">
 <li>DIC comparison</li>
 <li>Posterior summaries for each model</li>
@@ -210,7 +219,6 @@ Where <span class="math inline">\(r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j&
 </ol>
 <div style="page-break-after: always;"></div>
 </section>
-</section>
 <section id="conclusions" class="level1">
 <h1>Conclusions </h1>
 <p>In this research…</p>
@@ -218,24 +226,12 @@ Where <span class="math inline">\(r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j&
 </section>
 <section id="references" class="level1">
 <h1>References</h1>
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
-<div id="ref-Asplin2003" class="csl-entry" role="listitem">
-Asplin, Brent R., David J. Magid, Karin V. Rhodes, Leif I. Solberg, Nicole Lurie, and Carlos A. Camargo. 2003. <span>“A Conceptual Model of Emergency Department Crowding.”</span> <em>Annals of Emergency Medicine</em> 42 (2): 173–80. <a href="https://doi.org/10.1067/mem.2003.302">https://doi.org/10.1067/mem.2003.302</a>.
-</div>
-<div id="ref-Gelman2013" class="csl-entry" role="listitem">
-Gelman, Andrew, John B. Carlin, Hal S. Stern, David B. Dunson, Aki Vehtari, and Donald B. Rubin. 2013. <em>Bayesian Data Analysis</em>. 3rd ed. Texts in Statistical Science. Boca Raton: Chapman &amp; Hall/CRC. <a href="https://doi.org/10.1201/b16018">https://doi.org/10.1201/b16018</a>.
-</div>
-<div id="ref-HSE2026" class="csl-entry" role="listitem">
-Health Service Executive. 2026. <span>“Urgent and Emergency Care Report.”</span> <a href="https://www2.hse.ie/services/urgent-emergency-care-report/">https://www2.hse.ie/services/urgent-emergency-care-report/</a>.
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-Laird1989" class="csl-entry" role="listitem">
+Laird, N. M., &amp; Louis, T. A. (1989). Empirical <span>B</span>ayes ranking methods. <em>Journal of Educational Statistics</em>, <em>14</em>(1), 29–46. <a href="https://doi.org/10.3102/10769986014001029">https://doi.org/10.3102/10769986014001029</a>
 </div>
 <div id="ref-MacDermott2025" class="csl-entry" role="listitem">
-MacDermott, C., C. J. Scarrott, and J. Ferguson. 2025. <span>“Bayes-Ically Fair: <span>A</span> <span>B</span>ayesian <span>R</span>anking of the <span>O</span>lympic <span>M</span>edal <span>T</span>able.”</span> <a href="https://doi.org/10.48550/arXiv.2510.14723">https://doi.org/10.48550/arXiv.2510.14723</a>.
-</div>
-<div id="ref-Morley2018" class="csl-entry" role="listitem">
-Morley, Claire, Maria Unwin, Gregory M. Peterson, Jim Stankovich, and Leigh Kinsman. 2018. <span>“Emergency Department Crowding: A Systematic Review of Causes, Consequences and Solutions.”</span> <em>PLOS ONE</em> 13 (8): e0203316. <a href="https://doi.org/10.1371/journal.pone.0203316">https://doi.org/10.1371/journal.pone.0203316</a>.
-</div>
-<div id="ref-Shumway2017" class="csl-entry" role="listitem">
-Shumway, Robert H., and David S. Stoffer. 2017. <em>Time Series Analysis and Its Applications: With <span>R</span> Examples</em>. 4th ed. Springer Texts in Statistics. Cham: Springer. <a href="https://doi.org/10.1007/978-3-319-52452-8">https://doi.org/10.1007/978-3-319-52452-8</a>.
+MacDermott, C., Scarrott, C. J., &amp; Ferguson, J. (2025). <em>Bayes-ically fair: <span>A</span> <span>B</span>ayesian <span>R</span>anking of the <span>O</span>lympic <span>M</span>edal <span>T</span>able</em>. <a href="https://doi.org/10.48550/arXiv.2510.14723">https://doi.org/10.48550/arXiv.2510.14723</a>
 </div>
 </div>
 <div style="page-break-after: always;"></div>
@@ -243,6 +239,19 @@ Shumway, Robert H., and David S. Stoffer. 2017. <em>Time Series Analysis and Its
 <section id="appendix" class="level1">
 <h1>Appendix</h1>
 <p>[Placeholder — full posterior trace plots, Gelman–Rubin statistics, residual diagnostics.]</p>
+<section id="model-inheritance" class="level2">
+<h2 class="anchored" data-anchor-id="model-inheritance">Model Inheritance</h2>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="model_inheritance.png" class="img-fluid figure-img" style="width:60.0%"></p>
+<figcaption>Model inheritance</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 
 </main>
