@@ -45,3 +45,4 @@ bayes_models/tex_formulas/*.aux
 data/models/v*/*.nc
 data/models
 exploratory/*.png
+data/misc_plots
