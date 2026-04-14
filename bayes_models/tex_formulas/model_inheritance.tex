@@ -26,21 +26,29 @@
 \begin{tikzpicture}[node distance=1.8cm and 3.5cm]
 
     % Nodes
-    \node[model] (v1) {\textbf{V1}\\AR(1) + Seasonality};
-    \node[model, below=of v1] (v2) {\textbf{V2}\\Event Effects};
+    \node[model] (v0a) {\textbf{V0a}\\AR(1) Only};
+    \node[model, right=of v0a] (v0b) {\textbf{V0b}\\AR(2) Only};
+    \node[model, below=of v0a] (v1) {\textbf{V1}\\AR(1) + Annual Cycle};
+    \node[model, below left=1.8cm and 2cm of v1] (v2a) {\textbf{V2a}\\New Year Only};
+    \node[model, below right=1.8cm and 2cm of v1] (v2b) {\textbf{V2b}\\Mid West Reset Only};
+    \node[model, below right=1.8cm and -1cm of v2a] (v2) {\textbf{V2}\\Event Effects};
+    \node[model, right=3.5cm of v2] (v2c) {\textbf{V2c}\\6-Month Cycle};
     \node[model, below=of v2] (v3) {\textbf{V3}\\Regional New Year};
     \node[model, below=of v3] (v4) {\textbf{V4}\\Partial Pooling $\alpha$};
     \node[model, below left=of v4] (v5) {\textbf{V5}\\Hierarchical Cost Baseline};
-    \node[model, below right=of v4] (v6) {\textbf{V6}\\Seasonal Hospital Density};
-    \node[model, below=3.5cm of v4] (v7) {\textbf{V7}\\Budget-Scaled Response};
+    \node[model, below right=of v4] (v6) {\textbf{V6}\\Budget-Scaled Response};
 
     % Edges
-    \draw[arr] (v1) -- node[edge label, right] {+ shared event effects} (v2);
+    \draw[arr] (v0a) -- node[edge label, right] {+ annual cycle} (v1);
+    \draw[arr] (v1) -- node[edge label, left] {+ New Year dip only} (v2a);
+    \draw[arr] (v1) -- node[edge label, right] {+ Mid West reset only} (v2b);
+    \draw[arr] (v2a) -- node[edge label, left] {+ Mid West reset} (v2);
+    \draw[arr] (v2b) -- node[edge label, right] {+ New Year dip} (v2);
+    \draw[arr] (v2) -- node[edge label, above] {6-month cycle} (v2c);
     \draw[arr] (v2) -- node[edge label, right] {+ region-specific New Year} (v3);
     \draw[arr] (v3) -- node[edge label, right] {+ hierarchical intercepts} (v4);
     \draw[arr] (v4) -- node[edge label, left] {+ HR budget covariate} (v5);
-    \draw[arr] (v4) -- node[edge label, right] {+ density on seasonality} (v6);
-    \draw[arr] (v4) -- node[edge label, right] {+ budget-scaled response} (v7);
+    \draw[arr] (v4) -- node[edge label, right] {+ budget-scaled response} (v6);
 
 \end{tikzpicture}
 \end{document}

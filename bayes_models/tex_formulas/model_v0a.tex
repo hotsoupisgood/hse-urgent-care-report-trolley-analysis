@@ -1,0 +1,30 @@
+% Model V0a — AR(1) Only (Baseline)
+
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\begin{document}
+
+\section*{Model V0a --- AR(1) Only}
+
+\subsection*{Likelihood}
+
+\begin{align}
+  y_{i,1} &\sim \mathcal{N}(\alpha_i,\ \tau_i^{-1}) \\[6pt]
+  y_{i,t} &\sim \mathcal{N}\left(\alpha_i + \phi\,(y_{i,t-1} - \alpha_i),\ \tau_i^{-1}\right), \quad t > 1
+\end{align}
+
+\subsection*{Mean Function}
+
+\begin{equation}
+  \mu_{i,t} = \alpha_i
+\end{equation}
+
+\subsection*{Priors}
+
+\begin{align}
+  \alpha_i &\sim \mathcal{N}(0,\ 0.001) \\
+  \tau_i &\sim \Gamma(0.001,\ 0.001) \\
+  \phi &\sim \mathrm{Uniform}(-1,\ 1)
+\end{align}
+
+\end{document}

@@ -1,0 +1,380 @@
+---
+output:
+  bookdown::pdf_document2:
+    toc: no
+    number_sections: true
+  bookdown::html_document2:
+    number_sections: true
+bibliography: thesis.bib
+csl: apa.csl
+header-includes:
+  - \usepackage{amsmath, amssymb}
+  - \usepackage{graphicx}
+  - \usepackage{booktabs}
+---
+
+\begin{titlepage}
+\begin{center}
+	\includegraphics[width=7cm]{./logo.jpg}
+\vspace{0.5in}
+
+	\LARGE{MSc Thesis for Health Data Science}
+
+	\Huge{A Bayesian Time-Series Framework for Comparing Hospital Pressure Across Irish HSE Health Regions}
+
+	\Large{Evan Bergin, Lucas Henry}
+
+	\Large{Supervisor: Dr. Carl Scarrott}
+
+	\Large{XXXX 2026}
+
+\end{center}
+\end{titlepage}
+
+\clearpage
+\newpage
+
+\underline{Declaration}
+
+We hereby certify that this material, which we now submit for assessment on the programme of study leading to the award of Master of Science is entirely our own work and had not been taken from the work of others or Artificial Intelligence, save and to the extent that such work has been cited and acknowledged within the text of our work.
+
+ID: 25252089
+
+Date:
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Introduction \label{chap:intro}
+
+# Data \label{chap:data}
+
+## Data Collection \label{sect:data-collection}
+
+
+
+\newpage
+
+# Methods \label{chap:methods}
+## Standardisation \label{sect:standardisation}
+
+Raw trolley counts vary across regions primarily because of population size rather than differences in hospital pressure. To enable fair comparison, counts were standardised to a rate per 10,000 catchment population.
+
+$$
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region catchment population}_i} \times 10{,}000
+$$
+
+This transforms the outcome into patients on trolley per 10,000 population per week, removing the confounding effect of region size and allowing direct comparison of hospital pressure across the six HSE regions.
+
+## Model Development \label{sect:model-development}
+
+The model was developed iteratively. Each extension was motivated by a priori expectation or features observed in the residuals. The DIC comparisons in Table \@ref(tab:spine-dic) should therefore be read as a record of the development process rather than as pre-specified hypothesis tests [YOUR VOICE: add citation if desired, Chatfield (1995) or Gelman \& Hill (2006) both support this framing].
+
+All candidate models share the same Normal likelihood with an AR(1) correction. For region $i$ at week $t$:
+
+$$
+\begin{aligned}
+y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
+\end{aligned}
+$$
+
+The models differ in the mean function $\mu_{i,t}$ and the prior structure on $\alpha_i$. Unless otherwise noted, priors are independent and weakly informative: $\alpha_i, \beta_i, \gamma_i \sim \mathcal{N}(0, 0.001)$, $\tau_i \sim \Gamma(0.001, 0.001)$, $\phi \sim \text{Uniform}(-1, 1)$.
+
+### AR structure {-}
+
+**V0a**: AR(1) baseline. The mean function is a region-level intercept only:
+
+$$
+\mu_{i,t} = \alpha_i
+(\#eq:v0a)
+$$
+
+**V0b**: AR(2) baseline. The mean function is unchanged from V0a, but the AR(1) correction term is replaced by:
+
+$$
+\phi_1(y_{i,t-1} - \mu_{i,t-1}) + \phi_2(y_{i,t-2} - \mu_{i,t-2})
+(\#eq:v0b)
+$$
+
+with $\phi_1, \phi_2 \sim \text{Uniform}(-1,1)$.
+
+[YOUR VOICE: Did AR(2) offer meaningful improvement over AR(1)? See Table \@ref(tab:spine-dic).]
+
+### Annual cycle {-}
+
+**V1**: adds a Fourier pair to capture the annual cycle:
+
+$$
+\mu_{i,t} = \alpha_i
+  + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
+(\#eq:v1)
+$$
+
+### Event effects {-}
+
+**V2**: adds a three-week New Year dip (global, applied to all regions) and a three-week Mid West funding reset (applied only to HSE Mid West, $\text{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})$):
+
+$$
+\begin{aligned}
+\mu_{i,t} &= \alpha_i
+  + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\
+&\quad + \delta_{\text{pre}} \cdot \mathbf{1}(t \bmod 52 = 0)
+  + \delta_{\text{mid}} \cdot \mathbf{1}(t \bmod 52 = 1)
+  + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2) \\
+&\quad + \sigma_{\text{pre}} \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
+  + \sigma_{\text{mid}} \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
+  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+\end{aligned}
+(\#eq:v2)
+$$
+
+To confirm that each event effect contributes independently, two reduced variants were also fitted:
+
+- **V2a**: includes the New Year dip terms only (no Mid West reset)
+- **V2b**: includes the Mid West reset terms only (no New Year dip)
+
+[YOUR VOICE: What did the V2a vs V2b comparison tell you? e.g. "Both effects improved fit individually, but the New Year dip accounted for the larger share of the improvement."]
+
+### Region-specific New Year {-}
+
+**V3**: the global New Year dip parameters $\delta_{\text{pre}}, \delta_{\text{mid}}, \delta_{\text{post}}$ become region-specific: $\delta_{\text{pre},i}, \delta_{\text{mid},i}, \delta_{\text{post},i}$. The rest of the mean function is unchanged from V2.
+
+### Hierarchical intercepts {-}
+
+**V4**: replaces the independent priors on $\alpha_i$ with a hierarchical structure:
+
+$$
+\alpha_i \sim \mathcal{N}(\mu_\alpha,\ \tau_\alpha^{-1})
+(\#eq:v4-hier)
+$$
+
+with hyperpriors $\mu_\alpha \sim \mathcal{N}(0, 0.001)$ and $\tau_\alpha \sim \Gamma(0.001, 0.001)$. The full V4 mean function is given in Equation \@ref(eq:model).
+
+[YOUR VOICE: DIC did not improve from V3 to V4. Why did you keep the hierarchical structure? e.g. partial pooling is theoretically motivated when treating the six regions as exchangeable units of the same health system.]
+
+### DIC comparison {-}
+
+Model fit was compared using the Deviance Information Criterion (DIC; Spiegelhalter et al., 2002). Table \@ref(tab:spine-dic) shows the results for the model development sequence.
+
+```{r spine-dic, results='asis'}
+spine <- data.frame(
+  Model = c("V0a", "V0b", "V1", "V2a", "V2b", "V2", "V3", "V4"),
+  Description = c(
+    "AR(1) only",
+    "AR(2) only",
+    "AR(1) + annual cycle",
+    "V1 + New Year effect only",
+    "V1 + Mid West reset only",
+    "V1 + both event effects",
+    "V2 + region-specific New Year",
+    "V3 + hierarchical intercepts"
+  ),
+  Deviance = c(5344.0, 5331.6, 5294.9, 4682.7, 5259.1, 4637.3, 4555.7, 4556.1),
+  pD      = c(  26.6,   28.8,   51.2,   57.5,   57.0,   63.7,   93.4,   93.9),
+  DIC     = c(5370.6, 5360.4, 5346.1, 4740.2, 5316.1, 4701.0, 4649.1, 4650.0)
+)
+spine$Delta <- round(spine$DIC - min(spine$DIC), 1)
+
+knitr::kable(
+  spine,
+  booktabs = TRUE,
+  digits   = 1,
+  caption  = "DIC comparison for the model development sequence. Delta DIC is relative to the best-fitting model in the set (V3). Lower DIC indicates better fit after penalising for model complexity.",
+  col.names = c("Model", "Description", "Deviance", "pD", "DIC", "Delta DIC")
+)
+```
+
+[YOUR VOICE: 2--3 sentences summarising the key takeaways from the table. For example: the largest DIC drop comes from adding event effects (V1 to V2); the AR(2) extension offered minimal improvement over AR(1); etc.]
+
+## Model \label{sect:model}
+
+Let $y_{i,t}$ denote the scaled trolley count for region $i$ at week $t$, for $i \in \{1,\ldots,6\}$ and $t \in \{1,\ldots,T\}$.
+
+**Likelihood**
+
+$$
+\begin{aligned}
+y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
+\end{aligned}
+$$
+
+**Mean function**
+
+$$
+\begin{aligned}
+  \mu_{i,t} &= \alpha_i
+               + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
+               + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \nonumber \\
+            &\quad + \delta_{\text{pre},i}  \cdot \mathbf{1}(t \bmod 52 = 0)
+               +    \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
+               +    \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2) \nonumber \\
+            &\quad + \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
+               +    \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
+               +    \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+\end{aligned}
+  (\#eq:model)
+$$
+
+```{=html}
+<div style="text-align:center; font-size:0.9em; color:#666; margin-top:-0.75em; margin-bottom:1em;"><em>Model V4 mean function</em></div>
+```
+
+```{=latex}
+\begin{center}\small\emph{Model V4 mean function}\end{center}
+```
+
+ Where $\mathrm{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})$. The $\beta_i$ and $\gamma_i$ coefficients capture the annual seasonal cycle, $\frac{\gamma_i}{\beta_i}$. The $\delta_{\text{pre/mid/post},i}$ components are region level new year effects. The $\sigma_{\cdot}$ component captures the Mid West funding reset.
+
+ The term $\phi\,(y_{i,t-1} - \mu_{i,t-1})$ in Equation \@ref(eq:model) adds an AR(1) component, allowing each weeks observation to depend on the previous week's derivation from the mean.
+
+**Priors**
+
+The baseline parameters $\alpha_i$ are given a hierarchical prior, treating the six HSE regions as exchangeable within the same national health system:
+
+$$
+\begin{aligned}
+\alpha_i &\sim \mathcal{N}(\mu_\alpha,\ \tau_\alpha^{-1}) \\[4pt]
+\mu_\alpha &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_\alpha &\sim \Gamma(0.001,\ 0.001)
+\end{aligned}
+(\#eq:alpha-prior)
+$$
+
+Remaining priors are independent and uninformative:
+
+$$
+\begin{aligned}
+\beta_i,\ \gamma_i,\ \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi &\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
+\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
+\end{aligned}
+$$
+
+## Candidate Extensions \label{sect:extensions}
+
+[YOUR VOICE: 1-2 sentences framing why you tested extensions beyond V4, e.g. to check whether adding covariates or additional cycles could improve fit further.]
+
+Three extensions of V4 were fitted. Each adds a single structural change; the rest of the specification is identical to V4.
+
+- **V5**: replaces the hierarchical intercept mean $\mu_\alpha$ with a budget covariate: $\alpha_i \sim \mathcal{N}(\mu_\lambda \cdot c_i,\ \tau_\alpha^{-1})$, where $c_i$ is the health region budget per 10,000 population.
+- **V6**: adds hierarchical priors on the cycle coefficients $\beta_i$ and $\gamma_i$, moderated by ED hospital density: $\beta_i \sim \mathcal{N}(\mu_\beta + \eta_\beta \cdot \tilde{h}_i,\ \tau_\beta^{-1})$, where $\tilde{h}_i$ is the centred hospital density per 10,000 population (and analogously for $\gamma_i$).
+- **V7**: uses a different response variable: trolley counts scaled by budget per capita rather than population. DIC is not directly comparable to the other models.
+
+```{r extensions-dic, results='asis'}
+ext <- data.frame(
+  Model = c("V4", "V5", "V6"),
+  Description = c(
+    "Base (reference)",
+    "+ budget covariate on intercept",
+    "+ hospital density on cycle"
+  ),
+  Deviance = c(4556.1, 4556.1, 4550.3),
+  pD       = c(  93.9,   93.9,   81.6),
+  DIC      = c(4650.0, 4650.0, 4631.9)
+)
+ext$Delta <- round(ext$DIC - min(ext$DIC), 1)
+
+knitr::kable(
+  ext,
+  booktabs = TRUE,
+  digits   = 1,
+  caption  = "DIC comparison for candidate extensions of V4. Delta DIC is relative to the best-fitting extension (V6). V7 is excluded because it uses a different response variable and its DIC is not comparable.",
+  col.names = c("Model", "Description", "Deviance", "pD", "DIC", "Delta DIC")
+)
+```
+
+[YOUR VOICE: What do these results mean for your model choice? e.g. V6 shows a modest improvement; V5 adds nothing. Did you choose to stay with V4, or move to V6? Why?]
+
+## Posterior Sampling and Bayesian Ranking \label{sect:ranking}
+The *Just another Gibbs sampler* (*rJAGs*), package was used to draw 20,000 samples from the posteior distribution, $A$, illistrated below. Health region baselines, $\alpha^s_j$, were used for ranking. Where $j$ is one of the 6 HSE health regions, $j\in\{1,...,6\}$, and $s$ is the draw index, for $s\in\{1,...,n\}$ and total samples is defined as $n=20{,}000$.
+$$
+  A =
+  \left[ {\begin{array}{ccccc}
+    \alpha_1^1 & \cdots & \alpha_j^1 & \cdots & \alpha_6^1\\
+    \vdots  &        & \vdots\\
+    \alpha_1^s & \cdots & \alpha_j^s& \cdots & \alpha_6^s\\
+    \vdots  &        & \vdots\\
+    \alpha_1^n & \cdots & \alpha_j^n & \cdots & \alpha_6^n\\
+  \end{array} } \right]
+$$
+Ranks follow the posterior ranking approach of @Laird1989, as applied by @MacDermott2025. Where each sample is posterior sample is ranked to form rank distribution, $R$.
+$$
+  R =
+  \left[ {\begin{array}{ccccc}
+    r_1^1 & \cdots & r_j^1 & \cdots & r_6^1\\
+    \vdots  &        & \vdots\\
+    r_1^s & \cdots & r_j^s& \cdots & r_6^s\\
+    \vdots  &        & \vdots\\
+    r_1^n & \cdots & r_j^n & \cdots & r_6^n\\
+  \end{array} } \right]
+$$
+Where $r_j^s=\text{rank}(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s>\alpha_i^s)$. Given a tie, ranks are increased by $\frac{1}{2}$ steps for each tied value.
+$$r^s_j= \sum_{i=1}^{6} \left[ \mathbf{1}(\alpha_j^s > \alpha_i^s) + \tfrac{1}{2}\mathbf{1}(\alpha_j^s = \alpha_i^s) \right]$$
+Then posterior rank averages, $\hat{r}_i$, are calculated taking the mean across samples.
+$$\hat{r}_j=\displaystyle \frac{1}{n}\sum^n_{s=1} r_j^s$$
+$$
+  \hat{R} =
+  \left[ {\begin{array}{ccccc}
+    \hat{r}_1, \hat{r}_2, \hat{r}_3, \hat{r}_4, \hat{r}_5,  \hat{r}_6
+  \end{array} } \right]
+$$
+Then posterior ranked averages are ranked once again to achieve ranked posterior ranked averages are calculated.
+$$
+r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*>\alpha_i^*)
+$$
+$$
+  R^* =
+  \left[ {\begin{array}{ccccc}
+    r^*_1, r^*_2, r^*_3, r^*_4, r^*_5, r^*_6
+  \end{array} } \right]
+$$
+Where $r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j>\hat{r}_i)$.
+
+# Results \label{chap:results}
+
+1. DIC comparison
+2. Posterior summaries for each model
+3. Fitted values plots
+4. Regional rankings.
+
+\newpage
+
+# Conclusions \label{chap:conclusions}
+
+In this research...
+
+\newpage
+
+# References
+
+<div id="refs"></div>
+
+\newpage
+
+# Appendix
+
+[Placeholder — full posterior trace plots, Gelman--Rubin statistics, residual diagnostics.]
+
+## Model Inheritance
+
+```{r model-inheritance, echo=FALSE, fig.cap="Model inheritance", fig.align='center', out.width='60%'}
+fmt <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+ext <- if (!is.null(fmt) && fmt == "latex") "pdf" else "png"
+knitr::include_graphics(paste0("model_inheritance.", ext))
+```
+
+## Full Model Specifications {-}
+
+[Placeholder — include the full equation set for each model (V0a--V9). These are already compiled in `bayes_models/tex_formulas/`.]

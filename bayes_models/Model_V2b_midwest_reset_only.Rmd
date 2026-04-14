@@ -1,0 +1,288 @@
+---
+title: "Model 2b — Mid West Full Reset Only"
+output:
+  pdf_document: default
+---
+
+```{r}
+library('rjags')
+library(dplyr)
+library(tibble)
+library(stringr)
+library(ggplot2)
+library(tidyr)
+
+output_folder = "../data/models/v2b/"
+save_output   = TRUE
+if (save_output) dir.create(output_folder, recursive = TRUE, showWarnings = FALSE)
+```
+
+### Preprocess
+
+#### Load data
+
+Loading data in as a wide data frame
+
+With \~ rows (regions) x columns (weeks)
+
+1st column is the region names
+
+```{r}
+uecDf    = read.csv('../data/wide_weekly_scaledPer10k.csv')
+regions  = uecDf$Region # saving region names
+n.region = length(uecDf$Region) # number of regions
+uecDf    = uecDf %>% select(-Region) # remove region col
+n.weeks  = length(names(uecDf))
+head(uecDf)
+```
+
+#### Reformat Dataframe to Matrix
+
+Formatting as matrix with \~ rows (regions) x columns (weeks)
+
+```{r}
+uecMat = as.matrix(uecDf)
+```
+
+### Model 2b Specification
+
+Model 2b adds only the Mid West full reset effect to the baseline AR(1)
+seasonal structure. No New Year dip is modelled — this isolates the
+contribution of the Mid West structural break at week 86–88.
+
+```{r model-spec}
+model=
+"
+model{
+  # Iterate through the regions
+  for(i in 1:I){
+    #------------
+    #Likelihood
+    #------------
+    # Set first data point in region i to normal
+    y[i,1] ~ dnorm(mu[i,1], tau[i])
+    # Set second on data points to the AR1 model with a mean with a seasonal component
+    for(t in 2:T){
+      y[i,t] ~ dnorm(mu[i,t] +
+      (phi * (y[i,t-1] - mu[i,t-1])), tau[i])
+    }
+    # Assign mean to each time point
+    for(t in 1:T){
+      mu[i,t] <- alpha[i] +
+                 beta[i]      * cos((2 * pi) * (t/52)) +
+                 gamma[i]     * sin((2 * pi) * (t/52)) +
+
+                 sigma_pre   * fr_pre[t]  * mw[i] +
+                 sigma_mid   * fr_mid[t]  * mw[i] +
+                 sigma_post  * fr_post[t] * mw[i]
+    }
+    #Full conditional  mean used in the likelihood
+    fullmod[i,1] <- mu[i,1]
+    for(t in 2:T){
+      fullmod[i,t] <- mu[i,t] + phi * (y[i,t-1] - mu[i,t-1])
+    }
+    #Residuals
+    for(t in 1:T){
+      resid[i,t] <- y[i,t] - fullmod[i,t]
+    }
+    #Region specific priors
+    alpha[i] ~ dnorm(0, 0.001)
+    beta[i]  ~ dnorm(0, 0.001)
+    gamma[i] ~ dnorm(0, 0.001)
+    tau[i]   ~ dgamma(0.001, 0.001)
+  }
+  #non region specific priors
+  phi ~ dunif(-1, 1)
+  sigma_pre  ~ dnorm(0, 0.001)
+  sigma_mid  ~ dnorm(0, 0.001)
+  sigma_post ~ dnorm(0, 0.001)
+}
+"
+# Mid West full reset indicators
+fr_pre  = as.numeric((1:n.weeks) == 86)  # week before reset
+fr_mid  = as.numeric((1:n.weeks) == 87)  # the reset
+fr_post = as.numeric((1:n.weeks) == 88)  # week after reset
+mw      = as.numeric(regions == "HSE Mid West") # 1 only for Mid West
+```
+
+### Fit
+
+```{r fit}
+# fit model
+exp_jags = jags.model(textConnection(model),
+                      list(y  = uecMat,
+                           I  = n.region,
+                           T  = n.weeks,
+                           pi = pi,
+                           fr_pre    = fr_pre,
+                           fr_mid    = fr_mid,
+                           fr_post   = fr_post,
+                           mw        = mw), n.chains = 4)
+update(exp_jags, n.iter = 10000)
+# Parameters to watch
+model_parameters =  c("alpha","beta","gamma",
+                      "tau","phi",
+                      "sigma_pre","sigma_mid","sigma_post")
+# Sample
+exp_sim=coda.samples(model=exp_jags,
+                     variable.names=model_parameters,
+                     n.iter=20000)
+
+gelman_results = gelman.diag(exp_sim, multivariate = FALSE)
+gelman_results
+```
+
+### Fitted Values And Residuals
+
+```{r}
+# Posterior summary for monitored parameters
+jags_sum <- summary(exp_sim)
+df.stats = cbind(
+  as.data.frame(jags_sum$statistics),
+  as.data.frame(jags_sum$quantiles)
+) %>% rownames_to_column(var = "index")
+
+# Posterior mean helpers
+get_region_mean <- function(prefix) {
+  df.stats %>%
+    filter(grepl(paste0("^", prefix, "\\["), index)) %>%
+    arrange(as.integer(str_extract(index, "\\d+"))) %>%
+    pull(Mean)
+}
+
+get_scalar_mean <- function(name) {
+  df.stats %>%
+    filter(index == name) %>%
+    pull(Mean)
+}
+
+# Posterior means
+alpha_mean <- get_region_mean("alpha")
+beta_mean <- get_region_mean("beta")
+gamma_mean <- get_region_mean("gamma")
+phi_mean <- get_scalar_mean("phi")
+sigma_pre_mean <- get_scalar_mean("sigma_pre")
+sigma_mid_mean <- get_scalar_mean("sigma_mid")
+sigma_post_mean <- get_scalar_mean("sigma_post")
+
+# Reconstruct mu and AR(1) fitted values from posterior means
+matrix_mu <- matrix(0, nrow = n.region, ncol = n.weeks)
+matrix_fullmod <- matrix(0, nrow = n.region, ncol = n.weeks)
+
+for (i in seq_len(n.region)) {
+  for (t in seq_len(n.weeks)) {
+    matrix_mu[i, t] <- alpha_mean[i] +
+      beta_mean[i] * cos((2 * pi) * (t / 52)) +
+      gamma_mean[i] * sin((2 * pi) * (t / 52)) +
+      sigma_pre_mean * fr_pre[t] * mw[i] +
+      sigma_mid_mean * fr_mid[t] * mw[i] +
+      sigma_post_mean * fr_post[t] * mw[i]
+  }
+
+  matrix_fullmod[i, 1] <- matrix_mu[i, 1]
+  for (t in 2:n.weeks) {
+    matrix_fullmod[i, t] <- matrix_mu[i, t] + phi_mean * (uecMat[i, t - 1] - matrix_mu[i, t - 1])
+  }
+}
+
+# Save fitted values in long form
+df_fitted = as.data.frame(t(matrix_fullmod))
+colnames(df_fitted) = regions
+df_fitted$time = seq_len(n.weeks)
+df_fitted = df_fitted %>% pivot_longer(-time, names_to = "Region", values_to = "fitted")
+if (save_output) write.csv(df_fitted, paste0(output_folder, "fitted.csv"), row.names = FALSE)
+
+# Residual diagnostics
+matrix_resid = t(uecMat - matrix_fullmod)
+df_resid = as.data.frame(matrix_resid)
+colnames(df_resid) = regions
+df_resid$time = seq_len(nrow(df_resid))
+
+plot_cols <- min(3, n.region)
+plot_rows <- ceiling(n.region / plot_cols)
+
+# Residual plots by region
+par(mfrow = c(plot_rows, plot_cols))
+for (j in seq_len(n.region)) {
+  plot(df_resid$time, matrix_resid[, j], type = "l",
+       main = regions[j], xlab = "Time", ylab = "Residual")
+  abline(h = 0, col = "red", lty = 2)
+}
+par(mfrow = c(1, 1))
+
+# Residual outliers
+df_outliers = df_resid %>%
+  pivot_longer(-time, names_to="Region", values_to="Residual") %>%
+  filter(abs(Residual) > 3)
+df_outliers
+
+# PACF by region
+par(mfrow = c(plot_rows, plot_cols))
+for (j in seq_len(n.region)) {
+  pacf(matrix_resid[, j], lag.max = 55, main = regions[j])
+}
+par(mfrow = c(1, 1))
+
+# QQ by region
+par(mfrow = c(plot_rows, plot_cols))
+for (j in seq_len(n.region)) {
+  qqnorm(matrix_resid[, j], main = regions[j]); qqline(matrix_resid[, j])
+}
+par(mfrow = c(1, 1))
+```
+
+### DIC
+```{r}
+dic_v2b = dic.samples(exp_jags, n.iter = 20000)
+dic_v2b
+df_dic = data.frame(
+  deviance = sum(dic_v2b$deviance),
+  penalty  = sum(dic_v2b$penalty),
+  DIC      = sum(dic_v2b$deviance) + sum(dic_v2b$penalty)
+)
+if (save_output) write.csv(df_dic, paste0(output_folder, "dic.csv"), row.names = FALSE)
+```
+
+### Check Convergence
+
+#### Gelman Rubin Statistic
+
+```{r}
+# Refit for Gelman diagnostic
+exp_jags = jags.model(textConnection(model),
+                      list(y  = uecMat,
+                           I  = n.region,
+                           T  = n.weeks,
+                           pi = pi,
+                           fr_pre    = fr_pre,
+                           fr_mid    = fr_mid,
+                           fr_post   = fr_post,
+                           mw        = mw), n.chains = 4)
+update(exp_jags, n.iter = 10000)
+model_parameters =  c("alpha","beta","gamma",
+                      "tau","phi",
+                      "sigma_pre","sigma_mid","sigma_post")
+exp_sim=coda.samples(model=exp_jags,
+                     variable.names=model_parameters,
+                     n.iter=20000)
+
+gelman_results = gelman.diag(exp_sim, multivariate = FALSE)
+gelman_results
+if (save_output) write.csv(as.matrix(gelman_results),
+                           paste0(output_folder, "gelman.csv"), row.names = FALSE)
+```
+
+### Save
+
+```{r}
+if (save_output) {
+  samples_with_chain = do.call(rbind, lapply(seq_along(exp_sim), function(ch) {
+    df = as.data.frame(exp_sim[[ch]])
+    df$chain = ch
+    df
+  }))
+  write.csv(samples_with_chain,
+            paste0(output_folder, "raw_samples.csv"),
+            row.names = FALSE)
+}
+```

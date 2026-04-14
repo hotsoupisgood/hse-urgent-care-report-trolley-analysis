@@ -6,6 +6,7 @@ import seaborn as sns
 from statsmodels.graphics.gofplots import qqplot
 from statsmodels.nonparametric.smoothers_lowess import lowess
 from statsmodels.graphics.tsaplots import plot_acf
+from scipy.signal import periodogram
 
 SHORT_NAMES = {
     'HSE Dublin and Midlands': 'Dublin & Midlands',
@@ -63,6 +64,10 @@ def build_event_indicators(n_weeks, regions):
         't_vec': t_vec,
         'cos_t': np.cos(2 * np.pi * t_vec / 52),
         'sin_t': np.sin(2 * np.pi * t_vec / 52),
+        'cos_t4': np.cos(2 * np.pi * t_vec / 4),
+        'sin_t4': np.sin(2 * np.pi * t_vec / 4),
+        'cos_t10': np.cos(2 * np.pi * t_vec / 10),
+        'sin_t10': np.sin(2 * np.pi * t_vec / 10),
         'ny_pre': (week_mod == 0).astype(float),
         'ny_mid': (week_mod == 1).astype(float),
         'ny_post': (week_mod == 2).astype(float),
@@ -74,12 +79,15 @@ def build_event_indicators(n_weeks, regions):
     return indicators
 
 
-def reconstruct_mu(raw_df, regions, n_weeks, ev, region_delta=True):
+def reconstruct_mu(raw_df, regions, n_weeks, ev, region_delta=True,
+                   monthly_harmonic=False, tenweek_harmonic=False):
     """Reconstruct posterior mu[i,t] from MCMC samples.
 
     Args:
         region_delta: if True, delta_pre[i] is per-region (V3+).
                       if False, delta_pre is global (V2).
+        monthly_harmonic: if True, include beta4[i]/gamma4[i] period-4 terms (V8).
+        tenweek_harmonic: if True, include beta10[i]/gamma10[i] period-10 terms (V9).
     Returns:
         df_mu, df_mu_lower, df_mu_upper, phi_mean
     """
@@ -92,6 +100,14 @@ def reconstruct_mu(raw_df, regions, n_weeks, ev, region_delta=True):
         mu_i = (raw_df[f'alpha[{i+1}]'].values[:, None]
                 + raw_df[f'beta[{i+1}]'].values[:, None] * ev['cos_t'][None, :]
                 + raw_df[f'gamma[{i+1}]'].values[:, None] * ev['sin_t'][None, :])
+
+        if monthly_harmonic:
+            mu_i += (raw_df[f'beta4[{i+1}]'].values[:, None] * ev['cos_t4'][None, :]
+                     + raw_df[f'gamma4[{i+1}]'].values[:, None] * ev['sin_t4'][None, :])
+
+        if tenweek_harmonic:
+            mu_i += (raw_df[f'beta10[{i+1}]'].values[:, None] * ev['cos_t10'][None, :]
+                     + raw_df[f'gamma10[{i+1}]'].values[:, None] * ev['sin_t10'][None, :])
 
         if region_delta:
             mu_i += (raw_df[f'delta_pre[{i+1}]'].values[:, None] * ev['ny_pre'][None, :]
@@ -116,6 +132,104 @@ def reconstruct_mu(raw_df, regions, n_weeks, ev, region_delta=True):
     phi_mean = raw_df['phi'].mean()
 
     return df_mu, df_mu_lower, df_mu_upper, phi_mean
+
+
+def reconstruct_mu_ny_only(raw_df, regions, n_weeks, ev):
+    """Reconstruct posterior mu[i,t] for V2a — New Year effect only, no Mid West reset.
+
+    delta_pre, delta_mid, delta_post are global (not per-region).
+    """
+    n_region = len(regions)
+    mu_mean_arr = np.zeros((n_weeks, n_region))
+    mu_lower_arr = np.zeros((n_weeks, n_region))
+    mu_upper_arr = np.zeros((n_weeks, n_region))
+
+    for i in range(n_region):
+        mu_i = (raw_df[f'alpha[{i+1}]'].values[:, None]
+                + raw_df[f'beta[{i+1}]'].values[:, None] * ev['cos_t'][None, :]
+                + raw_df[f'gamma[{i+1}]'].values[:, None] * ev['sin_t'][None, :]
+                + raw_df['delta_pre'].values[:, None] * ev['ny_pre'][None, :]
+                + raw_df['delta_mid'].values[:, None] * ev['ny_mid'][None, :]
+                + raw_df['delta_post'].values[:, None] * ev['ny_post'][None, :])
+
+        mu_mean_arr[:, i] = mu_i.mean(axis=0)
+        mu_lower_arr[:, i] = np.quantile(mu_i, 0.025, axis=0)
+        mu_upper_arr[:, i] = np.quantile(mu_i, 0.975, axis=0)
+
+    df_mu = pd.DataFrame(mu_mean_arr, columns=regions)
+    df_mu_lower = pd.DataFrame(mu_lower_arr, columns=regions)
+    df_mu_upper = pd.DataFrame(mu_upper_arr, columns=regions)
+    phi_mean = raw_df['phi'].mean()
+
+    return df_mu, df_mu_lower, df_mu_upper, phi_mean
+
+
+def reconstruct_mu_mw_only(raw_df, regions, n_weeks, ev):
+    """Reconstruct posterior mu[i,t] for V2b — Mid West reset only, no New Year effect.
+
+    sigma_pre, sigma_mid, sigma_post are global, applied only to Mid West.
+    """
+    n_region = len(regions)
+    mu_mean_arr = np.zeros((n_weeks, n_region))
+    mu_lower_arr = np.zeros((n_weeks, n_region))
+    mu_upper_arr = np.zeros((n_weeks, n_region))
+
+    for i in range(n_region):
+        mu_i = (raw_df[f'alpha[{i+1}]'].values[:, None]
+                + raw_df[f'beta[{i+1}]'].values[:, None] * ev['cos_t'][None, :]
+                + raw_df[f'gamma[{i+1}]'].values[:, None] * ev['sin_t'][None, :]
+                + raw_df['sigma_pre'].values[:, None] * (ev['fr_pre'] * ev['mw'][i])[None, :]
+                + raw_df['sigma_mid'].values[:, None] * (ev['fr_mid'] * ev['mw'][i])[None, :]
+                + raw_df['sigma_post'].values[:, None] * (ev['fr_post'] * ev['mw'][i])[None, :])
+
+        mu_mean_arr[:, i] = mu_i.mean(axis=0)
+        mu_lower_arr[:, i] = np.quantile(mu_i, 0.025, axis=0)
+        mu_upper_arr[:, i] = np.quantile(mu_i, 0.975, axis=0)
+
+    df_mu = pd.DataFrame(mu_mean_arr, columns=regions)
+    df_mu_lower = pd.DataFrame(mu_lower_arr, columns=regions)
+    df_mu_upper = pd.DataFrame(mu_upper_arr, columns=regions)
+    phi_mean = raw_df['phi'].mean()
+
+    return df_mu, df_mu_lower, df_mu_upper, phi_mean
+
+
+def reconstruct_mu_baseline(raw_df, regions, n_weeks):
+    """Reconstruct mu[i,t] = alpha[i] for baseline models (V0a/V0b).
+
+    No seasonality, no events — just a constant intercept per region.
+    Returns df_mu, df_mu_lower, df_mu_upper.
+    """
+    n_region = len(regions)
+    mu_mean_arr = np.zeros((n_weeks, n_region))
+    mu_lower_arr = np.zeros((n_weeks, n_region))
+    mu_upper_arr = np.zeros((n_weeks, n_region))
+
+    for i in range(n_region):
+        alpha_i = raw_df[f'alpha[{i+1}]'].values
+        mu_mean_arr[:, i] = alpha_i.mean()
+        mu_lower_arr[:, i] = np.quantile(alpha_i, 0.025)
+        mu_upper_arr[:, i] = np.quantile(alpha_i, 0.975)
+
+    df_mu = pd.DataFrame(mu_mean_arr, columns=regions)
+    df_mu_lower = pd.DataFrame(mu_lower_arr, columns=regions)
+    df_mu_upper = pd.DataFrame(mu_upper_arr, columns=regions)
+    return df_mu, df_mu_lower, df_mu_upper
+
+
+def compute_ar2_fitted(df_mu, df_og, phi1_mean, phi2_mean):
+    """Compute AR(2) fitted values from mu and observed data."""
+    n_weeks = df_mu.shape[0]
+    df_ar2 = df_mu.copy()
+    # t=2: mu + phi1*(y[t-1] - mu[t-1])
+    df_ar2.iloc[1] = (df_mu.iloc[1]
+                       + phi1_mean * (df_og.iloc[0].values - df_mu.iloc[0].values))
+    # t>=3: mu + phi1*(y[t-1] - mu[t-1]) + phi2*(y[t-2] - mu[t-2])
+    for t in range(2, n_weeks):
+        df_ar2.iloc[t] = (df_mu.iloc[t]
+                           + phi1_mean * (df_og.iloc[t-1].values - df_mu.iloc[t-1].values)
+                           + phi2_mean * (df_og.iloc[t-2].values - df_mu.iloc[t-2].values))
+    return df_ar2
 
 
 def compute_ar1_fitted(df_mu, df_og, phi_mean):
@@ -271,6 +385,55 @@ def plot_residuals_qq(df_std_resid, save_path):
     plt.show()
 
 
+def plot_residuals_periodogram(df_std_resid, save_path, fs=1.0):
+    """Power spectral density of residuals via periodogram — 3x2 grid.
+
+    Parameters
+    ----------
+    df_std_resid : DataFrame
+        Standardized residuals, one column per region.
+    save_path : str
+        Path to save the figure.
+    fs : float
+        Sampling frequency in cycles per week (default 1.0 = weekly data).
+    """
+    fig, axes = plt.subplots(3, 2, figsize=(14, 10), layout='constrained')
+
+    ref_periods = [
+        (52, '1 Year'),
+        (26, '6 Months'),
+        (13, '1 Quarter'),
+        (4, '1 Month'),
+    ]
+
+    for ax, col in zip(axes.flatten(), df_std_resid.columns):
+        resid = df_std_resid[col].dropna().values
+        freqs, psd = periodogram(resid, fs=fs, window='hann')
+
+        # Convert frequency to period; skip DC component (freq=0)
+        mask = freqs > 0
+        periods = 1.0 / freqs[mask]
+        power = psd[mask]
+
+        ax.plot(periods, power, linewidth=0.8)
+
+        ax.set_title(f'PSD (Power Spectral Density): {SHORT_NAMES.get(col, col)}',
+                      fontsize=10)
+        ax.set_ylabel('Power')
+        ax.set_xlabel('Period (weeks)')
+        ax.set_xlim(0, 52)
+
+        for period, label in ref_periods:
+            ax.axvline(period, color='red', linestyle='--', linewidth=0.8)
+            ax.annotate(
+                f'\u25c0{label}', xy=(period, 95),
+                fontsize=7, va='top',
+            )
+
+    fig.savefig(save_path, bbox_inches='tight', dpi=150)
+    plt.show()
+
+
 def plot_labeled_scatter(df, x_col, y_col, label_col, save_path, title,
                          xlabel=None, ylabel=None):
     """Scatter plot with region labels and a simple fitted line."""
@@ -369,27 +532,31 @@ def pairwise_heatmap(df_pw, col, title, save_path,
     plt.show()
 
 
-def compute_amplitude(raw_df, regions):
+def compute_amplitude(raw_df, regions, beta_prefix='beta', gamma_prefix='gamma'):
     """Compute seasonal amplitude A_i = sqrt(beta^2 + gamma^2) per region."""
     ampl = {}
     for i, region in enumerate(regions):
-        b = raw_df[f'beta[{i+1}]']
-        g = raw_df[f'gamma[{i+1}]']
+        b = raw_df[f'{beta_prefix}[{i+1}]']
+        g = raw_df[f'{gamma_prefix}[{i+1}]']
         ampl[region] = np.sqrt(b ** 2 + g ** 2)
     return ampl
 
 
-def compute_phase(raw_df, regions):
+def compute_phase(raw_df, regions, beta_prefix='beta', gamma_prefix='gamma',
+                  period=52):
     """Compute peak week from arctan2(gamma, beta) per region.
 
-    Returns dict of {region: peak_week_samples} (each an array of floats in [0, 52)).
+    Args:
+        period: cycle period in weeks (52 for annual, 4 for monthly).
+
+    Returns dict of {region: peak_week_samples} (each an array of floats in [0, period)).
     """
     phase = {}
     for i, region in enumerate(regions):
-        b = raw_df[f'beta[{i+1}]'].values
-        g = raw_df[f'gamma[{i+1}]'].values
+        b = raw_df[f'{beta_prefix}[{i+1}]'].values
+        g = raw_df[f'{gamma_prefix}[{i+1}]'].values
         rad = np.arctan2(g, b)
-        phase[region] = ((52 / (2 * np.pi)) * rad) % 52
+        phase[region] = ((period / (2 * np.pi)) * rad) % period
     return phase
 
 

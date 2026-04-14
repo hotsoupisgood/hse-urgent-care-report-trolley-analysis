@@ -1,0 +1,37 @@
+% Model V0b — AR(2) Only (Baseline)
+
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\begin{document}
+
+\section*{Model V0b --- AR(2) Only}
+
+\subsection*{Likelihood}
+
+\begin{align}
+  y_{i,1} &\sim \mathcal{N}(\alpha_i,\ \tau_i^{-1}) \\[6pt]
+  y_{i,2} &\sim \mathcal{N}\left(\alpha_i + \phi_1\,(y_{i,1} - \alpha_i),\ \tau_i^{-1}\right) \\[6pt]
+  y_{i,t} &\sim \mathcal{N}\left(\alpha_i + \phi_1\,(y_{i,t-1} - \alpha_i) + \phi_2\,(y_{i,t-2} - \alpha_i),\ \tau_i^{-1}\right), \quad t > 2
+\end{align}
+
+\subsection*{Mean Function}
+
+\begin{equation}
+  \mu_{i,t} = \alpha_i
+\end{equation}
+
+\subsection*{Priors}
+
+\begin{align}
+  \alpha_i &\sim \mathcal{N}(0,\ 0.001) \\
+  \tau_i &\sim \Gamma(0.001,\ 0.001) \\
+  \phi_1 &\sim \mathrm{Uniform}(-1,\ 1) \\
+  \phi_2 &\sim \mathrm{Uniform}(-1,\ 1)
+\end{align}
+
+\noindent\textit{Note:} The uniform priors on $\phi_1, \phi_2$ do not enforce the AR(2) stationarity
+triangle ($\phi_1 + \phi_2 < 1$, $\phi_2 - \phi_1 < 1$, $|\phi_2| < 1$).
+This is consistent with the V0a/V1 prior on $\phi$ and allows the posterior to
+signal non-stationarity if present.
+
+\end{document}

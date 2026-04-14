@@ -1,5 +1,5 @@
 ---
-title: "Model V7 — Budget-Scaled Response"
+title: "Model V6 — Budget-Scaled Response"
 output:
   pdf_document: default
 ---
