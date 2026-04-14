@@ -164,7 +164,9 @@ $$
 Where $r_j^s=\text{rank}(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s>\alpha_i^s)$. Given a tie, ranks are increased by $\frac{1}{2}$ steps for each tied value. 
 $$r^s_j= \sum_{i=1}^{6} \left[ \mathbf{1}(\alpha_j^s > \alpha_i^s) + \tfrac{1}{2}\mathbf{1}(\alpha_j^s = \alpha_i^s) \right]$$ 
 Then posterior rank averages, $\hat{r}_i$, are calculated taking the mean across samples.
-$$\hat{r}_j=\displaystyle \frac{1}{n}\sum^n_{s=1} r_j^s$$
+$$
+ \hat{r}_j=\displaystyle \frac{1}{n}\sum^n_{s=1} r_j^s
+$$
 $$
   \hat{R} =
   \left[ {\begin{array}{ccccc}

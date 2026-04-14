@@ -1,1 +1,0 @@
-Model with AR(1) and Annual cycle components

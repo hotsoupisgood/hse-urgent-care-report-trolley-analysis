@@ -11,6 +11,7 @@ header-includes:
   - \usepackage{amsmath, amssymb}
   - \usepackage{graphicx}
   - \usepackage{booktabs}
+  - \usepackage{xcolor}
 ---
 
 \begin{titlepage}
@@ -71,11 +72,11 @@ $$
 y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region catchment population}_i} \times 10{,}000
 $$
 
-This transforms the outcome into patients on trolley per 10,000 population per week, removing the confounding effect of region size and allowing direct comparison of hospital pressure across the six HSE regions.
+This transforms the outcome into patients on trolley per 10,000 population per week, removing the confounding effect of region size and allowing direct comparison of hospital pressure across the six HSE health regions.
 
 ## Model Development \label{sect:model-development}
 
-The model was developed iteratively. Each extension was motivated by a priori expectation or features observed in the residuals. The DIC comparisons in Table \@ref(tab:spine-dic) should therefore be read as a record of the development process rather than as pre-specified hypothesis tests [YOUR VOICE: add citation if desired, Chatfield (1995) or Gelman \& Hill (2006) both support this framing].
+The model was developed iteratively with ever increasing models as described by @gelman_exploratory_2004. Each addition to the model is motivated by a combination of a priori knowledge and residuals. The DIC comparisons in Table \@ref(tab:spine-dic) should be read as a record of the model development.
 
 All candidate models share the same Normal likelihood with an AR(1) correction. For region $i$ at week $t$:
 
@@ -121,7 +122,7 @@ $$
 
 ### Event effects {-}
 
-**V2**: adds a three-week New Year dip (global, applied to all regions) and a three-week Mid West funding reset (applied only to HSE Mid West, $\text{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})$):
+**V2**: adds a three week New Year dip (global, applied to all regions) and a three-week Mid West funding reset (applied only to the Mid West region, $\text{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})$):
 
 $$
 \begin{aligned}
@@ -161,40 +162,6 @@ $$
 with hyperpriors $\mu_\alpha \sim \mathcal{N}(0, 0.001)$ and $\tau_\alpha \sim \Gamma(0.001, 0.001)$. The full V4 mean function is given in Equation \@ref(eq:model).
 
 [YOUR VOICE: DIC did not improve from V3 to V4. Why did you keep the hierarchical structure? e.g. partial pooling is theoretically motivated when treating the six regions as exchangeable units of the same health system.]
-
-### DIC comparison {-}
-
-Model fit was compared using the Deviance Information Criterion (DIC; Spiegelhalter et al., 2002). Table \@ref(tab:spine-dic) shows the results for the model development sequence.
-
-```{r spine-dic, results='asis'}
-spine <- data.frame(
-  Model = c("V0a", "V0b", "V1", "V2a", "V2b", "V2", "V3", "V4"),
-  Description = c(
-    "AR(1) only",
-    "AR(2) only",
-    "AR(1) + annual cycle",
-    "V1 + New Year effect only",
-    "V1 + Mid West reset only",
-    "V1 + both event effects",
-    "V2 + region-specific New Year",
-    "V3 + hierarchical intercepts"
-  ),
-  Deviance = c(5344.0, 5331.6, 5294.9, 4682.7, 5259.1, 4637.3, 4555.7, 4556.1),
-  pD      = c(  26.6,   28.8,   51.2,   57.5,   57.0,   63.7,   93.4,   93.9),
-  DIC     = c(5370.6, 5360.4, 5346.1, 4740.2, 5316.1, 4701.0, 4649.1, 4650.0)
-)
-spine$Delta <- round(spine$DIC - min(spine$DIC), 1)
-
-knitr::kable(
-  spine,
-  booktabs = TRUE,
-  digits   = 1,
-  caption  = "DIC comparison for the model development sequence. Delta DIC is relative to the best-fitting model in the set (V3). Lower DIC indicates better fit after penalising for model complexity.",
-  col.names = c("Model", "Description", "Deviance", "pD", "DIC", "Delta DIC")
-)
-```
-
-[YOUR VOICE: 2--3 sentences summarising the key takeaways from the table. For example: the largest DIC drop comes from adding event effects (V1 to V2); the AR(2) extension offered minimal improvement over AR(1); etc.]
 
 ## Model \label{sect:model}
 
@@ -262,40 +229,10 @@ $$
 \end{aligned}
 $$
 
-## Candidate Extensions \label{sect:extensions}
 
-[YOUR VOICE: 1-2 sentences framing why you tested extensions beyond V4, e.g. to check whether adding covariates or additional cycles could improve fit further.]
+**V5** extends V4 by replacing the response variable with trolley counts scaled by health region budget per 10,000 population, allowing direct cross-region comparison net of funding differences.
 
-Three extensions of V4 were fitted. Each adds a single structural change; the rest of the specification is identical to V4.
-
-- **V5**: replaces the hierarchical intercept mean $\mu_\alpha$ with a budget covariate: $\alpha_i \sim \mathcal{N}(\mu_\lambda \cdot c_i,\ \tau_\alpha^{-1})$, where $c_i$ is the health region budget per 10,000 population.
-- **V6**: adds hierarchical priors on the cycle coefficients $\beta_i$ and $\gamma_i$, moderated by ED hospital density: $\beta_i \sim \mathcal{N}(\mu_\beta + \eta_\beta \cdot \tilde{h}_i,\ \tau_\beta^{-1})$, where $\tilde{h}_i$ is the centred hospital density per 10,000 population (and analogously for $\gamma_i$).
-- **V7**: uses a different response variable: trolley counts scaled by budget per capita rather than population. DIC is not directly comparable to the other models.
-
-```{r extensions-dic, results='asis'}
-ext <- data.frame(
-  Model = c("V4", "V5", "V6"),
-  Description = c(
-    "Base (reference)",
-    "+ budget covariate on intercept",
-    "+ hospital density on cycle"
-  ),
-  Deviance = c(4556.1, 4556.1, 4550.3),
-  pD       = c(  93.9,   93.9,   81.6),
-  DIC      = c(4650.0, 4650.0, 4631.9)
-)
-ext$Delta <- round(ext$DIC - min(ext$DIC), 1)
-
-knitr::kable(
-  ext,
-  booktabs = TRUE,
-  digits   = 1,
-  caption  = "DIC comparison for candidate extensions of V4. Delta DIC is relative to the best-fitting extension (V6). V7 is excluded because it uses a different response variable and its DIC is not comparable.",
-  col.names = c("Model", "Description", "Deviance", "pD", "DIC", "Delta DIC")
-)
-```
-
-[YOUR VOICE: What do these results mean for your model choice? e.g. V6 shows a modest improvement; V5 adds nothing. Did you choose to stay with V4, or move to V6? Why?]
+[YOUR VOICE: Motivate the move to V5 — why does budget-scaling the response make more sense than leaving it in raw population-scaled units?]
 
 ## Posterior Sampling and Bayesian Ranking \label{sect:ranking}
 The *Just another Gibbs sampler* (*rJAGs*), package was used to draw 20,000 samples from the posteior distribution, $A$, illistrated below. Health region baselines, $\alpha^s_j$, were used for ranking. Where $j$ is one of the 6 HSE health regions, $j\in\{1,...,6\}$, and $s$ is the draw index, for $s\in\{1,...,n\}$ and total samples is defined as $n=20{,}000$.
@@ -344,7 +281,31 @@ Where $r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j>\hat{r}_i)$.
 
 # Results \label{chap:results}
 
-1. DIC comparison
+## Model Comparison \label{sect:dic-results}
+
+Model fit was compared using the Deviance Information Criterion (DIC; Spiegelhalter et al., 2002).
+
+```{r spine-dic, results='asis'}
+dic <- read.csv("../pyjags_pipeline/output/dic_comparison.csv",
+                stringsAsFactors = FALSE)
+
+selected <- c("v0.1", "v2.1", "v3.2", "v4.1", "v5.1", "v6.1", "v6.2")
+
+kableExtra::kbl(
+  dic[, c("version", "description", "deviance", "penalty", "DIC")],
+  booktabs  = TRUE,
+  digits    = 1,
+  row.names = FALSE,
+  col.names = c("Model", "Description", "Deviance", "pD", "DIC")
+) |>
+  kableExtra::row_spec(
+    which(dic$version %in% selected),
+    bold       = TRUE,
+    background = "#e8f4f8"
+  )
+```
+
+
 2. Posterior summaries for each model
 3. Fitted values plots
 4. Regional rankings.

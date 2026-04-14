@@ -55,9 +55,12 @@ div.csl-indent {
 <script src="ThesisDraft_v2_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="ThesisDraft_v2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="ThesisDraft_v2_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="ThesisDraft_v2_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="ThesisDraft_v2_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
 </head><body class="fullcontent quarto-light">\usepackage{amsmath, amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{xcolor}
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -124,11 +127,11 @@ window.Quarto = {
 <p><span class="math display">\[
 y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region catchment population}_i} \times 10{,}000
 \]</span></p>
-<p>This transforms the outcome into patients on trolley per 10,000 population per week, removing the confounding effect of region size and allowing direct comparison of hospital pressure across the six HSE regions.</p>
+<p>This transforms the outcome into patients on trolley per 10,000 population per week, removing the confounding effect of region size and allowing direct comparison of hospital pressure across the six HSE health regions.</p>
 </section>
 <section id="model-development" class="level2">
 <h2 class="anchored" data-anchor-id="model-development">Model Development </h2>
-<p>The model was developed iteratively. Each extension was motivated by a priori expectation or features observed in the residuals. The DIC comparisons in Table @ref(tab:spine-dic) should therefore be read as a record of the development process rather than as pre-specified hypothesis tests [YOUR VOICE: add citation if desired, Chatfield (1995) or Gelman &amp; Hill (2006) both support this framing].</p>
+<p>The model was developed iteratively with ever increasing models as described by <span class="citation" data-cites="gelman_exploratory_2004">Gelman (<a href="#ref-gelman_exploratory_2004" role="doc-biblioref">2004</a>)</span>. Each addition to the model is motivated by a combination of a priori knowledge and residuals. The DIC comparisons in Table @ref(tab:spine-dic) should be read as a record of the model development.</p>
 <p>All candidate models share the same Normal likelihood with an AR(1) correction. For region <span class="math inline">\(i\)</span> at week <span class="math inline">\(t\)</span>:</p>
 <p><span class="math display">\[
 \begin{aligned}
@@ -164,7 +167,7 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
 </section>
 <section id="event-effects" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="event-effects">Event effects</h3>
-<p><strong>V2</strong>: adds a three-week New Year dip (global, applied to all regions) and a three-week Mid West funding reset (applied only to HSE Mid West, <span class="math inline">\(\text{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})\)</span>):</p>
+<p><strong>V2</strong>: adds a three week New Year dip (global, applied to all regions) and a three-week Mid West funding reset (applied only to the Mid West region, <span class="math inline">\(\text{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})\)</span>):</p>
 <p><span class="math display">\[
 \begin{aligned}
 \mu_{i,t} &amp;= \alpha_i
@@ -199,98 +202,6 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
 \]</span></p>
 <p>with hyperpriors <span class="math inline">\(\mu_\alpha \sim \mathcal{N}(0, 0.001)\)</span> and <span class="math inline">\(\tau_\alpha \sim \Gamma(0.001, 0.001)\)</span>. The full V4 mean function is given in Equation @ref(eq:model).</p>
 <p>[YOUR VOICE: DIC did not improve from V3 to V4. Why did you keep the hierarchical structure? e.g.&nbsp;partial pooling is theoretically motivated when treating the six regions as exchangeable units of the same health system.]</p>
-</section>
-<section id="dic-comparison" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="dic-comparison">DIC comparison</h3>
-<p>Model fit was compared using the Deviance Information Criterion (DIC; Spiegelhalter et al., 2002). Table @ref(tab:spine-dic) shows the results for the model development sequence.</p>
-<table class="caption-top table">
-<caption>DIC comparison for the model development sequence. Delta DIC is relative to the best-fitting model in the set (V3). Lower DIC indicates better fit after penalising for model complexity.</caption>
-<colgroup>
-<col style="width: 8%">
-<col style="width: 44%">
-<col style="width: 13%">
-<col style="width: 7%">
-<col style="width: 10%">
-<col style="width: 14%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Model</th>
-<th style="text-align: left;">Description</th>
-<th style="text-align: right;">Deviance</th>
-<th style="text-align: right;">pD</th>
-<th style="text-align: right;">DIC</th>
-<th style="text-align: right;">Delta DIC</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">V0a</td>
-<td style="text-align: left;">AR(1) only</td>
-<td style="text-align: right;">5344.0</td>
-<td style="text-align: right;">26.6</td>
-<td style="text-align: right;">5370.6</td>
-<td style="text-align: right;">721.5</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">V0b</td>
-<td style="text-align: left;">AR(2) only</td>
-<td style="text-align: right;">5331.6</td>
-<td style="text-align: right;">28.8</td>
-<td style="text-align: right;">5360.4</td>
-<td style="text-align: right;">711.3</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">V1</td>
-<td style="text-align: left;">AR(1) + annual cycle</td>
-<td style="text-align: right;">5294.9</td>
-<td style="text-align: right;">51.2</td>
-<td style="text-align: right;">5346.1</td>
-<td style="text-align: right;">697.0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">V2a</td>
-<td style="text-align: left;">V1 + New Year effect only</td>
-<td style="text-align: right;">4682.7</td>
-<td style="text-align: right;">57.5</td>
-<td style="text-align: right;">4740.2</td>
-<td style="text-align: right;">91.1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">V2b</td>
-<td style="text-align: left;">V1 + Mid West reset only</td>
-<td style="text-align: right;">5259.1</td>
-<td style="text-align: right;">57.0</td>
-<td style="text-align: right;">5316.1</td>
-<td style="text-align: right;">667.0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">V2</td>
-<td style="text-align: left;">V1 + both event effects</td>
-<td style="text-align: right;">4637.3</td>
-<td style="text-align: right;">63.7</td>
-<td style="text-align: right;">4701.0</td>
-<td style="text-align: right;">51.9</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">V3</td>
-<td style="text-align: left;">V2 + region-specific New Year</td>
-<td style="text-align: right;">4555.7</td>
-<td style="text-align: right;">93.4</td>
-<td style="text-align: right;">4649.1</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">V4</td>
-<td style="text-align: left;">V3 + hierarchical intercepts</td>
-<td style="text-align: right;">4556.1</td>
-<td style="text-align: right;">93.9</td>
-<td style="text-align: right;">4650.0</td>
-<td style="text-align: right;">0.9</td>
-</tr>
-</tbody>
-</table>
-<p>[YOUR VOICE: 2–3 sentences summarising the key takeaways from the table. For example: the largest DIC drop comes from adding event effects (V1 to V2); the AR(2) extension offered minimal improvement over AR(1); etc.]</p>
 </section>
 </section>
 <section id="model" class="level2">
@@ -340,64 +251,8 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
 \sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001)
 \end{aligned}
 \]</span></p>
-</section>
-<section id="candidate-extensions" class="level2">
-<h2 class="anchored" data-anchor-id="candidate-extensions">Candidate Extensions </h2>
-<p>[YOUR VOICE: 1-2 sentences framing why you tested extensions beyond V4, e.g.&nbsp;to check whether adding covariates or additional cycles could improve fit further.]</p>
-<p>Three extensions of V4 were fitted. Each adds a single structural change; the rest of the specification is identical to V4.</p>
-<ul>
-<li><strong>V5</strong>: replaces the hierarchical intercept mean <span class="math inline">\(\mu_\alpha\)</span> with a budget covariate: <span class="math inline">\(\alpha_i \sim \mathcal{N}(\mu_\lambda \cdot c_i,\ \tau_\alpha^{-1})\)</span>, where <span class="math inline">\(c_i\)</span> is the health region budget per 10,000 population.</li>
-<li><strong>V6</strong>: adds hierarchical priors on the cycle coefficients <span class="math inline">\(\beta_i\)</span> and <span class="math inline">\(\gamma_i\)</span>, moderated by ED hospital density: <span class="math inline">\(\beta_i \sim \mathcal{N}(\mu_\beta + \eta_\beta \cdot \tilde{h}_i,\ \tau_\beta^{-1})\)</span>, where <span class="math inline">\(\tilde{h}_i\)</span> is the centred hospital density per 10,000 population (and analogously for <span class="math inline">\(\gamma_i\)</span>).</li>
-<li><strong>V7</strong>: uses a different response variable: trolley counts scaled by budget per capita rather than population. DIC is not directly comparable to the other models.</li>
-</ul>
-<table class="caption-top table">
-<caption>DIC comparison for candidate extensions of V4. Delta DIC is relative to the best-fitting extension (V6). V7 is excluded because it uses a different response variable and its DIC is not comparable.</caption>
-<colgroup>
-<col style="width: 8%">
-<col style="width: 46%">
-<col style="width: 13%">
-<col style="width: 7%">
-<col style="width: 10%">
-<col style="width: 14%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Model</th>
-<th style="text-align: left;">Description</th>
-<th style="text-align: right;">Deviance</th>
-<th style="text-align: right;">pD</th>
-<th style="text-align: right;">DIC</th>
-<th style="text-align: right;">Delta DIC</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">V4</td>
-<td style="text-align: left;">Base (reference)</td>
-<td style="text-align: right;">4556.1</td>
-<td style="text-align: right;">93.9</td>
-<td style="text-align: right;">4650.0</td>
-<td style="text-align: right;">18.1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">V5</td>
-<td style="text-align: left;">+ budget covariate on intercept</td>
-<td style="text-align: right;">4556.1</td>
-<td style="text-align: right;">93.9</td>
-<td style="text-align: right;">4650.0</td>
-<td style="text-align: right;">18.1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">V6</td>
-<td style="text-align: left;">+ hospital density on cycle</td>
-<td style="text-align: right;">4550.3</td>
-<td style="text-align: right;">81.6</td>
-<td style="text-align: right;">4631.9</td>
-<td style="text-align: right;">0.0</td>
-</tr>
-</tbody>
-</table>
-<p>[YOUR VOICE: What do these results mean for your model choice? e.g.&nbsp;V6 shows a modest improvement; V5 adds nothing. Did you choose to stay with V4, or move to V6? Why?]</p>
+<p><strong>V5</strong> extends V4 by replacing the response variable with trolley counts scaled by health region budget per 10,000 population, allowing direct cross-region comparison net of funding differences.</p>
+<p>[YOUR VOICE: Motivate the move to V5 — why does budget-scaling the response make more sense than leaving it in raw population-scaled units?]</p>
 </section>
 <section id="posterior-sampling-and-bayesian-ranking" class="level2">
 <h2 class="anchored" data-anchor-id="posterior-sampling-and-bayesian-ranking">Posterior Sampling and Bayesian Ranking </h2>
@@ -436,13 +291,127 @@ r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*&gt;\alpha_i^*)
 </section>
 <section id="results" class="level1">
 <h1>Results </h1>
-<ol type="1">
-<li>DIC comparison</li>
+<section id="model-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="model-comparison">Model Comparison </h2>
+<p>Model fit was compared using the Deviance Information Criterion (DIC; Spiegelhalter et al., 2002).</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Model</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Description</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviance</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pD</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">DIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v4.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Regional NY + MW Reset</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4555.7</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">93.4</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4649.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v5.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Hierarchical Intercepts</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4556.1</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">93.9</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4650.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v3.2</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Regional New Year Effect</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4604.6</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">87.3</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4691.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v3.1</td>
+<td style="text-align: left;">Global New Year Effect</td>
+<td style="text-align: right;">4682.7</td>
+<td style="text-align: right;">57.5</td>
+<td style="text-align: right;">4740.2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">v3.3</td>
+<td style="text-align: left;">Mid West Reset Only</td>
+<td style="text-align: right;">5259.1</td>
+<td style="text-align: right;">57.0</td>
+<td style="text-align: right;">5316.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v2.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) + Annual Cycle</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5294.9</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">51.2</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5346.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">v2.5</td>
+<td style="text-align: left;">Annual + 2-Month Cycle</td>
+<td style="text-align: right;">5284.9</td>
+<td style="text-align: right;">75.3</td>
+<td style="text-align: right;">5360.2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v0.2</td>
+<td style="text-align: left;">AR(2) Only</td>
+<td style="text-align: right;">5331.6</td>
+<td style="text-align: right;">28.8</td>
+<td style="text-align: right;">5360.4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v0.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) Only</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5344.0</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">26.6</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5370.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v2.4</td>
+<td style="text-align: left;">Annual + 6-Month Cycle</td>
+<td style="text-align: right;">5301.3</td>
+<td style="text-align: right;">75.8</td>
+<td style="text-align: right;">5377.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">v2.3</td>
+<td style="text-align: left;">AR(1) + 2-Month Cycle</td>
+<td style="text-align: right;">5335.3</td>
+<td style="text-align: right;">50.9</td>
+<td style="text-align: right;">5386.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v2.2</td>
+<td style="text-align: left;">AR(1) + 6-Month Cycle</td>
+<td style="text-align: right;">5349.4</td>
+<td style="text-align: right;">51.1</td>
+<td style="text-align: right;">5400.5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v6.2</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Bed-Scaled Response</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11449.2</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">94.4</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11543.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v6.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Budget-Scaled Response</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19858.3</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">79.4</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19937.7</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="1">
 <li>Posterior summaries for each model</li>
 <li>Fitted values plots</li>
 <li>Regional rankings.</li>
 </ol>
 <div style="page-break-after: always;"></div>
+</section>
 </section>
 <section id="conclusions" class="level1">
 <h1>Conclusions </h1>
@@ -452,6 +421,9 @@ r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*&gt;\alpha_i^*)
 <section id="references" class="level1">
 <h1>References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-gelman_exploratory_2004" class="csl-entry" role="listitem">
+Gelman, A. (2004). Exploratory <span>Data</span> <span>Analysis</span> for <span>Complex</span> <span>Models</span>. <em>Journal of Computational and Graphical Statistics</em>, <em>13</em>(4), 755–779. <a href="https://doi.org/10.1198/106186004X11435">https://doi.org/10.1198/106186004X11435</a>
+</div>
 <div id="ref-Laird1989" class="csl-entry" role="listitem">
 Laird, N. M., &amp; Louis, T. A. (1989). Empirical <span>B</span>ayes ranking methods. <em>Journal of Educational Statistics</em>, <em>14</em>(1), 29–46. <a href="https://doi.org/10.3102/10769986014001029">https://doi.org/10.3102/10769986014001029</a>
 </div>
