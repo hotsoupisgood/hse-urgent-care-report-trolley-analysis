@@ -286,10 +286,12 @@ Where $r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j>\hat{r}_i)$.
 Model fit was compared using the Deviance Information Criterion (DIC; Spiegelhalter et al., 2002).
 
 ```{r spine-dic, results='asis'}
-dic <- read.csv("../pyjags_pipeline/output/dic_comparison.csv",
-                stringsAsFactors = FALSE)
+dic_dir <- "../data/models/wide_weekly_scaledPer10k"
+dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full.names = TRUE)
+dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
+dic <- dic[order(dic$DIC), ]
 
-selected <- c("v0.1", "v2.1", "v3.2", "v4.1", "v5.1", "v6.1", "v6.2")
+selected <- c("v0.1", "v2.1", "v3.2", "v4.1", "v5.1")
 
 kableExtra::kbl(
   dic[, c("version", "description", "deviance", "penalty", "DIC")],
