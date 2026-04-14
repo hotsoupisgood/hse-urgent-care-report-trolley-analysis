@@ -27,21 +27,11 @@ CLAUDE.md
 
 # Project-specific
 ~$Poster_Presentation.pptx
-bayes_models/**_files
-bayes_models/**.html
-bayes_models/**.rmarkdown
-
-bayes_models/*.pdf
-bayes_models/*.md
-bayes_models/tex_formulas/*.pdf
-bayes_models/~$*.xlsx
-bayes_models/tex_formulas/*.log
 thesis/_bookdown_files
 out
 .DS_Store
-bayes_models/tex_formulas/*.aux
-exploratory/*.png
 .mplconfig
 data/
 annual_cycle_period_sweep
-pyjags_pipeline
+pyjags_pipeline/output
+deprecated
