@@ -223,7 +223,8 @@ class BaseModel(ABC):
         """Save raw samples, DIC, and Gelman to the output directory."""
         od = result.output_dir
         result.raw_df.to_csv(od / 'raw_samples.csv', index=False)
-        pd.DataFrame([result.dic]).to_csv(od / 'dic.csv', index=False)
+        dic_row = {'version': self.version, 'description': self.name, **result.dic}
+        pd.DataFrame([dic_row]).to_csv(od / 'dic.csv', index=False)
         result.gelman.to_csv(od / 'gelman.csv', index=False)
         result.df_fitted.to_csv(od / 'fitted.csv', index=False)
         result.df_mu.to_csv(od / 'mu.csv', index=False)

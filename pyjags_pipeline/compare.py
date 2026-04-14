@@ -50,5 +50,8 @@ def compare_dic(data_path, versions=None):
             'Run models first with run_model().'
         )
 
-    result = pd.DataFrame(rows)[['version', 'deviance', 'penalty', 'DIC']]
+    cols = ['version', 'description', 'deviance', 'penalty', 'DIC']
+    # description may be absent in older output files
+    available = [c for c in cols if c in pd.DataFrame(rows).columns]
+    result = pd.DataFrame(rows)[available]
     return result.sort_values('DIC').reset_index(drop=True)
