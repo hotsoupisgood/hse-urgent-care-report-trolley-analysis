@@ -35,35 +35,32 @@
 \begin{tikzpicture}[node distance=1.8cm and 0.3cm]
 
     % --- Row 0: AR baseline ---
-    \node[model] (v0_1) {\textbf{V0.1}\\AR(1) Only};
-    \node[unselected, right=2.8cm of v0_1] (v0_2) {\textbf{V0.2}\\AR(2) Only};
+    \node[model] (v0_1) {\textbf{v0.1}\\AR(1) Only};
+    \node[unselected, right=2.8cm of v0_1] (v0_2) {\textbf{v0.2}\\AR(2) Only};
 
-    % --- Row 2: Cycle tests (all on same horizontal plane) ---
-    \node[model, below=of v0_1] (v2_1) {\textbf{V2.1}\\Annual Cycle};
-    \node[unselected, right=of v2_1] (v2_2) {\textbf{V2.2}\\6-Month Cycle};
-    \node[unselected, right=of v2_2] (v2_3) {\textbf{V2.3}\\2-Month Cycle};
-    \node[unselected, right=of v2_3] (v2_4) {\textbf{V2.4}\\Annual + 6-Month};
-    \node[unselected, right=of v2_4] (v2_5) {\textbf{V2.5}\\Annual + 2-Month};
+    % --- Row 2: Cycle tests ---
+    \node[model, below=of v0_1] (v2_1) {\textbf{v2.1}\\Annual Cycle};
+    \node[unselected, right=of v2_1] (v2_2) {\textbf{v2.2}\\6-Month Cycle};
+    \node[unselected, right=of v2_2] (v2_3) {\textbf{v2.3}\\2-Month Cycle};
+    \node[unselected, right=of v2_3] (v2_4) {\textbf{v2.4}\\Annual + 6-Month};
+    \node[unselected, right=of v2_4] (v2_5) {\textbf{v2.5}\\Annual + 2-Month};
 
-    % --- Row 3: New Year effects (V3.2 is spine, directly below V2.1) ---
-    \node[model, below=of v2_1] (v3_2) {\textbf{V3.2}\\Regional New Year};
-    \node[unselected, left=of v3_2] (v3_1) {\textbf{V3.1}\\Global New Year};
-    \node[unselected, right=of v3_2] (v3_3) {\textbf{V3.3}\\MW Reset Only};
+    % --- Row 3: New Year / MW reset ---
+    \node[model, below=of v2_1] (v3_2) {\textbf{v3.2}\\Regional New Year};
+    \node[unselected, left=of v3_2] (v3_1) {\textbf{v3.1}\\Global New Year};
+    \node[unselected, right=of v3_2] (v3_3) {\textbf{v3.3}\\MW Reset Only};
 
     % --- Spine ---
-    \node[model, below=of v3_2] (v4_1) {\textbf{V4.1}\\Regional NY + MW Reset};
-    \node[model, below=of v4_1] (v5_1) {\textbf{V5.1}\\Hierarchical Intercepts};
-    \node[model, below=of v5_1] (v6_1) {\textbf{V6.1}\\Budget-Scaled Response};
-    \node[model, right=of v6_1] (v6_2) {\textbf{V6.2}\\Bed-Scaled Response};
+    \node[model, below=of v3_2] (v4_1) {\textbf{v4.1}\\Regional NY + MW Reset};
+    \node[model, below=of v4_1] (v5_1) {\textbf{v5.1}\\Hierarchical Intercepts};
 
-    % --- Row side labels (all anchored at left edge of V3.1) ---
+    % --- Row side labels ---
     \coordinate (llabel) at ($(v3_1.west) + (-0.4, 0)$);
     \node[row label, anchor=east] at (llabel |- v0_1)  {AR order};
     \node[row label, anchor=east] at (llabel |- v2_1)  {Cycle type};
-    \node[row label, anchor=east] at (llabel |- v3_2)  {New Year};
+    \node[row label, anchor=east] at (llabel |- v3_2)  {Event effects};
     \node[row label, anchor=east] at (llabel |- v4_1)  {MW reset};
     \node[row label, anchor=east] at (llabel |- v5_1)  {Pooling};
-    \node[row label, anchor=east] at (llabel |- v6_1)  {Response scaling};
 
     % --- Horizontal dividers ---
     \coordinate (left)  at ($(v3_1.west) + (-2.8, 0)$);
@@ -77,16 +74,20 @@
         ($(left |- v3_2.south) + (0,-0.5)$) -- ($(right |- v3_2.south) + (0,-0.5)$);
     \draw[dashed, color=divider, line width=0.6pt]
         ($(left |- v4_1.south) + (0,-0.5)$) -- ($(right |- v4_1.south) + (0,-0.5)$);
-    \draw[dashed, color=divider, line width=0.6pt]
-        ($(left |- v5_1.south) + (0,-0.5)$) -- ($(right |- v5_1.south) + (0,-0.5)$);
 
-    % --- Arrows ---
-    \draw[arr branch] (v0_1) -- (v2_1);
-    \draw[arr branch] (v2_1) -- (v3_2);
+    % --- Diagram title ---
+    \node[font=\small\itshape, text=bordergrey, above=0.7cm of v0_1, xshift=5.5cm, anchor=center]
+        {Population-scaled response: trolleys per 10{,}000 population per week};
+
+    % --- Spine arrows ---
+    \draw[arr] (v0_1) -- (v2_1);
+    \draw[arr] (v2_1) -- (v3_2);
     \draw[arr] (v3_2) -- (v4_1);
     \draw[arr] (v4_1) -- (v5_1);
-    \draw[arr] (v5_1) -- (v6_1);
-    \draw[arr branch] (v5_1) -| (v6_2);
+
+    % --- Branch arrows (cross-row only) ---
+    \draw[arr branch] (v2_1) -| (v3_1);
+    \draw[arr branch] (v2_1) -| (v3_3);
 
 \end{tikzpicture}
 \end{document}

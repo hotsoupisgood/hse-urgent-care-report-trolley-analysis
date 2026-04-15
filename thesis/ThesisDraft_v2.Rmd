@@ -12,6 +12,10 @@ header-includes:
   - \usepackage{graphicx}
   - \usepackage{booktabs}
   - \usepackage{xcolor}
+  - \usepackage{caption}
+  - \captionsetup[table]{position=below,skip=6pt}
+  - \usepackage{tikz}
+  - \usetikzlibrary{arrows.meta,positioning,shadows,calc}
 ---
 
 \begin{titlepage}
@@ -59,13 +63,139 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Data Collection \label{sect:data-collection}
 
+\begin{figure}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  node distance=0.7cm,
+  box/.style={
+    rectangle, rounded corners=4pt,
+    draw=black!60, fill=gray!10,
+    text width=2.9cm, minimum height=1.1cm,
+    align=center, font=\small
+  },
+  arr/.style={->, line width=1.8pt, >=Stealth, shorten >=2pt, shorten <=2pt}
+]
+  \node[box] (src)   {Urgent \&\\ Emergency Care\\ Report};
+  \node[box, right=of src]   (db)    {Scrape to\\ PostgreSQL};
+  \node[box, right=of db]    (agg)   {Aggregate\\ to Weeks};
+  \node[box, right=of agg]   (scale) {Scale per\\ 10{,}000};
+  \node[box, right=of scale] (csv)   {Wide CSV};
 
+  \draw[arr] (src)   -- (db);
+  \draw[arr] (db)    -- (agg);
+  \draw[arr] (agg)   -- (scale);
+  \draw[arr] (scale) -- (csv);
+\end{tikzpicture}%
+}% end resizebox
+\caption{Data pipeline from source to model input.}
+\label{fig:data-pipeline}
+\end{figure}
 
 \newpage
 
 # Methods \label{chap:methods}
-## Standardisation \label{sect:standardisation}
 
+## Model Development \label{sect:model-development}
+
+Models were developed iteratively with increasing complexity as described in @gelman_exploratory_2004, and visualised in figure \@ref(fig:model-inheritance). Model components were tested based on a priori expectation, and residual patterns. For instance: On trolley counts vary over time, so autoregressive components were first modeled. Then tested against each other on which minimised the Deviance Information Criterion (DIC) and residuals. Table \@ref(tab:spine-dic-hrpop) reads as a record of this model selection.
+
+### Base Likelihood {-}
+All models share the same Normal likelihood:
+
+$$
+\begin{aligned}
+y_{i,t} &\sim \mathcal{N}(\mu_{i,t},\ \tau_i^{-1}) \\[4pt]
+\end{aligned}
+$$
+
+The models differ in the mean function $\mu_{i,t}$, the prior structure on $\alpha_i$, and autoregressive component, $\phi$.
+
+### AR structure {-}
+
+Autoregressive component of lag 1 and 2 were initially added to the mean of the model. 
+AR(1):
+$$
+\begin{aligned}
+y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + z_{i,t},\ \tau_i^{-1}\right), \quad t > 1 \\
+\text{where} \quad &z_{i,t} = \phi\,(y_{i,t-1} - \mu_{i,t-1}) \\
+\text{with} \quad &\phi \sim \mathrm{Uniform}(-1,1)
+\end{aligned}
+$$
+
+AR(2):
+$$
+\begin{aligned}
+&\phi_1(y_{i,t-1} - \mu_{i,t-1}) + \phi_2(y_{i,t-2} - \mu_{i,t-2})\\
+\text{with} \quad &\phi_1, \phi_2 \sim \text{Uniform}(-1,1)
+\end{aligned}
+(\#eq:v02)
+$$
+
+### Cycles {-}
+Added Fourier pairs to capture seasonal effects. A single harmonic with period $P$ (weeks) is defined as:
+
+$$
+\text{cycle}_i(t;\,P) = \beta_i \cos\!\left(\tfrac{2\pi t}{P}\right) + \gamma_i \sin\!\left(\tfrac{2\pi t}{P}\right)
+(\#eq:cycle-component)
+$$
+
+Single-cycle models set $\text{cycles}_{i,t} = \text{cycle}_i(t;\,P)$ for $P \in \{52, 26, 8\}$ respectively.
+
+Dual-cycle models sum two cycles with independent coefficients:
+
+$$
+\text{cycles}_{i,t} = \text{cycle}_{1,i}(t;\,P_1) + \text{cycle}_{2,i}(t;\,P_2)
+(\#eq:dual-cycle)
+$$
+
+where $(P_1, P_2) \in \{(52, 26),\,(52, 8)\}$. The subscripts on $\text{cycle}_{1,i}$, $\text{cycle}_{2,i}$ correspond to independent coefficient pairs $(\beta_{1,i}, \gamma_{1,i})$ and $(\beta_{2,i}, \gamma_{2,i})$.
+
+### Event effects {-}
+
+Residual patterns motivated testing two event effects. A three week period around New Years (applied globally, or to each region) and a three-week Mid West funding reset (applied only to the Mid West region, $\text{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})$). Each was fitted independently to confirm independent contribution:
+
+Global New Year effect:
+
+$$
+\text{ny}_{t} = \delta_{\text{pre}} \cdot \mathbf{1}(t \bmod 52 = 0)
+  + \delta_{\text{mid}}  \cdot \mathbf{1}(t \bmod 52 = 1)
+  + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2)
+(\#eq:global-ny)
+$$
+
+Regional New Year effect:
+
+$$
+\text{ny}_{i,t} = \delta_{\text{pre},i} \cdot \mathbf{1}(t \bmod 52 = 0)
+  + \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
+  + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2)
+(\#eq:regional-ny)
+$$
+
+Mid West reset:
+
+$$
+\text{mwr}_{i,t} = \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
+  + \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
+  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+(\#eq:mw-reset)
+$$
+
+
+### Hierarchical intercepts {-}
+
+Replaces the independent priors on $\alpha_i$ with a hierarchical structure:
+
+$$
+\alpha_i \sim \mathcal{N}(\mu_\alpha,\ \tau_\alpha^{-1})
+(\#eq:v4-hier)
+$$
+
+with hyperpriors $\mu_\alpha \sim \mathcal{N}(0, 0.001)$ and $\tau_\alpha \sim \Gamma(0.001, 0.001)$. The full v5.1 mean function is given in Equation \@ref(eq:model).
+
+## Response Scaling \label{sect:standardisation}
+The on trolley counts were standardised to 10,000 people in each health region, 
 Raw trolley counts vary across regions primarily because of population size rather than differences in hospital pressure. To enable fair comparison, counts were standardised to a rate per 10,000 catchment population.
 
 $$
@@ -74,11 +204,275 @@ $$
 
 This transforms the outcome into patients on trolley per 10,000 population per week, removing the confounding effect of region size and allowing direct comparison of hospital pressure across the six HSE health regions.
 
-## Model Development \label{sect:model-development}
 
-The model was developed iteratively with ever increasing models as described by @gelman_exploratory_2004. Each addition to the model is motivated by a combination of a priori knowledge and residuals. The DIC comparisons in Table \@ref(tab:spine-dic) should be read as a record of the model development.
+## Posterior Sampling and Bayesian Ranking \label{sect:ranking}
+*Just another Gibbs sampler* (*JAGs*), implemented using pyJAGS [@Nowotny2024pyjags], a Python interface to JAGS [@Plummer2003], was used to sample from the posterior distribution of our parameters given our data. Health region baselines, $\alpha^s_j$, were used for ranking. Where $j$ is one of the 6 HSE health regions, $j\in\{1,...,6\}$, and $s$ is the draw index, for $s\in\{1,...,n\}$ and total samples is defined as $n=20{,}000$.
+$$
+  A =
+  \left[ {\begin{array}{ccccc}
+    \alpha_1^1 & \cdots & \alpha_j^1 & \cdots & \alpha_6^1\\
+    \vdots  &        & \vdots\\
+    \alpha_1^s & \cdots & \alpha_j^s& \cdots & \alpha_6^s\\
+    \vdots  &        & \vdots\\
+    \alpha_1^n & \cdots & \alpha_j^n & \cdots & \alpha_6^n\\
+  \end{array} } \right]
+$$
+Ranks follow the posterior ranking approach of @Laird1989, as applied by @MacDermott2025. Where each sample is posterior sample is ranked to form rank distribution, $R$.
+$$
+  R =
+  \left[ {\begin{array}{ccccc}
+    r_1^1 & \cdots & r_j^1 & \cdots & r_6^1\\
+    \vdots  &        & \vdots\\
+    r_1^s & \cdots & r_j^s& \cdots & r_6^s\\
+    \vdots  &        & \vdots\\
+    r_1^n & \cdots & r_j^n & \cdots & r_6^n\\
+  \end{array} } \right]
+$$
+Where $r_j^s=\text{rank}(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s>\alpha_i^s)$. Given a tie, ranks are increased by $\frac{1}{2}$ steps for each tied value:
+$$r^s_j= \sum_{i=1}^{6} \left[ \mathbf{1}(\alpha_j^s > \alpha_i^s) + \tfrac{1}{2}\mathbf{1}(\alpha_j^s = \alpha_i^s) \right]$$
+Then posterior rank averages, $\hat{r}_i$, are calculated taking the mean across samples.
+$$\hat{r}_j=\displaystyle \frac{1}{n}\sum^n_{s=1} r_j^s$$
+$$
+  \hat{R} =
+  \left[ {\begin{array}{ccccc}
+    \hat{r}_1, \hat{r}_2, \hat{r}_3, \hat{r}_4, \hat{r}_5,  \hat{r}_6
+  \end{array} } \right]
+$$
+Then posterior ranked averages are ranked once again to achieve ranked posterior ranked averages are calculated.
+$$
+r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*>\alpha_i^*)
+$$
+$$
+  R^* =
+  \left[ {\begin{array}{ccccc}
+    r^*_1, r^*_2, r^*_3, r^*_4, r^*_5, r^*_6
+  \end{array} } \right]
+$$
+Where $r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j>\hat{r}_i)$.
 
-All candidate models share the same Normal likelihood with an AR(1) correction. For region $i$ at week $t$:
+# Results \label{chap:results}
+
+## Model Comparison \label{sect:dic-results}
+
+Model fit was compared using the DIC. A DIC table was generated at every response scale.
+
+### Scaled by 2022 health region population (per 10,000 people)
+```{r spine-dic-hrpop, results='asis'}
+dic_dir <- "../data/models/wide_weekly_scaledPer10k"
+dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full.names = TRUE)
+dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
+dic <- dic[order(dic$DIC), ]
+
+selected <- c("v0.1", "v2.1", "v3.2", "v4.1", "v5.1")
+
+kableExtra::kbl(
+  dic[, c("version", "description", "deviance", "penalty", "DIC")],
+  booktabs  = TRUE,
+  digits    = 1,
+  row.names = FALSE,
+  col.names = c("Model", "Description", "Deviance", "pD", "DIC"),
+  caption   = "DIC comparison across the models with a trolley rate per 10,000 people. Bold rows indicate the selected spine."
+) |>
+  kableExtra::row_spec(
+    which(dic$version %in% selected),
+    bold       = TRUE,
+    background = "#e8f4f8"
+  ) |>
+  kableExtra::kable_styling(latex_options = "hold_position")
+```
+
+### Regional Baseline
+
+### Week-to-Week Autocorrelation
+
+### Annual Cycle
+
+### Regional Rankings
+
+\newpage
+
+# Discussion \label{chap:Discussion}
+
+
+\newpage
+
+# References
+
+<div id="refs"></div>
+
+\newpage
+
+# Appendix
+
+Todo: full posterior trace plots, Gelman stats, residual diagnostics.
+
+## Model Inheritance
+
+\definecolor{boxblue}{HTML}{e8f4f8}
+\definecolor{boxborder}{HTML}{2c3e50}
+\definecolor{boxgrey}{HTML}{f0f0f0}
+\definecolor{bordergrey}{HTML}{999999}
+\definecolor{divider}{HTML}{aaaaaa}
+
+\tikzset{
+  model/.style={
+    rectangle, rounded corners=4pt,
+    draw=boxborder, fill=boxblue,
+    minimum width=3.2cm, minimum height=1.1cm,
+    text width=3.0cm, align=center, font=\small,
+    drop shadow={shadow xshift=0.5mm, shadow yshift=-0.5mm}
+  },
+  unselected/.style={
+    rectangle, rounded corners=4pt,
+    draw=boxborder, fill=boxgrey,
+    minimum width=3.2cm, minimum height=1.1cm,
+    text width=3.0cm, align=center, font=\small,
+    drop shadow={shadow xshift=0.5mm, shadow yshift=-0.5mm}
+  },
+  row label/.style={
+    font=\scriptsize\itshape, text=bordergrey,
+    align=right, text width=2.2cm
+  },
+  arr/.style={-Stealth, thick, color=boxborder},
+  arr branch/.style={-Stealth, thin, color=boxborder}
+}
+
+\begin{figure}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[node distance=1.8cm and 0.3cm]
+
+  % --- Row 0: AR baseline ---
+  \node[model] (v0_1) {\textbf{v0.1}\\AR(1) Only};
+  \node[unselected, right=2.8cm of v0_1] (v0_2) {\textbf{v0.2}\\AR(2) Only};
+
+  % --- Row 2: Cycle tests ---
+  \node[model, below=of v0_1] (v2_1) {\textbf{v2.1}\\Annual Cycle};
+  \node[unselected, right=of v2_1] (v2_2) {\textbf{v2.2}\\6-Month Cycle};
+  \node[unselected, right=of v2_2] (v2_3) {\textbf{v2.3}\\2-Month Cycle};
+  \node[unselected, right=of v2_3] (v2_4) {\textbf{v2.4}\\Annual + 6-Month};
+  \node[unselected, right=of v2_4] (v2_5) {\textbf{v2.5}\\Annual + 2-Month};
+
+  % --- Row 3: New Year / MW reset ---
+  \node[model, below=of v2_1] (v3_2) {\textbf{v3.2}\\Regional New Year};
+  \node[unselected, left=of v3_2] (v3_1) {\textbf{v3.1}\\Global New Year};
+  \node[unselected, right=of v3_2] (v3_3) {\textbf{v3.3}\\MW Reset Only};
+
+  % --- Spine ---
+  \node[model, below=of v3_2] (v4_1) {\textbf{v4.1}\\Regional NY + MW Reset};
+  \node[model, below=of v4_1] (v5_1) {\textbf{v5.1}\\Hierarchical Intercepts};
+
+  % --- Row side labels ---
+  \coordinate (llabel) at ($(v3_1.west) + (-0.4, 0)$);
+  \node[row label, anchor=east] at (llabel |- v0_1) {AR order};
+  \node[row label, anchor=east] at (llabel |- v2_1) {Cycle type};
+  \node[row label, anchor=east] at (llabel |- v3_2) {Event effects};
+  \node[row label, anchor=east] at (llabel |- v4_1) {MW reset};
+  \node[row label, anchor=east] at (llabel |- v5_1) {Pooling};
+
+  % --- Horizontal dividers ---
+  \coordinate (left)  at ($(v3_1.west) + (-2.8, 0)$);
+  \coordinate (right) at ($(v2_5.east)  + ( 0.4, 0)$);
+
+  \draw[dashed, color=divider, line width=0.6pt]
+    ($(left |- v0_1.south) + (0,-0.5)$) -- ($(right |- v0_1.south) + (0,-0.5)$);
+  \draw[dashed, color=divider, line width=0.6pt]
+    ($(left |- v2_1.south) + (0,-0.5)$) -- ($(right |- v2_1.south) + (0,-0.5)$);
+  \draw[dashed, color=divider, line width=0.6pt]
+    ($(left |- v3_2.south) + (0,-0.5)$) -- ($(right |- v3_2.south) + (0,-0.5)$);
+  \draw[dashed, color=divider, line width=0.6pt]
+    ($(left |- v4_1.south) + (0,-0.5)$) -- ($(right |- v4_1.south) + (0,-0.5)$);
+
+  % --- Diagram title ---
+  \node[font=\small\itshape, text=bordergrey,
+    above=0.7cm of v0_1, xshift=5.5cm, anchor=center]
+    {Population-scaled response: trolleys per 10{,}000 population per week};
+
+  % --- Spine arrows ---
+  \draw[arr] (v0_1) -- (v2_1);
+  \draw[arr] (v2_1) -- (v3_2);
+  \draw[arr] (v3_2) -- (v4_1);
+  \draw[arr] (v4_1) -- (v5_1);
+
+  % --- Branch arrows ---
+  \draw[arr branch] (v2_1) -| (v3_1);
+
+\end{tikzpicture}%
+}% end resizebox
+\caption{Model inheritance diagram. Spine nodes (blue) form the selected
+model sequence; grey nodes are tested variants. Thick arrows indicate the
+selected path; thin arrows indicate branches.}
+\label{fig:model-inheritance}
+\end{figure}
+
+## Full Model Specifications {-}
+
+Let $y_{i,t}$ denote the scaled trolley count for region $i$ at week $t$, for $i \in \{1,\ldots,6\}$ and $t \in \{1,\ldots,T\}$.
+
+### Model v0.1 {-}
+
+AR(1) component with a baseline. Constant region-level intercept, no cycle, no event effects.
+
+**Likelihood**
+
+$$
+\begin{aligned}
+y_{i,1} &\sim \mathcal{N}(\alpha_i,\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\alpha_i + \phi\,(y_{i,t-1} - \alpha_i),\ \tau_i^{-1}\right), \quad t > 1
+\end{aligned}
+$$
+
+**Mean function**
+
+$$
+\mu_{i,t} = \alpha_i
+$$
+
+**Priors**
+
+$$
+\begin{aligned}
+\alpha_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i   &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi     &\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+$$
+
+### Model v0.2 {-}
+
+AR(2) baseline. Extends v0.1 with a second autoregressive lag.
+
+**Likelihood**
+
+$$
+\begin{aligned}
+y_{i,1} &\sim \mathcal{N}(\alpha_i,\ \tau_i^{-1}) \\[4pt]
+y_{i,2} &\sim \mathcal{N}\!\left(\alpha_i + \phi_1\,(y_{i,1} - \alpha_i),\ \tau_i^{-1}\right) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\alpha_i + \phi_1\,(y_{i,t-1} - \alpha_i) + \phi_2\,(y_{i,t-2} - \alpha_i),\ \tau_i^{-1}\right), \quad t > 2
+\end{aligned}
+$$
+
+**Mean function**
+
+$$
+\mu_{i,t} = \alpha_i
+$$
+
+**Priors**
+
+$$
+\begin{aligned}
+\alpha_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i   &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi_1,\ \phi_2 &\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+$$
+
+### Model v2.1 {-}
+
+Extends v0.1. Adds a region-specific 52-week (annual) cycle.
+
+**Likelihood**
 
 $$
 \begin{aligned}
@@ -87,83 +481,205 @@ y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \
 \end{aligned}
 $$
 
-The models differ in the mean function $\mu_{i,t}$ and the prior structure on $\alpha_i$. Unless otherwise noted, priors are independent and weakly informative: $\alpha_i, \beta_i, \gamma_i \sim \mathcal{N}(0, 0.001)$, $\tau_i \sim \Gamma(0.001, 0.001)$, $\phi \sim \text{Uniform}(-1, 1)$.
-
-### AR structure {-}
-
-**V0a**: AR(1) baseline. The mean function is a region-level intercept only:
+**Mean function**
 
 $$
 \mu_{i,t} = \alpha_i
-(\#eq:v0a)
-$$
-
-**V0b**: AR(2) baseline. The mean function is unchanged from V0a, but the AR(1) correction term is replaced by:
-
-$$
-\phi_1(y_{i,t-1} - \mu_{i,t-1}) + \phi_2(y_{i,t-2} - \mu_{i,t-2})
-(\#eq:v0b)
-$$
-
-with $\phi_1, \phi_2 \sim \text{Uniform}(-1,1)$.
-
-[YOUR VOICE: Did AR(2) offer meaningful improvement over AR(1)? See Table \@ref(tab:spine-dic).]
-
-### Annual cycle {-}
-
-**V1**: adds a Fourier pair to capture the annual cycle:
-
-$$
-\mu_{i,t} = \alpha_i
-  + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
   + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
-(\#eq:v1)
 $$
 
-### Event effects {-}
+**Priors**
 
-**V2**: adds a three week New Year dip (global, applied to all regions) and a three-week Mid West funding reset (applied only to the Mid West region, $\text{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})$):
+$$
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+$$
+
+### Model v2.2 {-}
+
+Extends v0.1. Adds a region-specific 26-week (semi-annual) cycle.
+
+**Mean function**
+
+$$
+\mu_{i,t} = \alpha_i
+  + \beta_i  \cos\!\left(\tfrac{2\pi t}{26}\right)
+  + \gamma_i \sin\!\left(\tfrac{2\pi t}{26}\right)
+$$
+
+Likelihood and priors identical to v2.1.
+
+### Model v2.3 {-}
+
+Extends v0.1. Adds a region-specific 8-week cycle (pre-computed harmonic vectors).
+
+**Mean function**
+
+$$
+\mu_{i,t} = \alpha_i
+  + \beta_i\,\cos_8[t]
+  + \gamma_i\,\sin_8[t]
+$$
+
+where $\cos_8[t] = \cos(2\pi t / 8)$ and $\sin_8[t] = \sin(2\pi t / 8)$.
+
+Likelihood and priors identical to v2.1.
+
+### Model v2.4 {-}
+
+Extends v2.1. Adds a second harmonic at 26 weeks (dual cycle: annual + semi-annual).
+
+**Mean function**
+
+$$
+\mu_{i,t} = \alpha_i
+  + \beta_{1,i}  \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_{1,i} \sin\!\left(\tfrac{2\pi t}{52}\right)
+  + \beta_{2,i}  \cos_{26}[t]
+  + \gamma_{2,i} \sin_{26}[t]
+$$
+
+**Priors**
+
+$$
+\begin{aligned}
+\alpha_i,\ \beta_{1,i},\ \gamma_{1,i},\ \beta_{2,i},\ \gamma_{2,i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+$$
+
+### Model v2.5 {-}
+
+Extends v2.1. Adds a second harmonic at 8 weeks (dual cycle: annual + 8-week).
+
+**Mean function**
+
+$$
+\mu_{i,t} = \alpha_i
+  + \beta_{1,i}  \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_{1,i} \sin\!\left(\tfrac{2\pi t}{52}\right)
+  + \beta_{2,i}  \cos_8[t]
+  + \gamma_{2,i} \sin_8[t]
+$$
+
+Priors identical to v2.4.
+
+### Model v3.1 {-}
+
+Extends v2.1. Adds a global (shared across all regions) three-week New Year effect.
+
+**Mean function**
+
+$$
+\mu_{i,t} = \alpha_i
+  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
+  + \delta_{\text{pre}}  \cdot \mathbf{1}(t \bmod 52 = 0)
+  + \delta_{\text{mid}}  \cdot \mathbf{1}(t \bmod 52 = 1)
+  + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2)
+$$
+
+**Priors**
+
+$$
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
+\delta_{\text{pre}},\ \delta_{\text{mid}},\ \delta_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
+\end{aligned}
+$$
+
+### Model v3.2 {-}
+
+Extends v3.1. New Year effect is region-specific rather than global.
+
+**Mean function**
+
+$$
+\mu_{i,t} = \alpha_i
+  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
+  + \delta_{\text{pre},i}  \cdot \mathbf{1}(t \bmod 52 = 0)
+  + \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
+  + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2)
+$$
+
+**Priors**
+
+$$
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i,\ \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+$$
+
+### Model v3.3 {-}
+
+Extends v2.1. Adds a global Mid West funding reset effect (no New Year effect).
+
+**Mean function**
+
+$$
+\mu_{i,t} = \alpha_i
+  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
+  + \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
+  + \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
+  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+$$
+
+where $\mathrm{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})$.
+
+**Priors**
+
+$$
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
+\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
+\end{aligned}
+$$
+
+### Model v4.1 {-}
+
+Extends v3.2. Combines region-level New Year effects with the global Mid West funding reset.
+
+**Mean function**
 
 $$
 \begin{aligned}
 \mu_{i,t} &= \alpha_i
-  + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
-  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\
-&\quad + \delta_{\text{pre}} \cdot \mathbf{1}(t \bmod 52 = 0)
-  + \delta_{\text{mid}} \cdot \mathbf{1}(t \bmod 52 = 1)
-  + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2) \\
-&\quad + \sigma_{\text{pre}} \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
-  + \sigma_{\text{mid}} \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
-  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+               + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
+               + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\
+            &\quad + \delta_{\text{pre},i}  \cdot \mathbf{1}(t \bmod 52 = 0)
+               +    \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
+               +    \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2) \\
+            &\quad + \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
+               +    \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
+               +    \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
 \end{aligned}
-(\#eq:v2)
 $$
 
-To confirm that each event effect contributes independently, two reduced variants were also fitted:
-
-- **V2a**: includes the New Year dip terms only (no Mid West reset)
-- **V2b**: includes the Mid West reset terms only (no New Year dip)
-
-[YOUR VOICE: What did the V2a vs V2b comparison tell you? e.g. "Both effects improved fit individually, but the New Year dip accounted for the larger share of the improvement."]
-
-### Region-specific New Year {-}
-
-**V3**: the global New Year dip parameters $\delta_{\text{pre}}, \delta_{\text{mid}}, \delta_{\text{post}}$ become region-specific: $\delta_{\text{pre},i}, \delta_{\text{mid},i}, \delta_{\text{post},i}$. The rest of the mean function is unchanged from V2.
-
-### Hierarchical intercepts {-}
-
-**V4**: replaces the independent priors on $\alpha_i$ with a hierarchical structure:
+**Priors**
 
 $$
-\alpha_i \sim \mathcal{N}(\mu_\alpha,\ \tau_\alpha^{-1})
-(\#eq:v4-hier)
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i,\ \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
+\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
+\end{aligned}
 $$
 
-with hyperpriors $\mu_\alpha \sim \mathcal{N}(0, 0.001)$ and $\tau_\alpha \sim \Gamma(0.001, 0.001)$. The full V4 mean function is given in Equation \@ref(eq:model).
-
-[YOUR VOICE: DIC did not improve from V3 to V4. Why did you keep the hierarchical structure? e.g. partial pooling is theoretically motivated when treating the six regions as exchangeable units of the same health system.]
-
-## Model \label{sect:model}
+### Model v5.1 \label{sect:model}
 
 Let $y_{i,t}$ denote the scaled trolley count for region $i$ at week $t$, for $i \in \{1,\ldots,6\}$ and $t \in \{1,\ldots,T\}$.
 
@@ -194,11 +710,11 @@ $$
 $$
 
 ```{=html}
-<div style="text-align:center; font-size:0.9em; color:#666; margin-top:-0.75em; margin-bottom:1em;"><em>Model V4 mean function</em></div>
+<div style="text-align:center; font-size:0.9em; color:#666; margin-top:-0.75em; margin-bottom:1em;"><em>Model v5.1 mean function</em></div>
 ```
 
 ```{=latex}
-\begin{center}\small\emph{Model V4 mean function}\end{center}
+\begin{center}\small\emph{Model v5.1 mean function}\end{center}
 ```
 
  Where $\mathrm{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})$. The $\beta_i$ and $\gamma_i$ coefficients capture the annual seasonal cycle, $\frac{\gamma_i}{\beta_i}$. The $\delta_{\text{pre/mid/post},i}$ components are region level new year effects. The $\sigma_{\cdot}$ component captures the Mid West funding reset.
@@ -229,64 +745,22 @@ $$
 \end{aligned}
 $$
 
+## Alternative Response Scales
 
-**V5** extends V4 by replacing the response variable with trolley counts scaled by health region budget per 10,000 population, allowing direct cross-region comparison net of funding differences.
+The primary analysis uses population-scaled trolley counts (per 10,000 catchment population). Two sensitivity scalings were also fitted to assess robustness of model selection and regional rankings to the choice of denominator.
 
-[YOUR VOICE: Motivate the move to V5 — why does budget-scaling the response make more sense than leaving it in raw population-scaled units?]
+### Budget scaling
 
-## Posterior Sampling and Bayesian Ranking \label{sect:ranking}
-The *Just another Gibbs sampler* (*rJAGs*), package was used to draw 20,000 samples from the posteior distribution, $A$, illistrated below. Health region baselines, $\alpha^s_j$, were used for ranking. Where $j$ is one of the 6 HSE health regions, $j\in\{1,...,6\}$, and $s$ is the draw index, for $s\in\{1,...,n\}$ and total samples is defined as $n=20{,}000$.
-$$
-  A =
-  \left[ {\begin{array}{ccccc}
-    \alpha_1^1 & \cdots & \alpha_j^1 & \cdots & \alpha_6^1\\
-    \vdots  &        & \vdots\\
-    \alpha_1^s & \cdots & \alpha_j^s& \cdots & \alpha_6^s\\
-    \vdots  &        & \vdots\\
-    \alpha_1^n & \cdots & \alpha_j^n & \cdots & \alpha_6^n\\
-  \end{array} } \right]
-$$
-Ranks follow the posterior ranking approach of @Laird1989, as applied by @MacDermott2025. Where each sample is posterior sample is ranked to form rank distribution, $R$.
-$$
-  R =
-  \left[ {\begin{array}{ccccc}
-    r_1^1 & \cdots & r_j^1 & \cdots & r_6^1\\
-    \vdots  &        & \vdots\\
-    r_1^s & \cdots & r_j^s& \cdots & r_6^s\\
-    \vdots  &        & \vdots\\
-    r_1^n & \cdots & r_j^n & \cdots & r_6^n\\
-  \end{array} } \right]
-$$
-Where $r_j^s=\text{rank}(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s>\alpha_i^s)$. Given a tie, ranks are increased by $\frac{1}{2}$ steps for each tied value.
-$$r^s_j= \sum_{i=1}^{6} \left[ \mathbf{1}(\alpha_j^s > \alpha_i^s) + \tfrac{1}{2}\mathbf{1}(\alpha_j^s = \alpha_i^s) \right]$$
-Then posterior rank averages, $\hat{r}_i$, are calculated taking the mean across samples.
-$$\hat{r}_j=\displaystyle \frac{1}{n}\sum^n_{s=1} r_j^s$$
-$$
-  \hat{R} =
-  \left[ {\begin{array}{ccccc}
-    \hat{r}_1, \hat{r}_2, \hat{r}_3, \hat{r}_4, \hat{r}_5,  \hat{r}_6
-  \end{array} } \right]
-$$
-Then posterior ranked averages are ranked once again to achieve ranked posterior ranked averages are calculated.
-$$
-r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*>\alpha_i^*)
-$$
-$$
-  R^* =
-  \left[ {\begin{array}{ccccc}
-    r^*_1, r^*_2, r^*_3, r^*_4, r^*_5, r^*_6
-  \end{array} } \right]
-$$
-Where $r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j>\hat{r}_i)$.
+Weekly trolley counts scaled by the 2026 HSE regional budget allocation, expressing the outcome as trolleys per €1 billion allocated to the region.
 
-# Results \label{chap:results}
+$$
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region budget}_i / 10^6}
+$$
 
-## Model Comparison \label{sect:dic-results}
+where $\text{health region budget}_i$ is the 2026 budget allocation for region $i$ in €thousands. This controls for funding differentials: a region receiving a larger allocation is expected to handle a proportionally larger patient volume.
 
-Model fit was compared using the Deviance Information Criterion (DIC; Spiegelhalter et al., 2002).
-
-```{r spine-dic, results='asis'}
-dic_dir <- "../data/models/wide_weekly_scaledPer10k"
+```{r spine-dic-budget, results='asis'}
+dic_dir <- "../data/models/wide_weekly_scaledPerBudgetThousands"
 dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full.names = TRUE)
 dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
 dic <- dic[order(dic$DIC), ]
@@ -298,7 +772,8 @@ kableExtra::kbl(
   booktabs  = TRUE,
   digits    = 1,
   row.names = FALSE,
-  col.names = c("Model", "Description", "Deviance", "pD", "DIC")
+  col.names = c("Model", "Description", "Deviance", "pD", "DIC"),
+  caption   = "DIC comparison across the models (trolley count scaled by 2026 regional budget). Bold rows indicate the selected spine."
 ) |>
   kableExtra::row_spec(
     which(dic$version %in% selected),
@@ -307,37 +782,35 @@ kableExtra::kbl(
   )
 ```
 
+### Bed scaling
 
-2. Posterior summaries for each model
-3. Fitted values plots
-4. Regional rankings.
+Weekly trolley counts scaled by the number of inpatient beds in each region, expressing the outcome as an overcapacity rate: for every 100 inpatient beds, how many patients were waiting on trolleys that week.
 
-\newpage
+$$
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region inpatient beds}_i} \times 100
+$$
 
-# Conclusions \label{chap:conclusions}
+where $\text{health region inpatient beds}_i$ is the total inpatient bed count across hospitals in region $i$, summed from the June 2025 bed census. Hospitals with missing bed counts are excluded from the regional sum.
 
-In this research...
+```{r spine-dic-bed-count, results='asis'}
+dic_dir <- "../data/models/wide_weekly_scaledPerBed"
+dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full.names = TRUE)
+dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
+dic <- dic[order(dic$DIC), ]
 
-\newpage
+selected <- c("v0.1", "v2.1", "v3.2", "v4.1", "v5.1")
 
-# References
-
-<div id="refs"></div>
-
-\newpage
-
-# Appendix
-
-[Placeholder — full posterior trace plots, Gelman--Rubin statistics, residual diagnostics.]
-
-## Model Inheritance
-
-```{r model-inheritance, echo=FALSE, fig.cap="Model inheritance", fig.align='center', out.width='60%'}
-fmt <- knitr::opts_knit$get("rmarkdown.pandoc.to")
-ext <- if (!is.null(fmt) && fmt == "latex") "pdf" else "png"
-knitr::include_graphics(paste0("model_inheritance.", ext))
+kableExtra::kbl(
+  dic[, c("version", "description", "deviance", "penalty", "DIC")],
+  booktabs  = TRUE,
+  digits    = 1,
+  row.names = FALSE,
+  col.names = c("Model", "Description", "Deviance", "pD", "DIC"),
+  caption   = "DIC comparison across models (response scaled by June 2025 health region inpatient bed count). Bold rows indicate the selected spine."
+) |>
+  kableExtra::row_spec(
+    which(dic$version %in% selected),
+    bold       = TRUE,
+    background = "#e8f4f8"
+  )
 ```
-
-## Full Model Specifications {-}
-
-[Placeholder — include the full equation set for each model (V0a--V9). These are already compiled in `bayes_models/tex_formulas/`.]

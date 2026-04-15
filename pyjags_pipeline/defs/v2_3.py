@@ -14,7 +14,7 @@ class Model(BaseModel):
 
     @property
     def name(self):
-        return 'AR(1) + 2-Month Cycle'
+        return '2 Month Cycle Only'
 
     @property
     def jags_model_string(self):

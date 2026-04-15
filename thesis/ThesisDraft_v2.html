@@ -61,6 +61,10 @@ div.csl-indent {
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{xcolor}
+\usepackage{caption}
+\captionsetup[table]{position=below,skip=6pt}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shadows,calc}
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -121,91 +125,508 @@ window.Quarto = {
 </section>
 <section id="methods" class="level1">
 <h1>Methods </h1>
-<section id="standardisation" class="level2">
-<h2 class="anchored" data-anchor-id="standardisation">Standardisation </h2>
-<p>Raw trolley counts vary across regions primarily because of population size rather than differences in hospital pressure. To enable fair comparison, counts were standardised to a rate per 10,000 catchment population.</p>
+<section id="model-development" class="level2">
+<h2 class="anchored" data-anchor-id="model-development">Model Development </h2>
+<p>Models were developed iteratively with increasing complexity as described in <span class="citation" data-cites="gelman_exploratory_2004">Gelman (<a href="#ref-gelman_exploratory_2004" role="doc-biblioref">2004</a>)</span>, and visualised in figure @ref(fig:model-inheritance). Model components were tested based on a priori expectation, and residual patterns. For instance: On trolley counts vary over time, so autoregressive components were first modeled. Then tested against each other on which minimised the Deviance Information Criterion (DIC) and residuals. Table @ref(tab:spine-dic-hrpop) reads as a record of this model selection.</p>
+<section id="base-likelihood" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="base-likelihood">Base Likelihood</h3>
+<p>All models share the same Normal likelihood:</p>
+<p><span class="math display">\[
+\begin{aligned}
+y_{i,t} &amp;\sim \mathcal{N}(\mu_{i,t},\ \tau_i^{-1}) \\[4pt]
+\end{aligned}
+\]</span></p>
+<p>The models differ in the mean function <span class="math inline">\(\mu_{i,t}\)</span>, the prior structure on <span class="math inline">\(\alpha_i\)</span>, and autoregressive component, <span class="math inline">\(\phi\)</span>.</p>
+</section>
+<section id="ar-structure" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="ar-structure">AR structure</h3>
+<p>Autoregressive component of lag 1 and 2 were initially added to the mean of the model. AR(1): <span class="math display">\[
+\begin{aligned}
+y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + z_{i,t},\ \tau_i^{-1}\right), \quad t &gt; 1 \\
+\text{where} \quad &amp;z_{i,t} = \phi\,(y_{i,t-1} - \mu_{i,t-1}) \\
+\text{with} \quad &amp;\phi \sim \mathrm{Uniform}(-1,1)
+\end{aligned}
+\]</span></p>
+<p>AR(2): <span class="math display">\[
+\begin{aligned}
+&amp;\phi_1(y_{i,t-1} - \mu_{i,t-1}) + \phi_2(y_{i,t-2} - \mu_{i,t-2})\\
+\text{with} \quad &amp;\phi_1, \phi_2 \sim \text{Uniform}(-1,1)
+\end{aligned}
+(\#eq:v02)
+\]</span></p>
+</section>
+<section id="cycles" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="cycles">Cycles</h3>
+<p>Added Fourier pairs to capture seasonal effects. A single harmonic with period <span class="math inline">\(P\)</span> (weeks) is defined as:</p>
+<p><span class="math display">\[
+\text{cycle}_i(t;\,P) = \beta_i \cos\!\left(\tfrac{2\pi t}{P}\right) + \gamma_i \sin\!\left(\tfrac{2\pi t}{P}\right)
+(\#eq:cycle-component)
+\]</span></p>
+<p>Single-cycle models set <span class="math inline">\(\text{cycles}_{i,t} = \text{cycle}_i(t;\,P)\)</span> for <span class="math inline">\(P \in \{52, 26, 8\}\)</span> respectively.</p>
+<p>Dual-cycle models sum two cycles with independent coefficients:</p>
+<p><span class="math display">\[
+\text{cycles}_{i,t} = \text{cycle}_{1,i}(t;\,P_1) + \text{cycle}_{2,i}(t;\,P_2)
+(\#eq:dual-cycle)
+\]</span></p>
+<p>where <span class="math inline">\((P_1, P_2) \in \{(52, 26),\,(52, 8)\}\)</span>. The subscripts on <span class="math inline">\(\text{cycle}_{1,i}\)</span>, <span class="math inline">\(\text{cycle}_{2,i}\)</span> correspond to independent coefficient pairs <span class="math inline">\((\beta_{1,i}, \gamma_{1,i})\)</span> and <span class="math inline">\((\beta_{2,i}, \gamma_{2,i})\)</span>.</p>
+</section>
+<section id="event-effects" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="event-effects">Event effects</h3>
+<p>Residual patterns motivated testing two event effects. A three week period around New Years (applied globally, or to each region) and a three-week Mid West funding reset (applied only to the Mid West region, <span class="math inline">\(\text{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})\)</span>). Each was fitted independently to confirm independent contribution:</p>
+<p>Global New Year effect:</p>
+<p><span class="math display">\[
+\text{ny}_{t} = \delta_{\text{pre}} \cdot \mathbf{1}(t \bmod 52 = 0)
+  + \delta_{\text{mid}}  \cdot \mathbf{1}(t \bmod 52 = 1)
+  + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2)
+(\#eq:global-ny)
+\]</span></p>
+<p>Regional New Year effect:</p>
+<p><span class="math display">\[
+\text{ny}_{i,t} = \delta_{\text{pre},i} \cdot \mathbf{1}(t \bmod 52 = 0)
+  + \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
+  + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2)
+(\#eq:regional-ny)
+\]</span></p>
+<p>Mid West reset:</p>
+<p><span class="math display">\[
+\text{mwr}_{i,t} = \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
+  + \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
+  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+(\#eq:mw-reset)
+\]</span></p>
+</section>
+<section id="hierarchical-intercepts" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="hierarchical-intercepts">Hierarchical intercepts</h3>
+<p>Replaces the independent priors on <span class="math inline">\(\alpha_i\)</span> with a hierarchical structure:</p>
+<p><span class="math display">\[
+\alpha_i \sim \mathcal{N}(\mu_\alpha,\ \tau_\alpha^{-1})
+(\#eq:v4-hier)
+\]</span></p>
+<p>with hyperpriors <span class="math inline">\(\mu_\alpha \sim \mathcal{N}(0, 0.001)\)</span> and <span class="math inline">\(\tau_\alpha \sim \Gamma(0.001, 0.001)\)</span>. The full v5.1 mean function is given in Equation @ref(eq:model).</p>
+</section>
+</section>
+<section id="response-scaling" class="level2">
+<h2 class="anchored" data-anchor-id="response-scaling">Response Scaling </h2>
+<p>The on trolley counts were standardised to 10,000 people in each health region, Raw trolley counts vary across regions primarily because of population size rather than differences in hospital pressure. To enable fair comparison, counts were standardised to a rate per 10,000 catchment population.</p>
 <p><span class="math display">\[
 y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region catchment population}_i} \times 10{,}000
 \]</span></p>
 <p>This transforms the outcome into patients on trolley per 10,000 population per week, removing the confounding effect of region size and allowing direct comparison of hospital pressure across the six HSE health regions.</p>
 </section>
-<section id="model-development" class="level2">
-<h2 class="anchored" data-anchor-id="model-development">Model Development </h2>
-<p>The model was developed iteratively with ever increasing models as described by <span class="citation" data-cites="gelman_exploratory_2004">Gelman (<a href="#ref-gelman_exploratory_2004" role="doc-biblioref">2004</a>)</span>. Each addition to the model is motivated by a combination of a priori knowledge and residuals. The DIC comparisons in Table @ref(tab:spine-dic) should be read as a record of the model development.</p>
-<p>All candidate models share the same Normal likelihood with an AR(1) correction. For region <span class="math inline">\(i\)</span> at week <span class="math inline">\(t\)</span>:</p>
+<section id="posterior-sampling-and-bayesian-ranking" class="level2">
+<h2 class="anchored" data-anchor-id="posterior-sampling-and-bayesian-ranking">Posterior Sampling and Bayesian Ranking </h2>
+<p><em>Just another Gibbs sampler</em> (<em>JAGs</em>), implemented using pyJAGS <span class="citation" data-cites="Nowotny2024pyjags">(<a href="#ref-Nowotny2024pyjags" role="doc-biblioref">Nowotny, 2024</a>)</span>, a Python interface to JAGS <span class="citation" data-cites="Plummer2003">(<a href="#ref-Plummer2003" role="doc-biblioref">Plummer, 2003</a>)</span>, was used to sample from the posterior distribution of our parameters given our data. Health region baselines, <span class="math inline">\(\alpha^s_j\)</span>, were used for ranking. Where <span class="math inline">\(j\)</span> is one of the 6 HSE health regions, <span class="math inline">\(j\in\{1,...,6\}\)</span>, and <span class="math inline">\(s\)</span> is the draw index, for <span class="math inline">\(s\in\{1,...,n\}\)</span> and total samples is defined as <span class="math inline">\(n=20{,}000\)</span>. <span class="math display">\[
+  A =
+  \left[ {\begin{array}{ccccc}
+    \alpha_1^1 &amp; \cdots &amp; \alpha_j^1 &amp; \cdots &amp; \alpha_6^1\\
+    \vdots  &amp;        &amp; \vdots\\
+    \alpha_1^s &amp; \cdots &amp; \alpha_j^s&amp; \cdots &amp; \alpha_6^s\\
+    \vdots  &amp;        &amp; \vdots\\
+    \alpha_1^n &amp; \cdots &amp; \alpha_j^n &amp; \cdots &amp; \alpha_6^n\\
+  \end{array} } \right]
+\]</span> Ranks follow the posterior ranking approach of <span class="citation" data-cites="Laird1989">Laird &amp; Louis (<a href="#ref-Laird1989" role="doc-biblioref">1989</a>)</span>, as applied by <span class="citation" data-cites="MacDermott2025">MacDermott et al. (<a href="#ref-MacDermott2025" role="doc-biblioref">2025</a>)</span>. Where each sample is posterior sample is ranked to form rank distribution, <span class="math inline">\(R\)</span>. <span class="math display">\[
+  R =
+  \left[ {\begin{array}{ccccc}
+    r_1^1 &amp; \cdots &amp; r_j^1 &amp; \cdots &amp; r_6^1\\
+    \vdots  &amp;        &amp; \vdots\\
+    r_1^s &amp; \cdots &amp; r_j^s&amp; \cdots &amp; r_6^s\\
+    \vdots  &amp;        &amp; \vdots\\
+    r_1^n &amp; \cdots &amp; r_j^n &amp; \cdots &amp; r_6^n\\
+  \end{array} } \right]
+\]</span> Where <span class="math inline">\(r_j^s=\text{rank}(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s&gt;\alpha_i^s)\)</span>. Given a tie, ranks are increased by <span class="math inline">\(\frac{1}{2}\)</span> steps for each tied value: <span class="math display">\[r^s_j= \sum_{i=1}^{6} \left[ \mathbf{1}(\alpha_j^s &gt; \alpha_i^s) + \tfrac{1}{2}\mathbf{1}(\alpha_j^s = \alpha_i^s) \right]\]</span> Then posterior rank averages, <span class="math inline">\(\hat{r}_i\)</span>, are calculated taking the mean across samples. <span class="math display">\[\hat{r}_j=\displaystyle \frac{1}{n}\sum^n_{s=1} r_j^s\]</span> <span class="math display">\[
+  \hat{R} =
+  \left[ {\begin{array}{ccccc}
+    \hat{r}_1, \hat{r}_2, \hat{r}_3, \hat{r}_4, \hat{r}_5,  \hat{r}_6
+  \end{array} } \right]
+\]</span> Then posterior ranked averages are ranked once again to achieve ranked posterior ranked averages are calculated. <span class="math display">\[
+r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*&gt;\alpha_i^*)
+\]</span> <span class="math display">\[
+  R^* =
+  \left[ {\begin{array}{ccccc}
+    r^*_1, r^*_2, r^*_3, r^*_4, r^*_5, r^*_6
+  \end{array} } \right]
+\]</span> Where <span class="math inline">\(r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j&gt;\hat{r}_i)\)</span>.</p>
+</section>
+</section>
+<section id="results" class="level1">
+<h1>Results </h1>
+<section id="model-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="model-comparison">Model Comparison </h2>
+<p>Model fit was compared using the DIC. A DIC table was generated at every response scale.</p>
+<section id="scaled-by-2022-health-region-population-per-10000-people" class="level3">
+<h3 class="anchored" data-anchor-id="scaled-by-2022-health-region-population-per-10000-people">Scaled by 2022 health region population (per 10,000 people)</h3>
+<table class="table caption-top">
+<caption>DIC comparison across the models with a trolley rate per 10,000 people. Bold rows indicate the selected spine.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Model</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Description</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviance</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pD</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">DIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v4.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Regional NY + MW Reset</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4555.9</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">93.6</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4649.5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v5.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Hierarchical Intercepts</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4556.2</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">94.1</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4650.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v3.2</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Regional New Year Effect</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4604.6</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">87.3</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4691.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v3.1</td>
+<td style="text-align: left;">Global New Year Effect</td>
+<td style="text-align: right;">4682.7</td>
+<td style="text-align: right;">57.5</td>
+<td style="text-align: right;">4740.2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">v3.3</td>
+<td style="text-align: left;">Mid West Reset Only</td>
+<td style="text-align: right;">5259.2</td>
+<td style="text-align: right;">57.2</td>
+<td style="text-align: right;">5316.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v2.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) + Annual Cycle</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5294.9</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">51.2</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5346.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">v0.2</td>
+<td style="text-align: left;">AR(2) Only</td>
+<td style="text-align: right;">5331.5</td>
+<td style="text-align: right;">28.6</td>
+<td style="text-align: right;">5360.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v2.5</td>
+<td style="text-align: left;">Annual + 2-Month Cycle</td>
+<td style="text-align: right;">5284.9</td>
+<td style="text-align: right;">75.3</td>
+<td style="text-align: right;">5360.2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v0.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) Only</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5344.1</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">26.5</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5370.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v2.4</td>
+<td style="text-align: left;">Annual + 6-Month Cycle</td>
+<td style="text-align: right;">5301.3</td>
+<td style="text-align: right;">75.8</td>
+<td style="text-align: right;">5377.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">v2.3</td>
+<td style="text-align: left;">2 Month Cycle Only</td>
+<td style="text-align: right;">5335.3</td>
+<td style="text-align: right;">50.9</td>
+<td style="text-align: right;">5386.1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v2.2</td>
+<td style="text-align: left;">6 Month Cycle Only</td>
+<td style="text-align: right;">5349.4</td>
+<td style="text-align: right;">51.1</td>
+<td style="text-align: right;">5400.5</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="regional-baseline" class="level3">
+<h3 class="anchored" data-anchor-id="regional-baseline">Regional Baseline</h3>
+</section>
+<section id="week-to-week-autocorrelation" class="level3">
+<h3 class="anchored" data-anchor-id="week-to-week-autocorrelation">Week-to-Week Autocorrelation</h3>
+</section>
+<section id="annual-cycle" class="level3">
+<h3 class="anchored" data-anchor-id="annual-cycle">Annual Cycle</h3>
+</section>
+<section id="regional-rankings" class="level3">
+<h3 class="anchored" data-anchor-id="regional-rankings">Regional Rankings</h3>
+<div style="page-break-after: always;"></div>
+</section>
+</section>
+</section>
+<section id="discussion" class="level1">
+<h1>Discussion </h1>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-gelman_exploratory_2004" class="csl-entry" role="listitem">
+Gelman, A. (2004). Exploratory <span>Data</span> <span>Analysis</span> for <span>Complex</span> <span>Models</span>. <em>Journal of Computational and Graphical Statistics</em>, <em>13</em>(4), 755–779. <a href="https://doi.org/10.1198/106186004X11435">https://doi.org/10.1198/106186004X11435</a>
+</div>
+<div id="ref-Laird1989" class="csl-entry" role="listitem">
+Laird, N. M., &amp; Louis, T. A. (1989). Empirical <span>B</span>ayes ranking methods. <em>Journal of Educational Statistics</em>, <em>14</em>(1), 29–46. <a href="https://doi.org/10.3102/10769986014001029">https://doi.org/10.3102/10769986014001029</a>
+</div>
+<div id="ref-MacDermott2025" class="csl-entry" role="listitem">
+MacDermott, C., Scarrott, C. J., &amp; Ferguson, J. (2025). <em>Bayes-ically fair: <span>A</span> <span>B</span>ayesian <span>R</span>anking of the <span>O</span>lympic <span>M</span>edal <span>T</span>able</em>. <a href="https://doi.org/10.48550/arXiv.2510.14723">https://doi.org/10.48550/arXiv.2510.14723</a>
+</div>
+<div id="ref-Nowotny2024pyjags" class="csl-entry" role="listitem">
+Nowotny, M. (2024). <em><span class="nocase">pyJAGS</span>: A <span>P</span>ython interface to <span>JAGS</span></em> (Version 2.4.0) [Computer software]. <a href="https://github.com/michaelnowotny/pyjags">https://github.com/michaelnowotny/pyjags</a>
+</div>
+<div id="ref-Plummer2003" class="csl-entry" role="listitem">
+Plummer, M. (2003). <span>JAGS</span>: A program for analysis of <span>B</span>ayesian graphical models using <span>G</span>ibbs sampling. <em>Proceedings of the 3rd International Workshop on Distributed Statistical Computing (<span>DSC</span> 2003)</em>. <a href="https://www.r-project.org/conferences/DSC-2003/Proceedings/Plummer.pdf">https://www.r-project.org/conferences/DSC-2003/Proceedings/Plummer.pdf</a>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="appendix" class="level1">
+<h1>Appendix</h1>
+<p>Todo: full posterior trace plots, Gelman stats, residual diagnostics.</p>
+<section id="model-inheritance" class="level2">
+<h2 class="anchored" data-anchor-id="model-inheritance">Model Inheritance</h2>
+
+</section>
+<section id="full-model-specifications" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="full-model-specifications">Full Model Specifications</h2>
+<p>Let <span class="math inline">\(y_{i,t}\)</span> denote the scaled trolley count for region <span class="math inline">\(i\)</span> at week <span class="math inline">\(t\)</span>, for <span class="math inline">\(i \in \{1,\ldots,6\}\)</span> and <span class="math inline">\(t \in \{1,\ldots,T\}\)</span>.</p>
+<section id="model-v0.1" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="model-v0.1">Model v0.1</h3>
+<p>AR(1) component with a baseline. Constant region-level intercept, no cycle, no event effects.</p>
+<p><strong>Likelihood</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+y_{i,1} &amp;\sim \mathcal{N}(\alpha_i,\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &amp;\sim \mathcal{N}\!\left(\alpha_i + \phi\,(y_{i,t-1} - \alpha_i),\ \tau_i^{-1}\right), \quad t &gt; 1
+\end{aligned}
+\]</span></p>
+<p><strong>Mean function</strong></p>
+<p><span class="math display">\[
+\mu_{i,t} = \alpha_i
+\]</span></p>
+<p><strong>Priors</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha_i &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i   &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi     &amp;\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="model-v0.2" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="model-v0.2">Model v0.2</h3>
+<p>AR(2) baseline. Extends v0.1 with a second autoregressive lag.</p>
+<p><strong>Likelihood</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+y_{i,1} &amp;\sim \mathcal{N}(\alpha_i,\ \tau_i^{-1}) \\[4pt]
+y_{i,2} &amp;\sim \mathcal{N}\!\left(\alpha_i + \phi_1\,(y_{i,1} - \alpha_i),\ \tau_i^{-1}\right) \\[4pt]
+y_{i,t} &amp;\sim \mathcal{N}\!\left(\alpha_i + \phi_1\,(y_{i,t-1} - \alpha_i) + \phi_2\,(y_{i,t-2} - \alpha_i),\ \tau_i^{-1}\right), \quad t &gt; 2
+\end{aligned}
+\]</span></p>
+<p><strong>Mean function</strong></p>
+<p><span class="math display">\[
+\mu_{i,t} = \alpha_i
+\]</span></p>
+<p><strong>Priors</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha_i &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i   &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi_1,\ \phi_2 &amp;\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="model-v2.1" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="model-v2.1">Model v2.1</h3>
+<p>Extends v0.1. Adds a region-specific 52-week (annual) cycle.</p>
+<p><strong>Likelihood</strong></p>
 <p><span class="math display">\[
 \begin{aligned}
 y_{i,1} &amp;\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
 y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t &gt; 1
 \end{aligned}
 \]</span></p>
-<p>The models differ in the mean function <span class="math inline">\(\mu_{i,t}\)</span> and the prior structure on <span class="math inline">\(\alpha_i\)</span>. Unless otherwise noted, priors are independent and weakly informative: <span class="math inline">\(\alpha_i, \beta_i, \gamma_i \sim \mathcal{N}(0, 0.001)\)</span>, <span class="math inline">\(\tau_i \sim \Gamma(0.001, 0.001)\)</span>, <span class="math inline">\(\phi \sim \text{Uniform}(-1, 1)\)</span>.</p>
-<section id="ar-structure" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="ar-structure">AR structure</h3>
-<p><strong>V0a</strong>: AR(1) baseline. The mean function is a region-level intercept only:</p>
+<p><strong>Mean function</strong></p>
 <p><span class="math display">\[
 \mu_{i,t} = \alpha_i
-(\#eq:v0a)
-\]</span></p>
-<p><strong>V0b</strong>: AR(2) baseline. The mean function is unchanged from V0a, but the AR(1) correction term is replaced by:</p>
-<p><span class="math display">\[
-\phi_1(y_{i,t-1} - \mu_{i,t-1}) + \phi_2(y_{i,t-2} - \mu_{i,t-2})
-(\#eq:v0b)
-\]</span></p>
-<p>with <span class="math inline">\(\phi_1, \phi_2 \sim \text{Uniform}(-1,1)\)</span>.</p>
-<p>[YOUR VOICE: Did AR(2) offer meaningful improvement over AR(1)? See Table @ref(tab:spine-dic).]</p>
-</section>
-<section id="annual-cycle" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="annual-cycle">Annual cycle</h3>
-<p><strong>V1</strong>: adds a Fourier pair to capture the annual cycle:</p>
-<p><span class="math display">\[
-\mu_{i,t} = \alpha_i
-  + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
   + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
-(\#eq:v1)
+\]</span></p>
+<p><strong>Priors</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &amp;\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
 \]</span></p>
 </section>
-<section id="event-effects" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="event-effects">Event effects</h3>
-<p><strong>V2</strong>: adds a three week New Year dip (global, applied to all regions) and a three-week Mid West funding reset (applied only to the Mid West region, <span class="math inline">\(\text{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})\)</span>):</p>
+<section id="model-v2.2" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="model-v2.2">Model v2.2</h3>
+<p>Extends v0.1. Adds a region-specific 26-week (semi-annual) cycle.</p>
+<p><strong>Mean function</strong></p>
+<p><span class="math display">\[
+\mu_{i,t} = \alpha_i
+  + \beta_i  \cos\!\left(\tfrac{2\pi t}{26}\right)
+  + \gamma_i \sin\!\left(\tfrac{2\pi t}{26}\right)
+\]</span></p>
+<p>Likelihood and priors identical to v2.1.</p>
+</section>
+<section id="model-v2.3" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="model-v2.3">Model v2.3</h3>
+<p>Extends v0.1. Adds a region-specific 8-week cycle (pre-computed harmonic vectors).</p>
+<p><strong>Mean function</strong></p>
+<p><span class="math display">\[
+\mu_{i,t} = \alpha_i
+  + \beta_i\,\cos_8[t]
+  + \gamma_i\,\sin_8[t]
+\]</span></p>
+<p>where <span class="math inline">\(\cos_8[t] = \cos(2\pi t / 8)\)</span> and <span class="math inline">\(\sin_8[t] = \sin(2\pi t / 8)\)</span>.</p>
+<p>Likelihood and priors identical to v2.1.</p>
+</section>
+<section id="model-v2.4" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="model-v2.4">Model v2.4</h3>
+<p>Extends v2.1. Adds a second harmonic at 26 weeks (dual cycle: annual + semi-annual).</p>
+<p><strong>Mean function</strong></p>
+<p><span class="math display">\[
+\mu_{i,t} = \alpha_i
+  + \beta_{1,i}  \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_{1,i} \sin\!\left(\tfrac{2\pi t}{52}\right)
+  + \beta_{2,i}  \cos_{26}[t]
+  + \gamma_{2,i} \sin_{26}[t]
+\]</span></p>
+<p><strong>Priors</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha_i,\ \beta_{1,i},\ \gamma_{1,i},\ \beta_{2,i},\ \gamma_{2,i} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &amp;\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="model-v2.5" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="model-v2.5">Model v2.5</h3>
+<p>Extends v2.1. Adds a second harmonic at 8 weeks (dual cycle: annual + 8-week).</p>
+<p><strong>Mean function</strong></p>
+<p><span class="math display">\[
+\mu_{i,t} = \alpha_i
+  + \beta_{1,i}  \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_{1,i} \sin\!\left(\tfrac{2\pi t}{52}\right)
+  + \beta_{2,i}  \cos_8[t]
+  + \gamma_{2,i} \sin_8[t]
+\]</span></p>
+<p>Priors identical to v2.4.</p>
+</section>
+<section id="model-v3.1" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="model-v3.1">Model v3.1</h3>
+<p>Extends v2.1. Adds a global (shared across all regions) three-week New Year effect.</p>
+<p><strong>Mean function</strong></p>
+<p><span class="math display">\[
+\mu_{i,t} = \alpha_i
+  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
+  + \delta_{\text{pre}}  \cdot \mathbf{1}(t \bmod 52 = 0)
+  + \delta_{\text{mid}}  \cdot \mathbf{1}(t \bmod 52 = 1)
+  + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2)
+\]</span></p>
+<p><strong>Priors</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &amp;\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
+\delta_{\text{pre}},\ \delta_{\text{mid}},\ \delta_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="model-v3.2" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="model-v3.2">Model v3.2</h3>
+<p>Extends v3.1. New Year effect is region-specific rather than global.</p>
+<p><strong>Mean function</strong></p>
+<p><span class="math display">\[
+\mu_{i,t} = \alpha_i
+  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
+  + \delta_{\text{pre},i}  \cdot \mathbf{1}(t \bmod 52 = 0)
+  + \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
+  + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2)
+\]</span></p>
+<p><strong>Priors</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i,\ \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &amp;\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="model-v3.3" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="model-v3.3">Model v3.3</h3>
+<p>Extends v2.1. Adds a global Mid West funding reset effect (no New Year effect).</p>
+<p><strong>Mean function</strong></p>
+<p><span class="math display">\[
+\mu_{i,t} = \alpha_i
+  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
+  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
+  + \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
+  + \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
+  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+\]</span></p>
+<p>where <span class="math inline">\(\mathrm{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})\)</span>.</p>
+<p><strong>Priors</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &amp;\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
+\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001)
+\end{aligned}
+\]</span></p>
+</section>
+<section id="model-v4.1" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="model-v4.1">Model v4.1</h3>
+<p>Extends v3.2. Combines region-level New Year effects with the global Mid West funding reset.</p>
+<p><strong>Mean function</strong></p>
 <p><span class="math display">\[
 \begin{aligned}
 \mu_{i,t} &amp;= \alpha_i
-  + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
-  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\
-&amp;\quad + \delta_{\text{pre}} \cdot \mathbf{1}(t \bmod 52 = 0)
-  + \delta_{\text{mid}} \cdot \mathbf{1}(t \bmod 52 = 1)
-  + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2) \\
-&amp;\quad + \sigma_{\text{pre}} \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
-  + \sigma_{\text{mid}} \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
-  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+               + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
+               + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\
+            &amp;\quad + \delta_{\text{pre},i}  \cdot \mathbf{1}(t \bmod 52 = 0)
+               +    \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
+               +    \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2) \\
+            &amp;\quad + \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
+               +    \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
+               +    \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
 \end{aligned}
-(\#eq:v2)
 \]</span></p>
-<p>To confirm that each event effect contributes independently, two reduced variants were also fitted:</p>
-<ul>
-<li><strong>V2a</strong>: includes the New Year dip terms only (no Mid West reset)</li>
-<li><strong>V2b</strong>: includes the Mid West reset terms only (no New Year dip)</li>
-</ul>
-<p>[YOUR VOICE: What did the V2a vs V2b comparison tell you? e.g.&nbsp;“Both effects improved fit individually, but the New Year dip accounted for the larger share of the improvement.”]</p>
-</section>
-<section id="region-specific-new-year" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="region-specific-new-year">Region-specific New Year</h3>
-<p><strong>V3</strong>: the global New Year dip parameters <span class="math inline">\(\delta_{\text{pre}}, \delta_{\text{mid}}, \delta_{\text{post}}\)</span> become region-specific: <span class="math inline">\(\delta_{\text{pre},i}, \delta_{\text{mid},i}, \delta_{\text{post},i}\)</span>. The rest of the mean function is unchanged from V2.</p>
-</section>
-<section id="hierarchical-intercepts" class="level3 unnumbered">
-<h3 class="unnumbered anchored" data-anchor-id="hierarchical-intercepts">Hierarchical intercepts</h3>
-<p><strong>V4</strong>: replaces the independent priors on <span class="math inline">\(\alpha_i\)</span> with a hierarchical structure:</p>
+<p><strong>Priors</strong></p>
 <p><span class="math display">\[
-\alpha_i \sim \mathcal{N}(\mu_\alpha,\ \tau_\alpha^{-1})
-(\#eq:v4-hier)
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i,\ \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &amp;\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
+\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001)
+\end{aligned}
 \]</span></p>
-<p>with hyperpriors <span class="math inline">\(\mu_\alpha \sim \mathcal{N}(0, 0.001)\)</span> and <span class="math inline">\(\tau_\alpha \sim \Gamma(0.001, 0.001)\)</span>. The full V4 mean function is given in Equation @ref(eq:model).</p>
-<p>[YOUR VOICE: DIC did not improve from V3 to V4. Why did you keep the hierarchical structure? e.g.&nbsp;partial pooling is theoretically motivated when treating the six regions as exchangeable units of the same health system.]</p>
 </section>
-</section>
-<section id="model" class="level2">
-<h2 class="anchored" data-anchor-id="model">Model </h2>
+<section id="model-v5.1" class="level3">
+<h3 class="anchored" data-anchor-id="model-v5.1">Model v5.1 </h3>
 <p>Let <span class="math inline">\(y_{i,t}\)</span> denote the scaled trolley count for region <span class="math inline">\(i\)</span> at week <span class="math inline">\(t\)</span>, for <span class="math inline">\(i \in \{1,\ldots,6\}\)</span> and <span class="math inline">\(t \in \{1,\ldots,T\}\)</span>.</p>
 <p><strong>Likelihood</strong></p>
 <p><span class="math display">\[
@@ -229,7 +650,7 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
 \end{aligned}
   (\#eq:model)
 \]</span></p>
-<div style="text-align:center; font-size:0.9em; color:#666; margin-top:-0.75em; margin-bottom:1em;"><em>Model V4 mean function</em></div>
+<div style="text-align:center; font-size:0.9em; color:#666; margin-top:-0.75em; margin-bottom:1em;"><em>Model v5.1 mean function</em></div>
 <p>Where <span class="math inline">\(\mathrm{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})\)</span>. The <span class="math inline">\(\beta_i\)</span> and <span class="math inline">\(\gamma_i\)</span> coefficients capture the annual seasonal cycle, <span class="math inline">\(\frac{\gamma_i}{\beta_i}\)</span>. The <span class="math inline">\(\delta_{\text{pre/mid/post},i}\)</span> components are region level new year effects. The <span class="math inline">\(\sigma_{\cdot}\)</span> component captures the Mid West funding reset.</p>
 <p>The term <span class="math inline">\(\phi\,(y_{i,t-1} - \mu_{i,t-1})\)</span> in Equation @ref(eq:model) adds an AR(1) component, allowing each weeks observation to depend on the previous week’s derivation from the mean.</p>
 <p><strong>Priors</strong></p>
@@ -251,50 +672,126 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
 \sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001)
 \end{aligned}
 \]</span></p>
-<p><strong>V5</strong> extends V4 by replacing the response variable with trolley counts scaled by health region budget per 10,000 population, allowing direct cross-region comparison net of funding differences.</p>
-<p>[YOUR VOICE: Motivate the move to V5 — why does budget-scaling the response make more sense than leaving it in raw population-scaled units?]</p>
-</section>
-<section id="posterior-sampling-and-bayesian-ranking" class="level2">
-<h2 class="anchored" data-anchor-id="posterior-sampling-and-bayesian-ranking">Posterior Sampling and Bayesian Ranking </h2>
-<p>The <em>Just another Gibbs sampler</em> (<em>rJAGs</em>), package was used to draw 20,000 samples from the posteior distribution, <span class="math inline">\(A\)</span>, illistrated below. Health region baselines, <span class="math inline">\(\alpha^s_j\)</span>, were used for ranking. Where <span class="math inline">\(j\)</span> is one of the 6 HSE health regions, <span class="math inline">\(j\in\{1,...,6\}\)</span>, and <span class="math inline">\(s\)</span> is the draw index, for <span class="math inline">\(s\in\{1,...,n\}\)</span> and total samples is defined as <span class="math inline">\(n=20{,}000\)</span>. <span class="math display">\[
-  A =
-  \left[ {\begin{array}{ccccc}
-    \alpha_1^1 &amp; \cdots &amp; \alpha_j^1 &amp; \cdots &amp; \alpha_6^1\\
-    \vdots  &amp;        &amp; \vdots\\
-    \alpha_1^s &amp; \cdots &amp; \alpha_j^s&amp; \cdots &amp; \alpha_6^s\\
-    \vdots  &amp;        &amp; \vdots\\
-    \alpha_1^n &amp; \cdots &amp; \alpha_j^n &amp; \cdots &amp; \alpha_6^n\\
-  \end{array} } \right]
-\]</span> Ranks follow the posterior ranking approach of <span class="citation" data-cites="Laird1989">Laird &amp; Louis (<a href="#ref-Laird1989" role="doc-biblioref">1989</a>)</span>, as applied by <span class="citation" data-cites="MacDermott2025">MacDermott et al. (<a href="#ref-MacDermott2025" role="doc-biblioref">2025</a>)</span>. Where each sample is posterior sample is ranked to form rank distribution, <span class="math inline">\(R\)</span>. <span class="math display">\[
-  R =
-  \left[ {\begin{array}{ccccc}
-    r_1^1 &amp; \cdots &amp; r_j^1 &amp; \cdots &amp; r_6^1\\
-    \vdots  &amp;        &amp; \vdots\\
-    r_1^s &amp; \cdots &amp; r_j^s&amp; \cdots &amp; r_6^s\\
-    \vdots  &amp;        &amp; \vdots\\
-    r_1^n &amp; \cdots &amp; r_j^n &amp; \cdots &amp; r_6^n\\
-  \end{array} } \right]
-\]</span> Where <span class="math inline">\(r_j^s=\text{rank}(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s&gt;\alpha_i^s)\)</span>. Given a tie, ranks are increased by <span class="math inline">\(\frac{1}{2}\)</span> steps for each tied value. <span class="math display">\[r^s_j= \sum_{i=1}^{6} \left[ \mathbf{1}(\alpha_j^s &gt; \alpha_i^s) + \tfrac{1}{2}\mathbf{1}(\alpha_j^s = \alpha_i^s) \right]\]</span> Then posterior rank averages, <span class="math inline">\(\hat{r}_i\)</span>, are calculated taking the mean across samples. <span class="math display">\[\hat{r}_j=\displaystyle \frac{1}{n}\sum^n_{s=1} r_j^s\]</span> <span class="math display">\[
-  \hat{R} =
-  \left[ {\begin{array}{ccccc}
-    \hat{r}_1, \hat{r}_2, \hat{r}_3, \hat{r}_4, \hat{r}_5,  \hat{r}_6
-  \end{array} } \right]
-\]</span> Then posterior ranked averages are ranked once again to achieve ranked posterior ranked averages are calculated. <span class="math display">\[
-r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*&gt;\alpha_i^*)
-\]</span> <span class="math display">\[
-  R^* =
-  \left[ {\begin{array}{ccccc}
-    r^*_1, r^*_2, r^*_3, r^*_4, r^*_5, r^*_6
-  \end{array} } \right]
-\]</span> Where <span class="math inline">\(r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j&gt;\hat{r}_i)\)</span>.</p>
 </section>
 </section>
-<section id="results" class="level1">
-<h1>Results </h1>
-<section id="model-comparison" class="level2">
-<h2 class="anchored" data-anchor-id="model-comparison">Model Comparison </h2>
-<p>Model fit was compared using the Deviance Information Criterion (DIC; Spiegelhalter et al., 2002).</p>
+<section id="alternative-response-scales" class="level2">
+<h2 class="anchored" data-anchor-id="alternative-response-scales">Alternative Response Scales</h2>
+<p>The primary analysis uses population-scaled trolley counts (per 10,000 catchment population). Two sensitivity scalings were also fitted to assess robustness of model selection and regional rankings to the choice of denominator.</p>
+<section id="budget-scaling" class="level3">
+<h3 class="anchored" data-anchor-id="budget-scaling">Budget scaling</h3>
+<p>Weekly trolley counts scaled by the 2026 HSE regional budget allocation, expressing the outcome as trolleys per €1 billion allocated to the region.</p>
+<p><span class="math display">\[
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region budget}_i / 10^6}
+\]</span></p>
+<p>where <span class="math inline">\(\text{health region budget}_i\)</span> is the 2026 budget allocation for region <span class="math inline">\(i\)</span> in €thousands. This controls for funding differentials: a region receiving a larger allocation is expected to handle a proportionally larger patient volume.</p>
 <table class="caption-top table">
+<caption>DIC comparison across the models (trolley count scaled by 2026 regional budget). Bold rows indicate the selected spine.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Model</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Description</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Deviance</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">pD</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">DIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v5.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Hierarchical Intercepts</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19858.3</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">80.6</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19938.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v3.1</td>
+<td style="text-align: left;">Global New Year Effect</td>
+<td style="text-align: right;">19920.3</td>
+<td style="text-align: right;">54.9</td>
+<td style="text-align: right;">19975.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v4.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Regional NY + MW Reset</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19899.9</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">79.4</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19979.3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v3.2</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Regional New Year Effect</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19908.3</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">77.4</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19985.7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">v3.3</td>
+<td style="text-align: left;">Mid West Reset Only</td>
+<td style="text-align: right;">20169.5</td>
+<td style="text-align: right;">50.4</td>
+<td style="text-align: right;">20219.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v2.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) + Annual Cycle</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">20176.0</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">48.6</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">20224.6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">v2.5</td>
+<td style="text-align: left;">Annual + 2-Month Cycle</td>
+<td style="text-align: right;">20171.4</td>
+<td style="text-align: right;">72.1</td>
+<td style="text-align: right;">20243.5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v2.4</td>
+<td style="text-align: left;">Annual + 6-Month Cycle</td>
+<td style="text-align: right;">20195.4</td>
+<td style="text-align: right;">70.6</td>
+<td style="text-align: right;">20266.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v0.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) Only</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">20253.9</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">27.0</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">20280.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v0.2</td>
+<td style="text-align: left;">AR(2) Only</td>
+<td style="text-align: right;">20253.9</td>
+<td style="text-align: right;">29.3</td>
+<td style="text-align: right;">20283.2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">v2.3</td>
+<td style="text-align: left;">2 Month Cycle Only</td>
+<td style="text-align: right;">20248.9</td>
+<td style="text-align: right;">50.6</td>
+<td style="text-align: right;">20299.5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v2.2</td>
+<td style="text-align: left;">6 Month Cycle Only</td>
+<td style="text-align: right;">20274.2</td>
+<td style="text-align: right;">48.8</td>
+<td style="text-align: right;">20323.0</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="bed-scaling" class="level3">
+<h3 class="anchored" data-anchor-id="bed-scaling">Bed scaling</h3>
+<p>Weekly trolley counts scaled by the number of inpatient beds in each region, expressing the outcome as an overcapacity rate: for every 100 inpatient beds, how many patients were waiting on trolleys that week.</p>
+<p><span class="math display">\[
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region inpatient beds}_i} \times 100
+\]</span></p>
+<p>where <span class="math inline">\(\text{health region inpatient beds}_i\)</span> is the total inpatient bed count across hospitals in region <span class="math inline">\(i\)</span>, summed from the June 2025 bed census. Hospitals with missing bed counts are excluded from the regional sum.</p>
+<table class="caption-top table">
+<caption>DIC comparison across models (response scaled by June 2025 health region inpatient bed count). Bold rows indicate the selected spine.</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">Model</th>
@@ -308,150 +805,90 @@ r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*&gt;\alpha_i^*)
 <tr class="odd">
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v4.1</td>
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Regional NY + MW Reset</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4555.7</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">93.4</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4649.1</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11448.9</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">93.0</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11541.9</td>
 </tr>
 <tr class="even">
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v5.1</td>
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Hierarchical Intercepts</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4556.1</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">93.9</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4650.0</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11449.0</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">93.3</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11542.4</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v3.2</td>
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Regional New Year Effect</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4604.6</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11470.0</td>
 <td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">87.3</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4691.9</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11557.3</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">v3.1</td>
 <td style="text-align: left;">Global New Year Effect</td>
-<td style="text-align: right;">4682.7</td>
-<td style="text-align: right;">57.5</td>
-<td style="text-align: right;">4740.2</td>
+<td style="text-align: right;">11510.1</td>
+<td style="text-align: right;">57.2</td>
+<td style="text-align: right;">11567.3</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">v3.3</td>
 <td style="text-align: left;">Mid West Reset Only</td>
-<td style="text-align: right;">5259.1</td>
-<td style="text-align: right;">57.0</td>
-<td style="text-align: right;">5316.1</td>
+<td style="text-align: right;">11738.6</td>
+<td style="text-align: right;">56.7</td>
+<td style="text-align: right;">11795.3</td>
 </tr>
 <tr class="even">
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v2.1</td>
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) + Annual Cycle</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5294.9</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">51.2</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5346.1</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11756.7</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">51.0</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11807.7</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">v2.5</td>
 <td style="text-align: left;">Annual + 2-Month Cycle</td>
-<td style="text-align: right;">5284.9</td>
-<td style="text-align: right;">75.3</td>
-<td style="text-align: right;">5360.2</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">v0.2</td>
-<td style="text-align: left;">AR(2) Only</td>
-<td style="text-align: right;">5331.6</td>
-<td style="text-align: right;">28.8</td>
-<td style="text-align: right;">5360.4</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v0.1</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) Only</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5344.0</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">26.6</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5370.6</td>
+<td style="text-align: right;">11751.8</td>
+<td style="text-align: right;">75.1</td>
+<td style="text-align: right;">11826.9</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">v2.4</td>
 <td style="text-align: left;">Annual + 6-Month Cycle</td>
-<td style="text-align: right;">5301.3</td>
-<td style="text-align: right;">75.8</td>
-<td style="text-align: right;">5377.1</td>
+<td style="text-align: right;">11773.3</td>
+<td style="text-align: right;">75.3</td>
+<td style="text-align: right;">11848.6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v0.1</td>
+<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) Only</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11828.7</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">26.6</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11855.3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v0.2</td>
+<td style="text-align: left;">AR(2) Only</td>
+<td style="text-align: right;">11828.3</td>
+<td style="text-align: right;">28.6</td>
+<td style="text-align: right;">11856.8</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">v2.3</td>
-<td style="text-align: left;">AR(1) + 2-Month Cycle</td>
-<td style="text-align: right;">5335.3</td>
-<td style="text-align: right;">50.9</td>
-<td style="text-align: right;">5386.1</td>
+<td style="text-align: left;">2 Month Cycle Only</td>
+<td style="text-align: right;">11823.4</td>
+<td style="text-align: right;">50.7</td>
+<td style="text-align: right;">11874.1</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">v2.2</td>
-<td style="text-align: left;">AR(1) + 6-Month Cycle</td>
-<td style="text-align: right;">5349.4</td>
-<td style="text-align: right;">51.1</td>
-<td style="text-align: right;">5400.5</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v6.2</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Bed-Scaled Response</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11449.2</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">94.4</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11543.6</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v6.1</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Budget-Scaled Response</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19858.3</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">79.4</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19937.7</td>
+<td style="text-align: left;">6 Month Cycle Only</td>
+<td style="text-align: right;">11845.5</td>
+<td style="text-align: right;">50.9</td>
+<td style="text-align: right;">11896.4</td>
 </tr>
 </tbody>
 </table>
-<ol start="2" type="1">
-<li>Posterior summaries for each model</li>
-<li>Fitted values plots</li>
-<li>Regional rankings.</li>
-</ol>
-<div style="page-break-after: always;"></div>
 </section>
-</section>
-<section id="conclusions" class="level1">
-<h1>Conclusions </h1>
-<p>In this research…</p>
-<div style="page-break-after: always;"></div>
-</section>
-<section id="references" class="level1">
-<h1>References</h1>
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
-<div id="ref-gelman_exploratory_2004" class="csl-entry" role="listitem">
-Gelman, A. (2004). Exploratory <span>Data</span> <span>Analysis</span> for <span>Complex</span> <span>Models</span>. <em>Journal of Computational and Graphical Statistics</em>, <em>13</em>(4), 755–779. <a href="https://doi.org/10.1198/106186004X11435">https://doi.org/10.1198/106186004X11435</a>
-</div>
-<div id="ref-Laird1989" class="csl-entry" role="listitem">
-Laird, N. M., &amp; Louis, T. A. (1989). Empirical <span>B</span>ayes ranking methods. <em>Journal of Educational Statistics</em>, <em>14</em>(1), 29–46. <a href="https://doi.org/10.3102/10769986014001029">https://doi.org/10.3102/10769986014001029</a>
-</div>
-<div id="ref-MacDermott2025" class="csl-entry" role="listitem">
-MacDermott, C., Scarrott, C. J., &amp; Ferguson, J. (2025). <em>Bayes-ically fair: <span>A</span> <span>B</span>ayesian <span>R</span>anking of the <span>O</span>lympic <span>M</span>edal <span>T</span>able</em>. <a href="https://doi.org/10.48550/arXiv.2510.14723">https://doi.org/10.48550/arXiv.2510.14723</a>
-</div>
-</div>
-<div style="page-break-after: always;"></div>
-</section>
-<section id="appendix" class="level1">
-<h1>Appendix</h1>
-<p>[Placeholder — full posterior trace plots, Gelman–Rubin statistics, residual diagnostics.]</p>
-<section id="model-inheritance" class="level2">
-<h2 class="anchored" data-anchor-id="model-inheritance">Model Inheritance</h2>
-<div class="cell" data-layout-align="center">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="model_inheritance.png" class="img-fluid figure-img" style="width:60.0%"></p>
-<figcaption>Model inheritance</figcaption>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="full-model-specifications" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="full-model-specifications">Full Model Specifications</h2>
-<p>[Placeholder — include the full equation set for each model (V0a–V9). These are already compiled in <code>bayes_models/tex_formulas/</code>.]</p>
 </section>
 </section>
 

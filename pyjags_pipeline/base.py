@@ -203,6 +203,7 @@ class BaseModel(ABC):
         # alpha ranking
         ranked = _sig.build_ranked_alpha(raw_df, regions)
         rank_summary = ranked.describe().T[['mean', 'std', '25%', '50%', '75%']]
+        rank_summary['ranked_mean'] = rank_summary['mean'].rank(method='average')
         rank_summary.to_csv(od / 'ranks.csv')
 
         # amplitude + phase (if model has annual harmonic)
