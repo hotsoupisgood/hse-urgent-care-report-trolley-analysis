@@ -547,9 +547,14 @@ def trends_page(scope="region", freq="weekly", rate="count"):
 
 # -- Model gallery --------------------------------------------------------
 
+_SCALE_DATA_DIRS = {
+    "per10k":      "wide_weekly_scaledPer10k",
+    "per_bed":     "wide_weekly_scaledPerBed",
+    "per_budget":  "wide_weekly_scaledPerBudgetThousands",
+}
 _MODEL_DATA_BASE = os.path.join(
     os.path.dirname(__file__), "..", "data", "models",
-    "wide_weekly_scaledPer10k",
+    _SCALE_DATA_DIRS["per10k"],
 )
 
 def _load_dic_table():
@@ -573,6 +578,41 @@ def _load_dic_table():
     best = out["DIC"].idxmin()
     out["Selected"] = ""
     out.at[best, "Selected"] = "✓"
+    return out
+
+
+def _load_ranks_table():
+    """Load ranks.csv for v4.1 across all three scales; return a merged DataFrame."""
+    base = os.path.join(os.path.dirname(__file__), "..", "data", "models")
+    frames = {}
+    for key, folder in _SCALE_DATA_DIRS.items():
+        path = os.path.join(base, folder, "v4.1", "ranks.csv")
+        if os.path.exists(path):
+            df = pd.read_csv(path, index_col=0)
+            frames[key] = df
+
+    if not frames:
+        return None
+
+    scale_labels = {
+        "per10k":     "Per 10k",
+        "per_bed":    "Per Bed",
+        "per_budget": "Per Budget",
+    }
+    rows = []
+    # Use regions from the first available scale
+    regions = list(next(iter(frames.values())).index)
+    for region in regions:
+        row = {"Region": region}
+        for key, df in frames.items():
+            if region in df.index:
+                mean_rank = df.loc[region, "ranked_mean"]
+                sd        = df.loc[region, "std"]
+                row[f"Rank ({scale_labels[key]})"] = int(mean_rank)
+                row[f"SD ({scale_labels[key]})"]   = round(sd, 3)
+        rows.append(row)
+
+    out = pd.DataFrame(rows).sort_values("Rank (Per 10k)")
     return out
 
 
@@ -766,6 +806,40 @@ def model_page(scale="per10k"):
             style={"fontSize": "0.8125rem", "lineHeight": "1.7", "margin": "0"},
         ),
     ]))
+
+    # -- Posterior rankings (headline result) --
+    ranks_df = _load_ranks_table()
+    if ranks_df is not None:
+        children.append(html.Div(style=CARD, children=[
+            html.H3("Posterior Regional Rankings — V4.1",
+                    style={"margin": "0 0 0.5rem", "fontSize": "1rem"}),
+            html.P(
+                "Rank 1 = highest trolley burden (worst), Rank 6 = lowest. "
+                "Rankings are derived from the posterior distribution of region-level "
+                "mean trolley counts under the selected model. "
+                "Shown across all three response scales to assess robustness — "
+                "consistent ranks across scales indicate the finding is not an "
+                "artefact of normalisation choice. SD near 0 indicates a highly "
+                "certain rank; SD > 0.5 indicates overlap between adjacent regions.",
+                style={"fontSize": "0.8125rem", "color": "#666",
+                       "margin": "0 0 0.75rem", "lineHeight": "1.6"},
+            ),
+            dash_table.DataTable(
+                columns=[{"name": c, "id": c} for c in ranks_df.columns],
+                data=ranks_df.to_dict("records"),
+                sort_action="native",
+                style_table={"overflowX": "auto"},
+                style_cell={"textAlign": "left", "padding": "0.4rem 0.75rem",
+                             "fontSize": "0.8125rem", "fontFamily": FONT},
+                style_header={"fontWeight": "600", "backgroundColor": "#f0f0f0",
+                              "borderBottom": "2px solid #dee2e6"},
+                style_data_conditional=[
+                    {"if": {"row_index": 0},
+                     "backgroundColor": "#fdecea"},  # rank 1 — worst
+                    {"if": {"row_index": "odd"}, "backgroundColor": "#f8f9fa"},
+                ],
+            ),
+        ]))
 
     # -- DIC comparison table --
     dic_df = _load_dic_table()
