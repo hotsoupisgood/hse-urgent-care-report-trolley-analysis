@@ -35,7 +35,7 @@ def run_model(version, data_path=_DEFAULT_DATA_PATH,
     Parameters
     ----------
     version : str
-        Model version, e.g. 'v4.1'.
+        Model version, e.g. 'v3.1'.
     data_path : str or Path
         Path to the scaled CSV to use as input.
         Relative paths are resolved from the project root.

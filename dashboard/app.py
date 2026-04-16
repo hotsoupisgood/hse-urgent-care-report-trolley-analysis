@@ -8,6 +8,7 @@ URL params sync state for bookmarking/sharing.
 import datetime
 import json
 import os
+from pathlib import Path
 import re
 import sys
 
@@ -558,27 +559,44 @@ _MODEL_DATA_BASE = os.path.join(
 )
 
 def _load_dic_table():
-    """Load DIC CSVs for all versions and return a comparison DataFrame."""
+    """Load DIC CSVs for all fitted versions; auto-discovers from the per10k output dir."""
     rows = []
-    for v in ["v0.1", "v0.2", "v2.1", "v2.2", "v2.3", "v2.4", "v2.5",
-              "v3.1", "v3.2", "v3.3", "v4.1", "v5.1"]:
-        path = os.path.join(_MODEL_DATA_BASE, v, "dic.csv")
-        if os.path.exists(path):
-            df = pd.read_csv(path)
-            rows.append({
-                "Version":     v,
-                "Description": df["description"].iloc[0],
-                "Deviance":    round(df["deviance"].iloc[0], 2),
-                "Penalty":     round(df["penalty"].iloc[0], 2),
-                "DIC":         round(df["DIC"].iloc[0], 2),
-            })
+    for dic_path in sorted(Path(_MODEL_DATA_BASE).glob("*/dic.csv")):
+        v = dic_path.parent.name
+        df = pd.read_csv(dic_path)
+        rows.append({
+            "Version":     v,
+            "Description": df["description"].iloc[0],
+            "Deviance":    round(df["deviance"].iloc[0], 2),
+            "Penalty":     round(df["penalty"].iloc[0], 2),
+            "DIC":         round(df["DIC"].iloc[0], 2),
+        })
     if not rows:
         return None
     out = pd.DataFrame(rows)
     best = out["DIC"].idxmin()
-    out["Selected"] = ""
-    out.at[best, "Selected"] = "✓"
+    out["_best"] = out.index == best
     return out
+
+
+def _load_version_ranks(scale, version):
+    """Load ranks.csv for a given scale + version; return DataFrame sorted by rank, or None."""
+    path = os.path.join(
+        os.path.dirname(__file__), "..", "data", "models",
+        _SCALE_DATA_DIRS[scale], version, "ranks.csv",
+    )
+    if not os.path.exists(path):
+        return None
+    df = pd.read_csv(path, index_col=0).reset_index()
+    df.columns = ["Region", "Mean Rank", "SD", "25%", "Median Rank", "75%", "Rank"]
+    df["Rank"] = df["Rank"].astype(int)
+    df["Median Rank"] = df["Median Rank"].astype(int)
+    df["25%"] = df["25%"].astype(int)
+    df["75%"] = df["75%"].astype(int)
+    for col in ["Mean Rank", "SD"]:
+        df[col] = df[col].round(3)
+    df = df[["Region", "Rank", "Mean Rank", "Median Rank", "25%", "75%", "SD"]]
+    return df.sort_values("Rank").reset_index(drop=True)
 
 
 def _load_ranks_table():
@@ -586,7 +604,7 @@ def _load_ranks_table():
     base = os.path.join(os.path.dirname(__file__), "..", "data", "models")
     frames = {}
     for key, folder in _SCALE_DATA_DIRS.items():
-        path = os.path.join(base, folder, "v4.1", "ranks.csv")
+        path = os.path.join(base, folder, "v3.1", "ranks.csv")
         if os.path.exists(path):
             df = pd.read_csv(path, index_col=0)
             frames[key] = df
@@ -616,13 +634,11 @@ def _load_ranks_table():
     return out
 
 
-MODEL_VERSIONS = [
-    "v0.1", "v0.2",
-    "v2.1", "v2.2", "v2.3", "v2.4", "v2.5",
-    "v3.1", "v3.2", "v3.3",
-    "v4.1",
-    "v5.1",
-]
+def _discover_model_versions():
+    """Discover available model versions from the per10k output dir (lexicographic order)."""
+    return sorted(p.parent.name for p in Path(_MODEL_DATA_BASE).glob("*/dic.csv"))
+
+MODEL_VERSIONS = _discover_model_versions()
 
 MODEL_SCALE_OPTIONS = [
     {"label": "Per 10k Pop.", "value": "per10k"},
@@ -630,89 +646,21 @@ MODEL_SCALE_OPTIONS = [
     {"label": "Per Budget",   "value": "per_budget"},
 ]
 
-# Fill in descriptions here — markdown supported.
-# mu_fit: the posterior mean cycle + AR fit plot
-# fitted: the posterior fitted values vs observed
-MODEL_DESCRIPTIONS = {
-    "v0.1": {
-        "title":    "V0.1 — Baseline AR(1)",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-    "v0.2": {
-        "title":    "V0.2 — Baseline AR(2)",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-    "v2.1": {
-        "title":    "V2.1 — Annual Cycle Only (52-week)",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-    "v2.2": {
-        "title":    "V2.2 — 26-Week Cycle Only (no annual)",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-    "v2.3": {
-        "title":    "V2.3 — 8-Week Cycle Only (no annual)",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-    "v2.4": {
-        "title":    "V2.4 — Annual (52-week) + 6-Month (26-week) Cycle",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-    "v2.5": {
-        "title":    "V2.5 — Annual (52-week) + 8-Week Cycle",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-    "v3.1": {
-        "title":    "V3.1 — Annual + Global New Year Effect",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-    "v3.2": {
-        "title":    "V3.2 — Annual + Region-Specific New Year Effect",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-    "v3.3": {
-        "title":    "V3.3 — Annual + Mid West Reset Event (no New Year)",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-    "v4.1": {
-        "title":    "V4.1 — Annual + Region-Specific New Year + Mid West Reset (Selected)",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-    "v5.1": {
-        "title":    "V5.1 — V4.1 + Partial Pooling",
-        "overview": "",
-        "mu_fit":   "",
-        "fitted":   "",
-    },
-}
+def _load_model_titles():
+    """Build {version: title} from dic.csv files (per10k as canonical source)."""
+    titles = {}
+    for v in MODEL_VERSIONS:
+        path = os.path.join(_MODEL_DATA_BASE, v, "dic.csv")
+        if os.path.exists(path):
+            df = pd.read_csv(path)
+            name = df["description"].iloc[0]
+            titles[v] = f"{v.upper()} — {name}"
+        else:
+            titles[v] = v
+    return titles
 
-_PLACEHOLDER = html.P(
-    "Description to be added.",
-    style={"color": "#bbb", "fontStyle": "italic", "fontSize": "0.8125rem",
-           "margin": "0.5rem 0 0"},
-)
+
+_MODEL_TITLES = _load_model_titles()
 
 _IMG_STYLE = {
     "width": "100%",
@@ -731,59 +679,82 @@ _PLOT_LABEL_STYLE = {
 
 
 def _build_model_sections(scale):
-    """Render all model version cards for a given scale key."""
+    """Render all model version cards for a given scale key (most complex first)."""
     sections = []
-    for version in MODEL_VERSIONS:
-        desc = MODEL_DESCRIPTIONS.get(version, {})
-        mu_src   = f"/assets/models/{scale}/{version}/mu_fit.png"
-        fit_src  = f"/assets/models/{scale}/{version}/fitted.png"
+    first = True
+    for version in reversed(MODEL_VERSIONS):
+        title = _MODEL_TITLES.get(version, version)
+        mu_src  = f"/assets/models/{scale}/{version}/mu_fit.png"
+        res_src = f"/assets/models/{scale}/{version}/residuals_combined.png"
 
-        def _desc_block(text):
-            if text:
-                return dcc.Markdown(text, style={"fontSize": "0.8125rem",
-                                                 "marginTop": "0.5rem",
-                                                 "lineHeight": "1.6"})
-            return _PLACEHOLDER
-
-        overview = desc.get("overview", "")
+        # -- Rankings drawer --
+        ranks_df = _load_version_ranks(scale, version)
+        if ranks_df is not None:
+            ranks_drawer = html.Details(
+                open=first,
+                style={"marginTop": "1rem", "borderTop": "1px solid #eee",
+                       "paddingTop": "0.75rem"},
+                children=[
+                    html.Summary(
+                        "Posterior Regional Rankings",
+                        style={"cursor": "pointer", "fontSize": "0.8125rem",
+                               "fontWeight": "600", "color": "#444",
+                               "userSelect": "none", "marginBottom": "0.5rem"},
+                    ),
+                    dash_table.DataTable(
+                        columns=[{"name": c, "id": c} for c in ranks_df.columns],
+                        data=ranks_df.to_dict("records"),
+                        sort_action="native",
+                        style_table={"overflowX": "auto", "marginTop": "0.5rem"},
+                        style_cell={"textAlign": "left", "padding": "0.4rem 0.75rem",
+                                    "fontSize": "0.8125rem", "fontFamily": FONT},
+                        style_header={"fontWeight": "600", "backgroundColor": "#f0f0f0",
+                                      "borderBottom": "2px solid #dee2e6"},
+                        style_data_conditional=[
+                            {"if": {"filter_query": "{Rank} = 1"},
+                             "backgroundColor": "#fdecea", "fontWeight": "600"},
+                            {"if": {"row_index": "odd"}, "backgroundColor": "#f8f9fa"},
+                        ],
+                    ),
+                    html.P("Rank 1 = highest trolley burden. SD of posterior rank samples shown.",
+                           style={"fontSize": "0.7rem", "color": "#888",
+                                  "marginTop": "0.4rem", "marginBottom": "0"}),
+                ],
+            )
+        else:
+            ranks_drawer = None
 
         sections.append(html.Div(
             style={**CARD, "marginBottom": "1rem"},
             children=[
                 # Version header
                 html.H3(
-                    desc.get("title", version),
+                    title,
                     style={"margin": "0 0 0.5rem", "fontSize": "1rem",
                            "borderBottom": "1px solid #eee", "paddingBottom": "0.5rem"},
                 ),
-                # Optional overview
-                (dcc.Markdown(overview, style={"fontSize": "0.8125rem",
-                                               "marginBottom": "0.75rem",
-                                               "lineHeight": "1.6"})
-                 if overview else None),
                 # Two-plot row
                 html.Div(
                     style={"display": "flex", "gap": "1.5rem",
                            "alignItems": "flex-start"},
                     children=[
                         html.Div(style={"flex": "1", "minWidth": "0"}, children=[
-                            html.P("Posterior Mean Fit", style=_PLOT_LABEL_STYLE),
-                            html.Img(src=mu_src,
-                                     alt=f"{version} mu_fit",
+                            html.P("Posterior Mean Fit (95% CI)", style=_PLOT_LABEL_STYLE),
+                            html.Img(src=mu_src, alt=f"{version} mu_fit",
                                      style=_IMG_STYLE),
-                            _desc_block(desc.get("mu_fit", "")),
                         ]),
                         html.Div(style={"flex": "1", "minWidth": "0"}, children=[
-                            html.P("Fitted vs Observed", style=_PLOT_LABEL_STYLE),
-                            html.Img(src=fit_src,
-                                     alt=f"{version} fitted",
+                            html.P("Standardised Residuals", style=_PLOT_LABEL_STYLE),
+                            html.Img(src=res_src, alt=f"{version} residuals",
                                      style=_IMG_STYLE),
-                            _desc_block(desc.get("fitted", "")),
                         ]),
                     ],
                 ),
+                # Collapsible rankings drawer
+                ranks_drawer,
             ],
         ))
+        first = False
     return sections
 
 
@@ -811,40 +782,6 @@ def model_page(scale="per10k"):
         ),
     ]))
 
-    # -- Posterior rankings (headline result) --
-    ranks_df = _load_ranks_table()
-    if ranks_df is not None:
-        children.append(html.Div(style=CARD, children=[
-            html.H3("Posterior Regional Rankings — V4.1",
-                    style={"margin": "0 0 0.5rem", "fontSize": "1rem"}),
-            html.P(
-                "Rank 1 = highest trolley burden (worst), Rank 6 = lowest. "
-                "Rankings are derived from the posterior distribution of region-level "
-                "mean trolley counts under the selected model. "
-                "Shown across all three response scales to assess robustness — "
-                "consistent ranks across scales indicate the finding is not an "
-                "artefact of normalisation choice. SD near 0 indicates a highly "
-                "certain rank; SD > 0.5 indicates overlap between adjacent regions.",
-                style={"fontSize": "0.8125rem", "color": "#666",
-                       "margin": "0 0 0.75rem", "lineHeight": "1.6"},
-            ),
-            dash_table.DataTable(
-                columns=[{"name": c, "id": c} for c in ranks_df.columns],
-                data=ranks_df.to_dict("records"),
-                sort_action="native",
-                style_table={"overflowX": "auto"},
-                style_cell={"textAlign": "left", "padding": "0.4rem 0.75rem",
-                             "fontSize": "0.8125rem", "fontFamily": FONT},
-                style_header={"fontWeight": "600", "backgroundColor": "#f0f0f0",
-                              "borderBottom": "2px solid #dee2e6"},
-                style_data_conditional=[
-                    {"if": {"row_index": 0},
-                     "backgroundColor": "#fdecea"},  # rank 1 — worst
-                    {"if": {"row_index": "odd"}, "backgroundColor": "#f8f9fa"},
-                ],
-            ),
-        ]))
-
     # -- DIC comparison table --
     dic_df = _load_dic_table()
     if dic_df is not None:
@@ -859,7 +796,7 @@ def model_page(scale="per10k"):
                        "margin": "0 0 0.75rem"},
             ),
             dash_table.DataTable(
-                columns=[{"name": c, "id": c} for c in dic_df.columns],
+                columns=[{"name": c, "id": c} for c in dic_df.columns if c != "_best"],
                 data=dic_df.to_dict("records"),
                 sort_action="native",
                 style_table={"overflowX": "auto"},
@@ -868,7 +805,7 @@ def model_page(scale="per10k"):
                 style_header={"fontWeight": "600", "backgroundColor": "#f0f0f0",
                               "borderBottom": "2px solid #dee2e6"},
                 style_data_conditional=[
-                    {"if": {"filter_query": '{Selected} = "✓"'},
+                    {"if": {"filter_query": "{_best} = True"},
                      "backgroundColor": "#eaf4ea", "fontWeight": "600"},
                     {"if": {"row_index": "odd"}, "backgroundColor": "#f8f9fa"},
                 ],

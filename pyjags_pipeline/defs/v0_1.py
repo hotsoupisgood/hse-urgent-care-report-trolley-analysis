@@ -24,6 +24,9 @@ class Model(BaseModel):
             for(t in 2:T){
               y[i,t] ~ dnorm(alpha[i] + phi * (y[i,t-1] - alpha[i]), tau[i])
             }
+            for(t in 1:T){
+              mu[i,t] <- alpha[i]
+            }
             fullmod[i,1] <- alpha[i]
             for(t in 2:T){
               fullmod[i,t] <- alpha[i] + phi * (y[i,t-1] - alpha[i])
@@ -40,12 +43,12 @@ class Model(BaseModel):
 
     @property
     def monitor_params(self):
-        return ['alpha', 'tau', 'phi']
+        return ['alpha', 'tau', 'phi', 'mu', 'fullmod', 'resid']
 
     def jags_data(self, y, n_region, n_weeks, regions):
         return dict(y=y, I=n_region, T=n_weeks)
 
-    def reconstruct_mu(self, raw_df, regions, n_weeks, indicators):
+    def reconstruct_mu_old(self, raw_df, regions, n_weeks, indicators):
         """mu[i,t] = alpha[i] — constant intercept, no seasonality."""
         n_region = len(regions)
         mu_mean = np.zeros((n_weeks, n_region))
@@ -60,6 +63,6 @@ class Model(BaseModel):
                 pd.DataFrame(mu_lower, columns=regions),
                 pd.DataFrame(mu_upper, columns=regions))
 
-    def compute_fitted(self, df_mu, df_og, raw_df):
+    def compute_fitted_old(self, df_mu, df_og, raw_df):
         phi_mean = raw_df['phi'].mean()
         return compute_ar1_fitted(df_mu, df_og, phi_mean)

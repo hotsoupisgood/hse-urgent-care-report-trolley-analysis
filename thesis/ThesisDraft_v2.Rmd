@@ -99,6 +99,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ## Model Development \label{sect:model-development}
 
 Models were developed iteratively with increasing complexity as described in @gelman_exploratory_2004, and visualised in figure \@ref(fig:model-inheritance). Model components were tested based on a priori expectation, and residual patterns. For instance: On trolley counts vary over time, so autoregressive components were first modeled. Then tested against each other on which minimised the Deviance Information Criterion (DIC) and residuals. Table \@ref(tab:spine-dic-hrpop) reads as a record of this model selection.
+Below is the components added to the models. The full model definitions can be found in \@ref(full-model-specs). 
 
 ### Base Likelihood {-}
 All models share the same Normal likelihood:
@@ -106,9 +107,10 @@ All models share the same Normal likelihood:
 $$
 \begin{aligned}
 y_{i,t} &\sim \mathcal{N}(\mu_{i,t},\ \tau_i^{-1}) \\[4pt]
+\tau_i   &\sim \Gamma(0.001,\ 0.001)
 \end{aligned}
 $$
-
+Where $i$ and $t$ define the region and week since January 1st 2023 respectively.
 The models differ in the mean function $\mu_{i,t}$, the prior structure on $\alpha_i$, and autoregressive component, $\phi$.
 
 ### AR structure {-}
@@ -133,55 +135,74 @@ $$
 $$
 
 ### Cycles {-}
-Added Fourier pairs to capture seasonal effects. A single harmonic with period $P$ (weeks) is defined as:
+Three cycles, 8 week, 26 week and 52 weeks, were tested alone, and together. A single cycle with period $P$ (weeks) is defined as:
 
 $$
 \text{cycle}_i(t;\,P) = \beta_i \cos\!\left(\tfrac{2\pi t}{P}\right) + \gamma_i \sin\!\left(\tfrac{2\pi t}{P}\right)
 (\#eq:cycle-component)
 $$
 
-Single-cycle models set $\text{cycles}_{i,t} = \text{cycle}_i(t;\,P)$ for $P \in \{52, 26, 8\}$ respectively.
+Where $P \in \{52, 26, 8\}$.
 
-Dual-cycle models sum two cycles with independent coefficients:
-
+Dual cycle models sum the best preforming 52 week cycle with the 8 and 26 week cycles:
 $$
 \text{cycles}_{i,t} = \text{cycle}_{1,i}(t;\,P_1) + \text{cycle}_{2,i}(t;\,P_2)
 (\#eq:dual-cycle)
 $$
 
-where $(P_1, P_2) \in \{(52, 26),\,(52, 8)\}$. The subscripts on $\text{cycle}_{1,i}$, $\text{cycle}_{2,i}$ correspond to independent coefficient pairs $(\beta_{1,i}, \gamma_{1,i})$ and $(\beta_{2,i}, \gamma_{2,i})$.
+Where $(P_1, P_2) \in \{(52, 26),\,(52, 8)\}$.
+
+Cycle coefficients share the same weakly informative priors across all models:
+$$
+\beta_i \sim \mathcal{N}(0,\ 0.001), \qquad \gamma_i \sim \mathcal{N}(0,\ 0.001)
+$$
 
 ### Event effects {-}
 
-Residual patterns motivated testing two event effects. A three week period around New Years (applied globally, or to each region) and a three-week Mid West funding reset (applied only to the Mid West region, $\text{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})$). Each was fitted independently to confirm independent contribution:
+The New Years effect was captured by fitting independent components to the 51st and 52nd weeks of each year, and the 1st week of each new year. The Mid West Region specific reset was modeled with three independent components on the 86th, 87th, and 88th weeks since January 1st, 2023 (the same as the 34th, 35th and 36th weeks of 2024).  
 
 Global New Year effect:
 
-$$
-\text{ny}_{t} = \delta_{\text{pre}} \cdot \mathbf{1}(t \bmod 52 = 0)
+\begin{aligned}
+
+  \text{ny}_{t} &= \delta_{\text{pre}} \cdot \mathbf{1}(t \bmod 52 = 0)
   + \delta_{\text{mid}}  \cdot \mathbf{1}(t \bmod 52 = 1)
   + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2)
+  \\
+  \\
+  \delta_{\text{pre}},\ \delta_{\text{mid}},\ \delta_{\text{post}} & \sim \mathcal{N}(0,\ 0.001) 
 (\#eq:global-ny)
-$$
 
-Regional New Year effect:
+\end{aligned}
 
-$$
-\text{ny}_{i,t} = \delta_{\text{pre},i} \cdot \mathbf{1}(t \bmod 52 = 0)
+Regional ($i$) New Year effect:
+
+\begin{aligned}
+
+  \text{ny}_{i,t} &= \delta_{\text{pre},i} \cdot \mathbf{1}(t \bmod 52 = 0)
   + \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
   + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2)
-(\#eq:regional-ny)
-$$
+  \\
+  \\
+  \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i}&\sim \mathcal{N}(0,\ 0.001) 
+  (\#eq:regional-ny)
 
-Mid West reset:
+\end{aligned}
 
-$$
-\text{mwr}_{i,t} = \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
-  + \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
-  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+
+Mid West reset effect:
+
+\begin{aligned}
+
+  \text{mwr}_{i=\text{mid west},t} &= \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86)
+  + \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87)
+  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88)
+  \\
+  \\
+  \sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
+
 (\#eq:mw-reset)
-$$
-
+\end{aligned}
 
 ### Hierarchical intercepts {-}
 
@@ -192,7 +213,8 @@ $$
 (\#eq:v4-hier)
 $$
 
-with hyperpriors $\mu_\alpha \sim \mathcal{N}(0, 0.001)$ and $\tau_\alpha \sim \Gamma(0.001, 0.001)$. The full v5.1 mean function is given in Equation \@ref(eq:model).
+with hyperpriors $\mu_\alpha \sim \mathcal{N}(0, 0.001)$ and $\tau_\alpha \sim \Gamma(0.001, 0.001)$. 
+
 
 ## Response Scaling \label{sect:standardisation}
 The on trolley counts were standardised to 10,000 people in each health region, 
@@ -204,9 +226,8 @@ $$
 
 This transforms the outcome into patients on trolley per 10,000 population per week, removing the confounding effect of region size and allowing direct comparison of hospital pressure across the six HSE health regions.
 
-
 ## Posterior Sampling and Bayesian Ranking \label{sect:ranking}
-*Just another Gibbs sampler* (*JAGs*), implemented using pyJAGS [@Nowotny2024pyjags], a Python interface to JAGS [@Plummer2003], was used to sample from the posterior distribution of our parameters given our data. Health region baselines, $\alpha^s_j$, were used for ranking. Where $j$ is one of the 6 HSE health regions, $j\in\{1,...,6\}$, and $s$ is the draw index, for $s\in\{1,...,n\}$ and total samples is defined as $n=20{,}000$.
+Posterior sampling was preformed using *Just another Gibbs sampler* (*JAGs*)[@Plummer2003], implemented by pyJAGS [@Nowotny2024pyjags], a Python interface to JAGS. Health region baselines, $\alpha^s_j$, were used for ranking. Where $j$ is one of the 6 HSE health regions, $j\in\{1,...,6\}$, and $s$ is the draw index, for $s\in\{1,...,n\}$ and total samples is defined as $n=20{,}000$.
 $$
   A =
   \left[ {\begin{array}{ccccc}
@@ -217,7 +238,7 @@ $$
     \alpha_1^n & \cdots & \alpha_j^n & \cdots & \alpha_6^n\\
   \end{array} } \right]
 $$
-Ranks follow the posterior ranking approach of @Laird1989, as applied by @MacDermott2025. Where each sample is posterior sample is ranked to form rank distribution, $R$.
+Ranks follow the posterior ranking approach of @Laird1989. Where each sample is posterior sample is ranked to form rank distribution, $R$.
 $$
   R =
   \left[ {\begin{array}{ccccc}
@@ -263,7 +284,7 @@ dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full
 dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
 dic <- dic[order(dic$DIC), ]
 
-selected <- c("v0.1", "v2.1", "v3.2", "v4.1", "v5.1")
+selected <- c("v0.1", "v1.1", "v2.2", "v3.1", "v4.1")
 
 kableExtra::kbl(
   dic[, c("version", "description", "deviance", "penalty", "DIC")],
@@ -347,41 +368,41 @@ Todo: full posterior trace plots, Gelman stats, residual diagnostics.
   \node[unselected, right=2.8cm of v0_1] (v0_2) {\textbf{v0.2}\\AR(2) Only};
 
   % --- Row 2: Cycle tests ---
-  \node[model, below=of v0_1] (v2_1) {\textbf{v2.1}\\Annual Cycle};
-  \node[unselected, right=of v2_1] (v2_2) {\textbf{v2.2}\\6-Month Cycle};
-  \node[unselected, right=of v2_2] (v2_3) {\textbf{v2.3}\\2-Month Cycle};
-  \node[unselected, right=of v2_3] (v2_4) {\textbf{v2.4}\\Annual + 6-Month};
-  \node[unselected, right=of v2_4] (v2_5) {\textbf{v2.5}\\Annual + 2-Month};
+  \node[model, below=of v0_1] (v1_1) {\textbf{v1.1}\\Annual Cycle};
+  \node[unselected, right=of v1_1] (v1_2) {\textbf{v1.2}\\26-Week Cycle};
+  \node[unselected, right=of v1_2] (v1_3) {\textbf{v1.3}\\8-Week Cycle};
+  \node[unselected, right=of v1_3] (v1_4) {\textbf{v1.4}\\Annual + 6-Month};
+  \node[unselected, right=of v1_4] (v1_5) {\textbf{v1.5}\\Annual + 8-Week};
 
   % --- Row 3: New Year / MW reset ---
-  \node[model, below=of v2_1] (v3_2) {\textbf{v3.2}\\Regional New Year};
-  \node[unselected, left=of v3_2] (v3_1) {\textbf{v3.1}\\Global New Year};
-  \node[unselected, right=of v3_2] (v3_3) {\textbf{v3.3}\\MW Reset Only};
+  \node[model, below=of v1_1] (v2_2) {\textbf{v2.2}\\Regional New Year};
+  \node[unselected, left=of v2_2] (v2_1) {\textbf{v2.1}\\Global New Year};
+  \node[unselected, right=of v2_2] (v2_3) {\textbf{v2.3}\\MW Reset Only};
 
   % --- Spine ---
-  \node[model, below=of v3_2] (v4_1) {\textbf{v4.1}\\Regional NY + MW Reset};
-  \node[model, below=of v4_1] (v5_1) {\textbf{v5.1}\\Hierarchical Intercepts};
+  \node[model, below=of v2_2] (v3_1) {\textbf{v3.1}\\Regional NY + MW Reset};
+  \node[model, below=of v3_1] (v4_1) {\textbf{v4.1}\\Hierarchical Intercepts};
 
   % --- Row side labels ---
-  \coordinate (llabel) at ($(v3_1.west) + (-0.4, 0)$);
+  \coordinate (llabel) at ($(v2_1.west) + (-0.4, 0)$);
   \node[row label, anchor=east] at (llabel |- v0_1) {AR order};
-  \node[row label, anchor=east] at (llabel |- v2_1) {Cycle type};
-  \node[row label, anchor=east] at (llabel |- v3_2) {Event effects};
-  \node[row label, anchor=east] at (llabel |- v4_1) {MW reset};
-  \node[row label, anchor=east] at (llabel |- v5_1) {Pooling};
+  \node[row label, anchor=east] at (llabel |- v1_1) {Cycle type};
+  \node[row label, anchor=east] at (llabel |- v2_2) {Event effects};
+  \node[row label, anchor=east] at (llabel |- v3_1) {MW reset};
+  \node[row label, anchor=east] at (llabel |- v4_1) {Pooling};
 
   % --- Horizontal dividers ---
-  \coordinate (left)  at ($(v3_1.west) + (-2.8, 0)$);
-  \coordinate (right) at ($(v2_5.east)  + ( 0.4, 0)$);
+  \coordinate (left)  at ($(v2_1.west) + (-2.8, 0)$);
+  \coordinate (right) at ($(v1_5.east)  + ( 0.4, 0)$);
 
   \draw[dashed, color=divider, line width=0.6pt]
     ($(left |- v0_1.south) + (0,-0.5)$) -- ($(right |- v0_1.south) + (0,-0.5)$);
   \draw[dashed, color=divider, line width=0.6pt]
-    ($(left |- v2_1.south) + (0,-0.5)$) -- ($(right |- v2_1.south) + (0,-0.5)$);
+    ($(left |- v1_1.south) + (0,-0.5)$) -- ($(right |- v1_1.south) + (0,-0.5)$);
   \draw[dashed, color=divider, line width=0.6pt]
-    ($(left |- v3_2.south) + (0,-0.5)$) -- ($(right |- v3_2.south) + (0,-0.5)$);
+    ($(left |- v2_2.south) + (0,-0.5)$) -- ($(right |- v2_2.south) + (0,-0.5)$);
   \draw[dashed, color=divider, line width=0.6pt]
-    ($(left |- v4_1.south) + (0,-0.5)$) -- ($(right |- v4_1.south) + (0,-0.5)$);
+    ($(left |- v3_1.south) + (0,-0.5)$) -- ($(right |- v3_1.south) + (0,-0.5)$);
 
   % --- Diagram title ---
   \node[font=\small\itshape, text=bordergrey,
@@ -389,13 +410,13 @@ Todo: full posterior trace plots, Gelman stats, residual diagnostics.
     {Population-scaled response: trolleys per 10{,}000 population per week};
 
   % --- Spine arrows ---
-  \draw[arr] (v0_1) -- (v2_1);
-  \draw[arr] (v2_1) -- (v3_2);
-  \draw[arr] (v3_2) -- (v4_1);
-  \draw[arr] (v4_1) -- (v5_1);
+  \draw[arr] (v0_1) -- (v1_1);
+  \draw[arr] (v1_1) -- (v2_2);
+  \draw[arr] (v2_2) -- (v3_1);
+  \draw[arr] (v3_1) -- (v4_1);
 
   % --- Branch arrows ---
-  \draw[arr branch] (v2_1) -| (v3_1);
+  \draw[arr branch] (v1_1) -| (v2_1);
 
 \end{tikzpicture}%
 }% end resizebox
@@ -405,8 +426,7 @@ selected path; thin arrows indicate branches.}
 \label{fig:model-inheritance}
 \end{figure}
 
-## Full Model Specifications {-}
-
+## Full Model Specifications {full-model-specs}
 Let $y_{i,t}$ denote the scaled trolley count for region $i$ at week $t$, for $i \in \{1,\ldots,6\}$ and $t \in \{1,\ldots,T\}$.
 
 ### Model v0.1 {-}
@@ -765,7 +785,7 @@ dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full
 dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
 dic <- dic[order(dic$DIC), ]
 
-selected <- c("v0.1", "v2.1", "v3.2", "v4.1", "v5.1")
+selected <- c("v0.1", "v1.1", "v2.2", "v3.1", "v4.1")
 
 kableExtra::kbl(
   dic[, c("version", "description", "deviance", "penalty", "DIC")],
@@ -798,7 +818,7 @@ dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full
 dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
 dic <- dic[order(dic$DIC), ]
 
-selected <- c("v0.1", "v2.1", "v3.2", "v4.1", "v5.1")
+selected <- c("v0.1", "v1.1", "v2.2", "v3.1", "v4.1")
 
 kableExtra::kbl(
   dic[, c("version", "description", "deviance", "penalty", "DIC")],

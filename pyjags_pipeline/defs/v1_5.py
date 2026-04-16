@@ -10,11 +10,11 @@ class Model(BaseModel):
 
     @property
     def version(self):
-        return 'v2.4'
+        return 'v1.5'
 
     @property
     def name(self):
-        return 'Annual + 6-Month Cycle'
+        return 'V1.1 + 8-Week Cycle'
 
     @property
     def jags_model_string(self):
@@ -30,8 +30,8 @@ class Model(BaseModel):
               mu[i,t] <- alpha[i] +
                          beta1[i]  * cos((2 * pi) * (t/52)) +
                          gamma1[i] * sin((2 * pi) * (t/52)) +
-                         beta2[i]  * cos26[t] +
-                         gamma2[i] * sin26[t]
+                         beta2[i]  * cos8[t] +
+                         gamma2[i] * sin8[t]
             }
             fullmod[i,1] <- mu[i,1]
             for(t in 2:T){
@@ -53,16 +53,16 @@ class Model(BaseModel):
 
     @property
     def monitor_params(self):
-        return ['alpha', 'beta1', 'gamma1', 'beta2', 'gamma2', 'tau', 'phi']
+        return ['alpha', 'beta1', 'gamma1', 'beta2', 'gamma2', 'tau', 'phi', 'mu', 'fullmod', 'resid']
 
     def jags_data(self, y, n_region, n_weeks, regions):
         ev = build_event_indicators(n_weeks, regions)
         return dict(
             y=y, I=n_region, T=n_weeks, pi=np.pi,
-            cos26=ev['cos_t26'], sin26=ev['sin_t26'],
+            cos8=ev['cos_t8'], sin8=ev['sin_t8'],
         )
 
-    def reconstruct_mu(self, raw_df, regions, n_weeks, indicators):
+    def reconstruct_mu_old(self, raw_df, regions, n_weeks, indicators):
         n_region = len(regions)
         ev = indicators
         mu_mean = np.zeros((n_weeks, n_region))
@@ -72,8 +72,8 @@ class Model(BaseModel):
             mu_i = (raw_df[f'alpha[{i+1}]'].values[:,None]
                     + raw_df[f'beta1[{i+1}]'].values[:,None] * ev['cos_t'][None,:]
                     + raw_df[f'gamma1[{i+1}]'].values[:,None] * ev['sin_t'][None,:]
-                    + raw_df[f'beta2[{i+1}]'].values[:,None] * ev['cos_t26'][None,:]
-                    + raw_df[f'gamma2[{i+1}]'].values[:,None] * ev['sin_t26'][None,:])
+                    + raw_df[f'beta2[{i+1}]'].values[:,None] * ev['cos_t8'][None,:]
+                    + raw_df[f'gamma2[{i+1}]'].values[:,None] * ev['sin_t8'][None,:])
             mu_mean[:,i] = mu_i.mean(axis=0)
             mu_lower[:,i] = np.quantile(mu_i, 0.025, axis=0)
             mu_upper[:,i] = np.quantile(mu_i, 0.975, axis=0)
@@ -81,6 +81,6 @@ class Model(BaseModel):
                 pd.DataFrame(mu_lower, columns=regions),
                 pd.DataFrame(mu_upper, columns=regions))
 
-    def compute_fitted(self, df_mu, df_og, raw_df):
+    def compute_fitted_old(self, df_mu, df_og, raw_df):
         phi_mean = raw_df['phi'].mean()
         return compute_ar1_fitted(df_mu, df_og, phi_mean)

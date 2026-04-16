@@ -127,16 +127,16 @@ window.Quarto = {
 <h1>Methods </h1>
 <section id="model-development" class="level2">
 <h2 class="anchored" data-anchor-id="model-development">Model Development </h2>
-<p>Models were developed iteratively with increasing complexity as described in <span class="citation" data-cites="gelman_exploratory_2004">Gelman (<a href="#ref-gelman_exploratory_2004" role="doc-biblioref">2004</a>)</span>, and visualised in figure @ref(fig:model-inheritance). Model components were tested based on a priori expectation, and residual patterns. For instance: On trolley counts vary over time, so autoregressive components were first modeled. Then tested against each other on which minimised the Deviance Information Criterion (DIC) and residuals. Table @ref(tab:spine-dic-hrpop) reads as a record of this model selection.</p>
+<p>Models were developed iteratively with increasing complexity as described in <span class="citation" data-cites="gelman_exploratory_2004">Gelman (<a href="#ref-gelman_exploratory_2004" role="doc-biblioref">2004</a>)</span>, and visualised in figure @ref(fig:model-inheritance). Model components were tested based on a priori expectation, and residual patterns. For instance: On trolley counts vary over time, so autoregressive components were first modeled. Then tested against each other on which minimised the Deviance Information Criterion (DIC) and residuals. Table @ref(tab:spine-dic-hrpop) reads as a record of this model selection. Below is the components added to the models. The full model definitions can be found in @ref(full-model-specs).</p>
 <section id="base-likelihood" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="base-likelihood">Base Likelihood</h3>
 <p>All models share the same Normal likelihood:</p>
 <p><span class="math display">\[
 \begin{aligned}
 y_{i,t} &amp;\sim \mathcal{N}(\mu_{i,t},\ \tau_i^{-1}) \\[4pt]
+\tau_i   &amp;\sim \Gamma(0.001,\ 0.001)
 \end{aligned}
-\]</span></p>
-<p>The models differ in the mean function <span class="math inline">\(\mu_{i,t}\)</span>, the prior structure on <span class="math inline">\(\alpha_i\)</span>, and autoregressive component, <span class="math inline">\(\phi\)</span>.</p>
+\]</span> Where <span class="math inline">\(i\)</span> and <span class="math inline">\(t\)</span> define the region and week since January 1st 2023 respectively. The models differ in the mean function <span class="math inline">\(\mu_{i,t}\)</span>, the prior structure on <span class="math inline">\(\alpha_i\)</span>, and autoregressive component, <span class="math inline">\(\phi\)</span>.</p>
 </section>
 <section id="ar-structure" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="ar-structure">AR structure</h3>
@@ -157,43 +157,60 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + z_{i,t},\ \tau_i^{-1}\right), \
 </section>
 <section id="cycles" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="cycles">Cycles</h3>
-<p>Added Fourier pairs to capture seasonal effects. A single harmonic with period <span class="math inline">\(P\)</span> (weeks) is defined as:</p>
+<p>Three cycles, 8 week, 26 week and 52 weeks, were tested alone, and together. A single cycle with period <span class="math inline">\(P\)</span> (weeks) is defined as:</p>
 <p><span class="math display">\[
 \text{cycle}_i(t;\,P) = \beta_i \cos\!\left(\tfrac{2\pi t}{P}\right) + \gamma_i \sin\!\left(\tfrac{2\pi t}{P}\right)
 (\#eq:cycle-component)
 \]</span></p>
-<p>Single-cycle models set <span class="math inline">\(\text{cycles}_{i,t} = \text{cycle}_i(t;\,P)\)</span> for <span class="math inline">\(P \in \{52, 26, 8\}\)</span> respectively.</p>
-<p>Dual-cycle models sum two cycles with independent coefficients:</p>
-<p><span class="math display">\[
+<p>Where <span class="math inline">\(P \in \{52, 26, 8\}\)</span>.</p>
+<p>Dual cycle models sum the best preforming 52 week cycle with the 8 and 26 week cycles: <span class="math display">\[
 \text{cycles}_{i,t} = \text{cycle}_{1,i}(t;\,P_1) + \text{cycle}_{2,i}(t;\,P_2)
 (\#eq:dual-cycle)
 \]</span></p>
-<p>where <span class="math inline">\((P_1, P_2) \in \{(52, 26),\,(52, 8)\}\)</span>. The subscripts on <span class="math inline">\(\text{cycle}_{1,i}\)</span>, <span class="math inline">\(\text{cycle}_{2,i}\)</span> correspond to independent coefficient pairs <span class="math inline">\((\beta_{1,i}, \gamma_{1,i})\)</span> and <span class="math inline">\((\beta_{2,i}, \gamma_{2,i})\)</span>.</p>
+<p>Where <span class="math inline">\((P_1, P_2) \in \{(52, 26),\,(52, 8)\}\)</span>.</p>
+<p>Cycle coefficients share the same weakly informative priors across all models: <span class="math display">\[
+\beta_i \sim \mathcal{N}(0,\ 0.001), \qquad \gamma_i \sim \mathcal{N}(0,\ 0.001)
+\]</span></p>
 </section>
 <section id="event-effects" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="event-effects">Event effects</h3>
-<p>Residual patterns motivated testing two event effects. A three week period around New Years (applied globally, or to each region) and a three-week Mid West funding reset (applied only to the Mid West region, <span class="math inline">\(\text{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})\)</span>). Each was fitted independently to confirm independent contribution:</p>
+<p>The New Years effect was captured by fitting independent components to the 51st and 52nd weeks of each year, and the 1st week of each new year. The Mid West Region specific reset was modeled with three independent components on the 86th, 87th, and 88th weeks since January 1st, 2023 (the same as the 34th, 35th and 36th weeks of 2024).</p>
 <p>Global New Year effect:</p>
-<p><span class="math display">\[
-\text{ny}_{t} = \delta_{\text{pre}} \cdot \mathbf{1}(t \bmod 52 = 0)
+<span class="math display">\[\begin{aligned}
+
+  \text{ny}_{t} &amp;= \delta_{\text{pre}} \cdot \mathbf{1}(t \bmod 52 = 0)
   + \delta_{\text{mid}}  \cdot \mathbf{1}(t \bmod 52 = 1)
   + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2)
+  \\
+  \\
+  \delta_{\text{pre}},\ \delta_{\text{mid}},\ \delta_{\text{post}} &amp; \sim \mathcal{N}(0,\ 0.001)
 (\#eq:global-ny)
-\]</span></p>
-<p>Regional New Year effect:</p>
-<p><span class="math display">\[
-\text{ny}_{i,t} = \delta_{\text{pre},i} \cdot \mathbf{1}(t \bmod 52 = 0)
+
+\end{aligned}\]</span>
+<p>Regional (<span class="math inline">\(i\)</span>) New Year effect:</p>
+<span class="math display">\[\begin{aligned}
+
+  \text{ny}_{i,t} &amp;= \delta_{\text{pre},i} \cdot \mathbf{1}(t \bmod 52 = 0)
   + \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
   + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2)
-(\#eq:regional-ny)
-\]</span></p>
-<p>Mid West reset:</p>
-<p><span class="math display">\[
-\text{mwr}_{i,t} = \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
-  + \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
-  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+  \\
+  \\
+  \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i}&amp;\sim \mathcal{N}(0,\ 0.001)
+  (\#eq:regional-ny)
+
+\end{aligned}\]</span>
+<p>Mid West reset effect:</p>
+<span class="math display">\[\begin{aligned}
+
+  \text{mwr}_{i=\text{mid west},t} &amp;= \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86)
+  + \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87)
+  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88)
+  \\
+  \\
+  \sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001)
+
 (\#eq:mw-reset)
-\]</span></p>
+\end{aligned}\]</span>
 </section>
 <section id="hierarchical-intercepts" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="hierarchical-intercepts">Hierarchical intercepts</h3>
@@ -202,7 +219,7 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + z_{i,t},\ \tau_i^{-1}\right), \
 \alpha_i \sim \mathcal{N}(\mu_\alpha,\ \tau_\alpha^{-1})
 (\#eq:v4-hier)
 \]</span></p>
-<p>with hyperpriors <span class="math inline">\(\mu_\alpha \sim \mathcal{N}(0, 0.001)\)</span> and <span class="math inline">\(\tau_\alpha \sim \Gamma(0.001, 0.001)\)</span>. The full v5.1 mean function is given in Equation @ref(eq:model).</p>
+<p>with hyperpriors <span class="math inline">\(\mu_\alpha \sim \mathcal{N}(0, 0.001)\)</span> and <span class="math inline">\(\tau_\alpha \sim \Gamma(0.001, 0.001)\)</span>.</p>
 </section>
 </section>
 <section id="response-scaling" class="level2">
@@ -215,7 +232,7 @@ y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region catchment
 </section>
 <section id="posterior-sampling-and-bayesian-ranking" class="level2">
 <h2 class="anchored" data-anchor-id="posterior-sampling-and-bayesian-ranking">Posterior Sampling and Bayesian Ranking </h2>
-<p><em>Just another Gibbs sampler</em> (<em>JAGs</em>), implemented using pyJAGS <span class="citation" data-cites="Nowotny2024pyjags">(<a href="#ref-Nowotny2024pyjags" role="doc-biblioref">Nowotny, 2024</a>)</span>, a Python interface to JAGS <span class="citation" data-cites="Plummer2003">(<a href="#ref-Plummer2003" role="doc-biblioref">Plummer, 2003</a>)</span>, was used to sample from the posterior distribution of our parameters given our data. Health region baselines, <span class="math inline">\(\alpha^s_j\)</span>, were used for ranking. Where <span class="math inline">\(j\)</span> is one of the 6 HSE health regions, <span class="math inline">\(j\in\{1,...,6\}\)</span>, and <span class="math inline">\(s\)</span> is the draw index, for <span class="math inline">\(s\in\{1,...,n\}\)</span> and total samples is defined as <span class="math inline">\(n=20{,}000\)</span>. <span class="math display">\[
+<p>Posterior sampling was preformed using <em>Just another Gibbs sampler</em> (<em>JAGs</em>)<span class="citation" data-cites="Plummer2003">(<a href="#ref-Plummer2003" role="doc-biblioref">Plummer, 2003</a>)</span>, implemented by pyJAGS <span class="citation" data-cites="Nowotny2024pyjags">(<a href="#ref-Nowotny2024pyjags" role="doc-biblioref">Nowotny, 2024</a>)</span>, a Python interface to JAGS. Health region baselines, <span class="math inline">\(\alpha^s_j\)</span>, were used for ranking. Where <span class="math inline">\(j\)</span> is one of the 6 HSE health regions, <span class="math inline">\(j\in\{1,...,6\}\)</span>, and <span class="math inline">\(s\)</span> is the draw index, for <span class="math inline">\(s\in\{1,...,n\}\)</span> and total samples is defined as <span class="math inline">\(n=20{,}000\)</span>. <span class="math display">\[
   A =
   \left[ {\begin{array}{ccccc}
     \alpha_1^1 &amp; \cdots &amp; \alpha_j^1 &amp; \cdots &amp; \alpha_6^1\\
@@ -224,7 +241,7 @@ y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region catchment
     \vdots  &amp;        &amp; \vdots\\
     \alpha_1^n &amp; \cdots &amp; \alpha_j^n &amp; \cdots &amp; \alpha_6^n\\
   \end{array} } \right]
-\]</span> Ranks follow the posterior ranking approach of <span class="citation" data-cites="Laird1989">Laird &amp; Louis (<a href="#ref-Laird1989" role="doc-biblioref">1989</a>)</span>, as applied by <span class="citation" data-cites="MacDermott2025">MacDermott et al. (<a href="#ref-MacDermott2025" role="doc-biblioref">2025</a>)</span>. Where each sample is posterior sample is ranked to form rank distribution, <span class="math inline">\(R\)</span>. <span class="math display">\[
+\]</span> Ranks follow the posterior ranking approach of <span class="citation" data-cites="Laird1989">Laird &amp; Louis (<a href="#ref-Laird1989" role="doc-biblioref">1989</a>)</span>. Where each sample is posterior sample is ranked to form rank distribution, <span class="math inline">\(R\)</span>. <span class="math display">\[
   R =
   \left[ {\begin{array}{ccccc}
     r_1^1 &amp; \cdots &amp; r_j^1 &amp; \cdots &amp; r_6^1\\
@@ -277,9 +294,9 @@ r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*&gt;\alpha_i^*)
 <tr class="even">
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v5.1</td>
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Hierarchical Intercepts</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4556.2</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4556.1</td>
 <td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">94.1</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4650.3</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4650.1</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v3.2</td>
@@ -382,9 +399,6 @@ Gelman, A. (2004). Exploratory <span>Data</span> <span>Analysis</span> for <span
 <div id="ref-Laird1989" class="csl-entry" role="listitem">
 Laird, N. M., &amp; Louis, T. A. (1989). Empirical <span>B</span>ayes ranking methods. <em>Journal of Educational Statistics</em>, <em>14</em>(1), 29–46. <a href="https://doi.org/10.3102/10769986014001029">https://doi.org/10.3102/10769986014001029</a>
 </div>
-<div id="ref-MacDermott2025" class="csl-entry" role="listitem">
-MacDermott, C., Scarrott, C. J., &amp; Ferguson, J. (2025). <em>Bayes-ically fair: <span>A</span> <span>B</span>ayesian <span>R</span>anking of the <span>O</span>lympic <span>M</span>edal <span>T</span>able</em>. <a href="https://doi.org/10.48550/arXiv.2510.14723">https://doi.org/10.48550/arXiv.2510.14723</a>
-</div>
 <div id="ref-Nowotny2024pyjags" class="csl-entry" role="listitem">
 Nowotny, M. (2024). <em><span class="nocase">pyJAGS</span>: A <span>P</span>ython interface to <span>JAGS</span></em> (Version 2.4.0) [Computer software]. <a href="https://github.com/michaelnowotny/pyjags">https://github.com/michaelnowotny/pyjags</a>
 </div>
@@ -401,8 +415,8 @@ Plummer, M. (2003). <span>JAGS</span>: A program for analysis of <span>B</span>a
 <h2 class="anchored" data-anchor-id="model-inheritance">Model Inheritance</h2>
 
 </section>
-<section id="full-model-specifications" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="full-model-specifications">Full Model Specifications</h2>
+<section id="full-model-specifications-full-model-specs" class="level2">
+<h2 class="anchored" data-anchor-id="full-model-specifications-full-model-specs">Full Model Specifications {full-model-specs}</h2>
 <p>Let <span class="math inline">\(y_{i,t}\)</span> denote the scaled trolley count for region <span class="math inline">\(i\)</span> at week <span class="math inline">\(t\)</span>, for <span class="math inline">\(i \in \{1,\ldots,6\}\)</span> and <span class="math inline">\(t \in \{1,\ldots,T\}\)</span>.</p>
 <section id="model-v0.1" class="level3 unnumbered">
 <h3 class="unnumbered anchored" data-anchor-id="model-v0.1">Model v0.1</h3>
@@ -812,9 +826,9 @@ y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region inpatient
 <tr class="even">
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v5.1</td>
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">Hierarchical Intercepts</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11449.0</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">93.3</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11542.4</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11449.2</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">93.8</td>
+<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11543.1</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v3.2</td>

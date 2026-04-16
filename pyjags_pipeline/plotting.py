@@ -3,9 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from statsmodels.nonparametric.smoothers_lowess import lowess
-from statsmodels.graphics.tsaplots import plot_acf
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.graphics.gofplots import qqplot
-from scipy.signal import periodogram
+from scipy.signal import welch
 
 
 def _week_xlabels(index, start='2023-01-01'):
@@ -57,6 +57,26 @@ def plot_fitted(df_fitted, save_path, ylabel='Trolley Rate (per 10k)'):
     plt.close(fig)
 
 
+def plot_residuals_combined(df_std_resid, save_path):
+    fig, ax = plt.subplots(figsize=(12, 4), dpi=150, layout='constrained')
+    for col in df_std_resid.columns:
+        ax.plot(df_std_resid.index, df_std_resid[col], linewidth=0.8, label=col)
+    ax.axhline(y=0, color='black', linestyle='--', linewidth=1)
+    ax.set_xlim(0, df_std_resid.shape[0])
+    ax.set_title('Standardized Residuals — All Regions')
+    ax.set_xlabel('Weeks')
+    ax.set_ylabel('Standardized Residuals')
+    ax.set_xticks(df_std_resid.index[::20])
+    ax.set_xticklabels(_week_xlabels(df_std_resid.index)[::20])
+    handles, labels = ax.get_legend_handles_labels()
+    order = sorted(range(len(labels)),
+                   key=lambda i: df_std_resid[labels[i]].abs().mean(), reverse=True)
+    ax.legend([handles[i] for i in order], [labels[i] for i in order],
+              loc='upper right', fontsize=7)
+    fig.savefig(save_path, bbox_inches='tight', dpi=150)
+    plt.close(fig)
+
+
 def plot_residuals_ts(df_std_resid, save_path):
     fig, axes = plt.subplots(3, 2, figsize=(12, 10), sharey=True, layout='constrained')
     for col, ax in zip(df_std_resid.columns, axes.flatten()):
@@ -72,16 +92,32 @@ def plot_residuals_ts(df_std_resid, save_path):
     plt.close(fig)
 
 
-def plot_residuals_acf(df_std_resid, save_path, lags=40):
+def plot_residuals_acf(df_std_resid, save_path, lags=53):
     fig, axes = plt.subplots(3, 2, figsize=(12, 9), sharey=True, layout='constrained')
     for ax, col in zip(axes.flatten(), df_std_resid.columns):
         plot_acf(df_std_resid[col].dropna(), ax=ax, lags=lags, alpha=0.05)
         ax.set_title(col, fontsize=10)
         ax.set_ylabel('')
         ax.set_xlabel('')
+        ax.axvline(52, color='red', linestyle='--', linewidth=0.8, alpha=0.6)
     fig.suptitle('Autocorrelation of Residuals')
     fig.supxlabel('Lag (weeks)')
     fig.supylabel('ACF')
+    fig.savefig(save_path, bbox_inches='tight', dpi=150)
+    plt.close(fig)
+
+
+def plot_residuals_pacf(df_std_resid, save_path, lags=53):
+    fig, axes = plt.subplots(3, 2, figsize=(12, 9), sharey=True, layout='constrained')
+    for ax, col in zip(axes.flatten(), df_std_resid.columns):
+        plot_pacf(df_std_resid[col].dropna(), ax=ax, lags=lags, alpha=0.05, method='ywm')
+        ax.set_title(col, fontsize=10)
+        ax.set_ylabel('')
+        ax.set_xlabel('')
+        ax.axvline(52, color='red', linestyle='--', linewidth=0.8, alpha=0.6)
+    fig.suptitle('Partial Autocorrelation of Residuals')
+    fig.supxlabel('Lag (weeks)')
+    fig.supylabel('PACF')
     fig.savefig(save_path, bbox_inches='tight', dpi=150)
     plt.close(fig)
 
@@ -116,7 +152,9 @@ def plot_residuals_qq(df_std_resid, save_path):
     plt.close(fig)
 
 
-def plot_residuals_periodogram(df_std_resid, save_path, fs=1.0):
+def plot_residuals_periodogram(df_std_resid, save_path, fs=1.0, nperseg=52):
+    # Welch's method: nperseg=52 preserves annual-cycle frequency resolution;
+    # with ~150 obs and 50% overlap this yields ~5 averaged segments.
     ref_periods = [
         (52, '1 Year'),
         (26, '6 Months'),
@@ -126,7 +164,8 @@ def plot_residuals_periodogram(df_std_resid, save_path, fs=1.0):
     fig, axes = plt.subplots(3, 2, figsize=(14, 10), layout='constrained')
     for ax, col in zip(axes.flatten(), df_std_resid.columns):
         resid = df_std_resid[col].dropna().values
-        freqs, psd = periodogram(resid, fs=fs, window='hann')
+        freqs, psd = welch(resid, fs=fs, nperseg=min(nperseg, len(resid)),
+                           noverlap=nperseg // 2, window='hann')
         mask = freqs > 0
         periods = 1.0 / freqs[mask]
         power = psd[mask]
@@ -134,10 +173,11 @@ def plot_residuals_periodogram(df_std_resid, save_path, fs=1.0):
         ax.set_title(f'PSD: {col}', fontsize=10)
         ax.set_ylabel('Power')
         ax.set_xlabel('Period (weeks)')
-        ax.set_xlim(0, 52)
+        ax.set_xlim(0, 53)
+        y_top = power.max() * 0.95
         for period, label in ref_periods:
             ax.axvline(period, color='red', linestyle='--', linewidth=0.8)
-            ax.annotate(f'\u25c0{label}', xy=(period, 95), fontsize=7, va='top')
+            ax.annotate(f'\u25c0{label}', xy=(period, y_top), fontsize=7, va='top')
     fig.savefig(save_path, bbox_inches='tight', dpi=150)
     plt.close(fig)
 

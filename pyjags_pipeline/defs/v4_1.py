@@ -14,7 +14,7 @@ class Model(BaseModel):
 
     @property
     def name(self):
-        return 'Regional NY + MW Reset'
+        return 'V3.1 + Partial Pooling'
 
     @property
     def jags_model_string(self):
@@ -44,7 +44,7 @@ class Model(BaseModel):
             for(t in 1:T){
               resid[i,t] <- y[i,t] - fullmod[i,t]
             }
-            alpha[i]      ~ dnorm(0, 0.001)
+            alpha[i]      ~ dnorm(mu_alpha, tau_alpha)
             beta[i]       ~ dnorm(0, 0.001)
             gamma[i]      ~ dnorm(0, 0.001)
             tau[i]        ~ dgamma(0.001, 0.001)
@@ -56,6 +56,8 @@ class Model(BaseModel):
           sigma_pre  ~ dnorm(0, 0.001)
           sigma_mid  ~ dnorm(0, 0.001)
           sigma_post ~ dnorm(0, 0.001)
+          mu_alpha   ~ dnorm(0, 0.001)
+          tau_alpha  ~ dgamma(0.001, 0.001)
         }
         """
 
@@ -63,7 +65,8 @@ class Model(BaseModel):
     def monitor_params(self):
         return ['alpha', 'beta', 'gamma', 'tau', 'phi',
                 'delta_pre', 'delta_mid', 'delta_post',
-                'sigma_pre', 'sigma_mid', 'sigma_post']
+                'sigma_pre', 'sigma_mid', 'sigma_post',
+                'mu_alpha', 'tau_alpha']
 
     def jags_data(self, y, n_region, n_weeks, regions):
         ev = build_event_indicators(n_weeks, regions)

@@ -17,7 +17,7 @@ def compare_dic(data_path, versions=None):
         The CSV used for fitting, e.g. 'data/wide_weekly_scaledPerBed.csv'.
         Only the filename stem is used to locate the output directory.
     versions : list[str], optional
-        Restrict to these version strings (e.g. ['v3.1', 'v4.1']).
+        Restrict to these version strings (e.g. ['v2.1', 'v3.1']).
         If None, all versions with a dic.csv in the output dir are included.
 
     Returns

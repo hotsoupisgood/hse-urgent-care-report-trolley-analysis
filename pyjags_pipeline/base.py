@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 
 from . import data as _data
-from . import ar as _ar
 from . import fitting as _fitting
 from . import diagnostics as _diag
 from . import plotting as _plot
@@ -59,7 +58,7 @@ class BaseModel(ABC):
     @property
     @abstractmethod
     def version(self) -> str:
-        """e.g. 'v4.1'"""
+        """e.g. 'v3.1'"""
 
     @property
     @abstractmethod
@@ -74,19 +73,13 @@ class BaseModel(ABC):
     @property
     @abstractmethod
     def monitor_params(self) -> list[str]:
-        """Parameter names to monitor during sampling."""
+        """Parameter names to monitor during sampling.
+        Must include 'mu', 'fullmod', and 'resid' so that _build_result
+        can extract them directly from the JAGS posterior."""
 
     @abstractmethod
     def jags_data(self, y, n_region, n_weeks, regions) -> dict:
         """Build the data dict passed to pyjags.Model()."""
-
-    @abstractmethod
-    def reconstruct_mu(self, raw_df, regions, n_weeks, indicators):
-        """Return (df_mu, df_mu_lower, df_mu_upper)."""
-
-    @abstractmethod
-    def compute_fitted(self, df_mu, df_og, raw_df):
-        """Apply AR correction to mu. Return fitted DataFrame."""
 
     # ------------------------------------------------------------------ #
     # Optional overrides
@@ -97,6 +90,38 @@ class BaseModel(ABC):
 
     def extra_plots(self, result, plot_dir):
         pass
+
+    # ------------------------------------------------------------------ #
+    # Matrix extraction helpers (JAGS-monitored 2-D nodes)
+    # ------------------------------------------------------------------ #
+
+    @staticmethod
+    def _extract_matrix_summary(arr, regions):
+        """Return (df_mean, df_lower, df_upper) from a monitored 2-D JAGS node.
+
+        pyjags returns shape (n_region, n_weeks, n_iter, n_chains).
+        Outputs are DataFrames of shape (n_weeks, n_region).
+        """
+        n_region, n_weeks, n_iter, n_chains = arr.shape
+        flat = arr.reshape(n_region, n_weeks, -1)   # (n_region, n_weeks, n_samples)
+        mean  = flat.mean(axis=2).T                  # (n_weeks, n_region)
+        lower = np.quantile(flat, 0.025, axis=2).T
+        upper = np.quantile(flat, 0.975, axis=2).T
+        return (pd.DataFrame(mean,  columns=regions),
+                pd.DataFrame(lower, columns=regions),
+                pd.DataFrame(upper, columns=regions))
+
+    @staticmethod
+    def _extract_matrix_mean(arr, regions):
+        """Return a posterior-mean DataFrame from a monitored 2-D JAGS node.
+
+        pyjags returns shape (n_region, n_weeks, n_iter, n_chains).
+        Output is a DataFrame of shape (n_weeks, n_region).
+        """
+        n_region, n_weeks, n_iter, n_chains = arr.shape
+        flat = arr.reshape(n_region, n_weeks, -1)
+        mean = flat.mean(axis=2).T                   # (n_weeks, n_region)
+        return pd.DataFrame(mean, columns=regions)
 
     # ------------------------------------------------------------------ #
     # Pipeline methods
@@ -126,6 +151,12 @@ class BaseModel(ABC):
         print(f'[{self.version}] Computing DIC...')
         dic = _fitting.compute_dic(model, n_iter=sample)
 
+        # Pop 2-D matrix nodes immediately — shape (n_region, n_weeks, n_iter, n_chains)
+        # would break both compute_gelman and flatten_samples, which expect 1-D or scalar nodes.
+        mu_arr    = pyjags_samples.pop('mu',      None)
+        fm_arr    = pyjags_samples.pop('fullmod', None)
+        resid_arr = pyjags_samples.pop('resid',   None)
+
         print(f'[{self.version}] Computing Gelman-Rubin...')
         gelman = _fitting.compute_gelman(pyjags_samples)
 
@@ -133,18 +164,21 @@ class BaseModel(ABC):
 
         return self._build_result(raw_df, pyjags_samples, dic, gelman,
                                   df_og, regions, n_region, n_weeks, indicators,
-                                  output_dir)
+                                  output_dir,
+                                  mu_arr=mu_arr, fm_arr=fm_arr, resid_arr=resid_arr)
 
     def _build_result(self, raw_df, pyjags_samples, dic, gelman,
-                      df_og, regions, n_region, n_weeks, indicators, output_dir):
-        """Reconstruct mu, compute fitted values and residuals."""
-        print(f'[{self.version}] Reconstructing mu...')
-        df_mu, df_mu_lower, df_mu_upper = self.reconstruct_mu(
-            raw_df, regions, n_weeks, indicators)
+                      df_og, regions, n_region, n_weeks, indicators, output_dir,
+                      mu_arr=None, fm_arr=None, resid_arr=None):
+        """Extract mu, fullmod, and resid directly from monitored JAGS nodes."""
+        print(f'[{self.version}] Extracting mu, fitted, and residuals from posterior...')
+        df_mu, df_mu_lower, df_mu_upper = self._extract_matrix_summary(mu_arr, regions)
+        df_fitted    = self._extract_matrix_mean(fm_arr, regions)
+        df_residuals = self._extract_matrix_mean(resid_arr, regions)
+        df_std_resid = df_residuals / df_residuals.std()
 
-        print(f'[{self.version}] Computing fitted values and residuals...')
-        df_fitted = self.compute_fitted(df_mu, df_og, raw_df)
-        df_residuals, df_std_resid = _ar.compute_residuals(df_og, df_fitted)
+        # free the large sample arrays immediately
+        del mu_arr, fm_arr, resid_arr
 
         return ModelResult(
             raw_df=raw_df,
@@ -173,8 +207,10 @@ class BaseModel(ABC):
         _plot.plot_mu(result.df_mu, result.df_mu_lower, result.df_mu_upper,
                       plot_dir / 'mu_fit.png')
         _plot.plot_fitted(result.df_fitted, plot_dir / 'fitted.png')
+        _plot.plot_residuals_combined(result.df_std_resid, plot_dir / 'residuals_combined.png')
         _plot.plot_residuals_ts(result.df_std_resid, plot_dir / 'residuals_ts.png')
         _plot.plot_residuals_acf(result.df_std_resid, plot_dir / 'residuals_acf.png')
+        _plot.plot_residuals_pacf(result.df_std_resid, plot_dir / 'residuals_pacf.png')
         _plot.plot_residuals_vs_fitted(result.df_std_resid, result.df_fitted,
                                        plot_dir / 'residuals_vs_fitted.png')
         _plot.plot_residuals_qq(result.df_std_resid, plot_dir / 'residuals_qq.png')
@@ -231,6 +267,7 @@ class BaseModel(ABC):
         result.df_mu.to_csv(od / 'mu.csv', index=False)
         result.df_mu_lower.to_csv(od / 'mu_lower.csv', index=False)
         result.df_mu_upper.to_csv(od / 'mu_upper.csv', index=False)
+        result.df_residuals.to_csv(od / 'residuals_posterior_mean.csv', index=False)
 
         print(f'[{self.version}] Outputs exported to {od}')
 
