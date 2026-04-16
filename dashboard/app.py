@@ -545,177 +545,203 @@ def trends_page(scope="region", freq="weekly", rate="count"):
     ])
 
 
-# -- Model formulas -------------------------------------------------------
+# -- Model gallery --------------------------------------------------------
 
-FORMULAS_PATH = os.path.join(os.path.dirname(__file__), "..", "bayes_models",
-                             "model_formulas.xlsx")
-
-def _load_model_formula(model="V4"):
-    """Load LaTeX formulas from Excel and combine into a single aligned block."""
-    if not os.path.exists(FORMULAS_PATH):
-        return None
-    df = pd.read_excel(FORMULAS_PATH)
-    rows = df[df["Model"] == model]
-    if rows.empty:
-        return None
-    tex_lines = []
-    for _, row in rows.iterrows():
-        desc = row.get("Description", "")
-        comment = f" && \\text{{{desc}}}" if desc else ""
-        tex_lines.append(f"  \\textbf{{{row['Component']}:}} \\quad & {row['LaTeX']}{comment}")
-    body = " \\\\[6pt]\n".join(tex_lines)
-    return f"$$\\begin{{align}}\n{body}\n\\end{{align}}$$"
-
-
-# -- Model results data ---------------------------------------------------
-
-MODEL_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "models", "v4")
-
-# CSV keys available in MODEL_DIR — labels are just filenames with _ → spaces
-MODEL_CSV_KEYS = [
-    "amplitude_overall",
-    "amplitude_pairwise",
-    "phase_overall",
-    "seasonal_phase_test",
-    "delta_overall_combined",
-    "delta_pairwise_combined",
-    "alpha_overall",
-    "alpha_pairwise",
-    "full_reset_overall",
-    "ranks",
-    "global_parameters",
-    "dic",
-    "gelman",
+MODEL_VERSIONS = [
+    "v0.1", "v0.2",
+    "v2.1", "v2.2", "v2.3", "v2.4", "v2.5",
+    "v3.1", "v3.2", "v3.3",
+    "v4.1",
+    "v5.1",
 ]
 
-_LABEL_OVERRIDES = {"dic": "DIC", "gelman": "Gelman-Rubin"}
-MODEL_DROPDOWN_OPTIONS = [
-    {"label": _LABEL_OVERRIDES.get(k, k.replace("_", " ").title()), "value": k}
-    for k in MODEL_CSV_KEYS
+MODEL_SCALE_OPTIONS = [
+    {"label": "Per 10k Pop.", "value": "per10k"},
+    {"label": "Per Bed",      "value": "per_bed"},
+    {"label": "Per Budget",   "value": "per_budget"},
 ]
 
-PLOTS_DIR = os.path.join(MODEL_DIR, "plots")
+# Fill in descriptions here — markdown supported.
+# mu_fit: the posterior mean cycle + AR fit plot
+# fitted: the posterior fitted values vs observed
+MODEL_DESCRIPTIONS = {
+    "v0.1": {
+        "title":    "V0.1 — Baseline AR(1)",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+    "v0.2": {
+        "title":    "V0.2 — Baseline AR(2)",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+    "v2.1": {
+        "title":    "V2.1 — AR(1) + Annual Cycle",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+    "v2.2": {
+        "title":    "V2.2 — AR(1) + Annual + 10-Week Cycle",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+    "v2.3": {
+        "title":    "V2.3 — AR(1) + Annual + 6-Week Cycle",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+    "v2.4": {
+        "title":    "V2.4 — AR(1) + Annual + 26-Week Cycle",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+    "v2.5": {
+        "title":    "V2.5 — AR(1) + Annual + 4-Week Cycle",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+    "v3.1": {
+        "title":    "V3.1 — AR(1) + Annual Cycle + New Year Effect",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+    "v3.2": {
+        "title":    "V3.2 — AR(1) + Annual + 10-Week Cycle + New Year Effect",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+    "v3.3": {
+        "title":    "V3.3 — AR(1) + Annual + New Year + MW Reset",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+    "v4.1": {
+        "title":    "V4.1 — AR(1) + Annual + New Year + MW Reset (Selected)",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+    "v5.1": {
+        "title":    "V5.1 — V4.1 + Partial Pooling",
+        "overview": "",
+        "mu_fit":   "",
+        "fitted":   "",
+    },
+}
+
+_PLACEHOLDER = html.P(
+    "Description to be added.",
+    style={"color": "#bbb", "fontStyle": "italic", "fontSize": "0.8125rem",
+           "margin": "0.5rem 0 0"},
+)
+
+_IMG_STYLE = {
+    "width": "100%",
+    "borderRadius": "4px",
+    "display": "block",
+}
+
+_PLOT_LABEL_STYLE = {
+    "fontSize": "0.75rem",
+    "fontWeight": "600",
+    "color": "#555",
+    "textTransform": "uppercase",
+    "letterSpacing": "0.05em",
+    "marginBottom": "0.25rem",
+}
 
 
-def _load_model_csv(name):
-    path = os.path.join(MODEL_DIR, f"{name}.csv")
-    if os.path.exists(path):
-        df = pd.read_csv(path)
-        if "Unnamed: 0" in df.columns:
-            df = df.drop(columns=["Unnamed: 0"])
-        return df
-    return None
+def _build_model_sections(scale):
+    """Render all model version cards for a given scale key."""
+    sections = []
+    for version in MODEL_VERSIONS:
+        desc = MODEL_DESCRIPTIONS.get(version, {})
+        mu_src   = f"/assets/models/{scale}/{version}/mu_fit.png"
+        fit_src  = f"/assets/models/{scale}/{version}/fitted.png"
 
+        def _desc_block(text):
+            if text:
+                return dcc.Markdown(text, style={"fontSize": "0.8125rem",
+                                                 "marginTop": "0.5rem",
+                                                 "lineHeight": "1.6"})
+            return _PLACEHOLDER
 
-def _load_model_plot(name):
-    """Return a base64 data URI if {name}.png exists in plots dir, else None."""
-    path = os.path.join(PLOTS_DIR, f"{name}.png")
-    if not os.path.exists(path):
-        return None
-    import base64
-    with open(path, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode()
-    return f"data:image/png;base64,{encoded}"
+        overview = desc.get("overview", "")
 
-
-def _make_model_table(df):
-    """Build a DataTable from a model results DataFrame."""
-    for col in df.select_dtypes(include="number").columns:
-        df[col] = df[col].round(4)
-    return dash_table.DataTable(
-        id="model-table",
-        columns=[{"name": c, "id": c} for c in df.columns],
-        data=df.to_dict("records"),
-        sort_action="native",
-        style_table={"overflowX": "auto"},
-        style_cell={"textAlign": "left", "padding": "0.4rem 0.75rem",
-                    "fontSize": "0.8125rem", "fontFamily": FONT},
-        style_header={"fontWeight": "600", "backgroundColor": "#f0f0f0"},
-    )
-
-
-def _make_model_content(table_name):
-    """Build the plot + table content for a given model result key."""
-    children = []
-
-    # Plot image (if available)
-    img_src = _load_model_plot(table_name)
-    if img_src:
-        children.append(html.Img(
-            src=img_src,
-            alt=f"Plot for {table_name.replace('_', ' ')}",
-            style={"width": "100%", "maxWidth": "800px", "maxHeight": "500px",
-                   "objectFit": "contain",
-                   "marginBottom": "1rem", "borderRadius": "4px",
-                   "display": "block", "marginLeft": "auto",
-                   "marginRight": "auto"},
-        ))
-
-    # Data table
-    df = _load_model_csv(table_name)
-    if df is not None:
-        children.append(_make_model_table(df))
-    else:
-        children.append(html.P(
-            "CSV not found — run the analysis notebook to generate this table.",
-            style={"color": "#999", "fontStyle": "italic", "padding": "1rem 0"}))
-
-    return children
-
-
-def model_page(table="amplitude_overall"):
-    """Model results tab — formula card + dropdown results."""
-    children = []
-
-    # Formula card (collapsible)
-    formula_md = _load_model_formula("V4")
-    if formula_md:
-        children.append(html.Details(
-            open=True,
-            style={"backgroundColor": "white", "borderRadius": "8px",
-                   "padding": "1rem 1.25rem", "marginBottom": "0.75rem",
-                   "boxShadow": "0 1px 3px rgba(0,0,0,0.1)"},
+        sections.append(html.Div(
+            style={**CARD, "marginBottom": "1rem"},
             children=[
-                html.Summary("Model V4 — Specification",
-                             style={"fontSize": "1rem", "fontWeight": "600",
-                                    "cursor": "pointer", "marginBottom": "0.5rem"}),
+                # Version header
+                html.H3(
+                    desc.get("title", version),
+                    style={"margin": "0 0 0.5rem", "fontSize": "1rem",
+                           "borderBottom": "1px solid #eee", "paddingBottom": "0.5rem"},
+                ),
+                # Optional overview
+                (dcc.Markdown(overview, style={"fontSize": "0.8125rem",
+                                               "marginBottom": "0.75rem",
+                                               "lineHeight": "1.6"})
+                 if overview else None),
+                # Two-plot row
                 html.Div(
-                    style={"overflowX": "auto"},
-                    children=[dcc.Markdown(formula_md, mathjax=True,
-                                           style={"fontSize": "0.8125rem",
-                                                  "lineHeight": "2"})],
+                    style={"display": "flex", "gap": "1.5rem",
+                           "alignItems": "flex-start"},
+                    children=[
+                        html.Div(style={"flex": "1", "minWidth": "0"}, children=[
+                            html.P("Posterior Mean Fit", style=_PLOT_LABEL_STYLE),
+                            html.Img(src=mu_src,
+                                     alt=f"{version} mu_fit",
+                                     style=_IMG_STYLE),
+                            _desc_block(desc.get("mu_fit", "")),
+                        ]),
+                        html.Div(style={"flex": "1", "minWidth": "0"}, children=[
+                            html.P("Fitted vs Observed", style=_PLOT_LABEL_STYLE),
+                            html.Img(src=fit_src,
+                                     alt=f"{version} fitted",
+                                     style=_IMG_STYLE),
+                            _desc_block(desc.get("fitted", "")),
+                        ]),
+                    ],
                 ),
             ],
         ))
+    return sections
 
-    # Results card
-    children.append(html.Div(
-        style={"backgroundColor": "white", "borderRadius": "8px",
-               "padding": "1.25rem", "boxShadow": "0 1px 3px rgba(0,0,0,0.1)"},
-        children=[
-            html.H3("Posterior Analysis",
-                     style={"margin": "0 0 1rem", "fontSize": "1rem"}),
+
+def model_page(scale="per10k"):
+    """Model results tab — static plot gallery with scale toggle."""
+    return html.Div(style={"maxWidth": PAGE_WIDTH, "margin": "0 auto"}, children=[
+        # Scale toggle card
+        html.Div(style=CARD, children=[
             html.Div(
-                style={"display": "flex", "gap": "1rem", "alignItems": "center",
-                       "marginBottom": "1rem"},
+                style={"display": "flex", "alignItems": "center", "gap": "1rem"},
                 children=[
-                    html.Label("Result:", style={"fontSize": "0.8125rem",
-                                                 "fontWeight": "600"}),
-                    dcc.Dropdown(
-                        id="model-dropdown",
-                        options=MODEL_DROPDOWN_OPTIONS,
-                        value=table,
-                        clearable=False,
-                        style={"width": "400px", "fontSize": "0.8125rem"},
+                    html.Span("Scale:", style={"fontWeight": "600",
+                                               "fontSize": "0.8125rem"}),
+                    dcc.RadioItems(
+                        id="model-scale-toggle",
+                        options=MODEL_SCALE_OPTIONS,
+                        value=scale,
+                        inline=True,
+                        labelStyle={"marginRight": "0.75rem"},
+                        style={"fontSize": "0.8125rem"},
                     ),
                 ],
             ),
-            html.Div(id="model-table-container",
-                     children=_make_model_content(table)),
-        ],
-    ))
-
-    return html.Div(style={"maxWidth": PAGE_WIDTH, "margin": "0 auto"}, children=children)
+        ]),
+        # Model sections — rebuilt by callback when scale changes
+        html.Div(id="model-content", children=_build_model_sections(scale)),
+    ])
 
 
 # -- Main layout with navigation -----------------------------------------
@@ -891,19 +917,19 @@ app.clientside_callback(
     prevent_initial_call=True,
 )
 
-# Model dropdown → URL
+# Model scale toggle → URL
 app.clientside_callback(
     """
-    function(table_name) {
+    function(scale) {
         const p = new URLSearchParams();
         p.set('tab', 'model');
-        p.set('model_table', table_name);
+        p.set('scale', scale);
         window.history.replaceState({}, '', '?' + p.toString());
         return '';
     }
     """,
     Output("url-writer-model", "children"),
-    Input("model-dropdown", "value"),
+    Input("model-scale-toggle", "value"),
     prevent_initial_call=True,
 )
 
@@ -915,9 +941,7 @@ app.clientside_callback(
             window.history.replaceState({}, '', '?tab=about');
         }
         if (tab === 'model') {
-            const dd = document.querySelector('#model-dropdown input[type=hidden]');
-            const mt = dd ? dd.value : 'amplitude_overall';
-            window.history.replaceState({}, '', '?tab=model&model_table=' + mt);
+            window.history.replaceState({}, '', '?tab=model');
         }
         return '';
     }
@@ -939,7 +963,7 @@ def display_page(tab, params):
     if tab == "about":
         return about_page()
     if tab == "model":
-        return model_page(table=params.get("model_table", "amplitude_overall"))
+        return model_page(scale=params.get("scale", "per10k"))
     if tab == "trends":
         return trends_page(
             scope=params.get("scope", "region"),
@@ -1302,11 +1326,11 @@ def update_trends(scope, freq, rate, event_checks):
 # -- Model tab callback ---------------------------------------------------
 
 @app.callback(
-    Output("model-table-container", "children"),
-    Input("model-dropdown", "value"),
+    Output("model-content", "children"),
+    Input("model-scale-toggle", "value"),
 )
-def update_model_table(table_name):
-    return _make_model_content(table_name)
+def update_model_scale(scale):
+    return _build_model_sections(scale)
 
 
 # -- Run ------------------------------------------------------------------
