@@ -547,6 +547,35 @@ def trends_page(scope="region", freq="weekly", rate="count"):
 
 # -- Model gallery --------------------------------------------------------
 
+_MODEL_DATA_BASE = os.path.join(
+    os.path.dirname(__file__), "..", "data", "models",
+    "wide_weekly_scaledPer10k",
+)
+
+def _load_dic_table():
+    """Load DIC CSVs for all versions and return a comparison DataFrame."""
+    rows = []
+    for v in ["v0.1", "v0.2", "v2.1", "v2.2", "v2.3", "v2.4", "v2.5",
+              "v3.1", "v3.2", "v3.3", "v4.1", "v5.1"]:
+        path = os.path.join(_MODEL_DATA_BASE, v, "dic.csv")
+        if os.path.exists(path):
+            df = pd.read_csv(path)
+            rows.append({
+                "Version":     v,
+                "Description": df["description"].iloc[0],
+                "Deviance":    round(df["deviance"].iloc[0], 2),
+                "Penalty":     round(df["penalty"].iloc[0], 2),
+                "DIC":         round(df["DIC"].iloc[0], 2),
+            })
+    if not rows:
+        return None
+    out = pd.DataFrame(rows)
+    best = out["DIC"].idxmin()
+    out["Selected"] = ""
+    out.at[best, "Selected"] = "✓"
+    return out
+
+
 MODEL_VERSIONS = [
     "v0.1", "v0.2",
     "v2.1", "v2.2", "v2.3", "v2.4", "v2.5",
@@ -720,28 +749,88 @@ def _build_model_sections(scale):
 
 def model_page(scale="per10k"):
     """Model results tab — static plot gallery with scale toggle."""
-    return html.Div(style={"maxWidth": PAGE_WIDTH, "margin": "0 auto"}, children=[
-        # Scale toggle card
-        html.Div(style=CARD, children=[
-            html.Div(
-                style={"display": "flex", "alignItems": "center", "gap": "1rem"},
-                children=[
-                    html.Span("Scale:", style={"fontWeight": "600",
-                                               "fontSize": "0.8125rem"}),
-                    dcc.RadioItems(
-                        id="model-scale-toggle",
-                        options=MODEL_SCALE_OPTIONS,
-                        value=scale,
-                        inline=True,
-                        labelStyle={"marginRight": "0.75rem"},
-                        style={"fontSize": "0.8125rem"},
-                    ),
+    children = []
+
+    # -- Version scheme explanation card --
+    children.append(html.Div(style=CARD, children=[
+        html.H3("Model Versioning", style={"margin": "0 0 0.5rem", "fontSize": "1rem"}),
+        dcc.Markdown(
+            "Models are numbered by family and iteration. "
+            "**V0.x** — AR baseline (no cycle). "
+            "**V2.x** — AR + harmonic cycle (varying period). "
+            "**V3.x** — V2 + New Year effect. "
+            "**V4.x** — V3 + mid-winter reset covariate (selected family). "
+            "**V5.x** — V4 + partial pooling across regions. "
+            "V1.x and V6.x are intentionally absent (deprecated branches). "
+            "The selected model is **V4.1**, chosen by lowest DIC.",
+            style={"fontSize": "0.8125rem", "lineHeight": "1.7", "margin": "0"},
+        ),
+    ]))
+
+    # -- DIC comparison table --
+    dic_df = _load_dic_table()
+    if dic_df is not None:
+        children.append(html.Div(style=CARD, children=[
+            html.H3("Model Comparison — DIC",
+                    style={"margin": "0 0 0.5rem", "fontSize": "1rem"}),
+            html.P(
+                "Lower DIC indicates better out-of-sample predictive accuracy. "
+                "Penalty = effective number of parameters (pD). "
+                "✓ marks the selected model.",
+                style={"fontSize": "0.8125rem", "color": "#666",
+                       "margin": "0 0 0.75rem"},
+            ),
+            dash_table.DataTable(
+                columns=[{"name": c, "id": c} for c in dic_df.columns],
+                data=dic_df.to_dict("records"),
+                sort_action="native",
+                style_table={"overflowX": "auto"},
+                style_cell={"textAlign": "left", "padding": "0.4rem 0.75rem",
+                             "fontSize": "0.8125rem", "fontFamily": FONT},
+                style_header={"fontWeight": "600", "backgroundColor": "#f0f0f0",
+                              "borderBottom": "2px solid #dee2e6"},
+                style_data_conditional=[
+                    {"if": {"filter_query": '{Selected} = "✓"'},
+                     "backgroundColor": "#eaf4ea", "fontWeight": "600"},
+                    {"if": {"row_index": "odd"}, "backgroundColor": "#f8f9fa"},
                 ],
             ),
-        ]),
-        # Model sections — rebuilt by callback when scale changes
-        html.Div(id="model-content", children=_build_model_sections(scale)),
-    ])
+        ]))
+
+    # -- Scale toggle card --
+    children.append(html.Div(style=CARD, children=[
+        html.Div(
+            style={"display": "flex", "alignItems": "center", "gap": "1rem",
+                   "marginBottom": "0.4rem"},
+            children=[
+                html.Span("Response scale:", style={"fontWeight": "600",
+                                                    "fontSize": "0.8125rem"}),
+                dcc.RadioItems(
+                    id="model-scale-toggle",
+                    options=MODEL_SCALE_OPTIONS,
+                    value=scale,
+                    inline=True,
+                    labelStyle={"marginRight": "0.75rem"},
+                    style={"fontSize": "0.8125rem"},
+                ),
+            ],
+        ),
+        html.P(
+            "Switching scale re-normalises the trolley count used to fit each model "
+            "(e.g. trolleys per 10k population vs. per inpatient bed). "
+            "The AR structure, cycle periods, and priors are identical across scales — "
+            "only the magnitude and inter-regional comparability of the response changes.",
+            style={"fontSize": "0.75rem", "color": "#888", "margin": "0",
+                   "lineHeight": "1.5"},
+        ),
+    ]))
+
+    # -- Model gallery (rebuilt by callback) --
+    children.append(html.Div(id="model-content",
+                             children=_build_model_sections(scale)))
+
+    return html.Div(style={"maxWidth": PAGE_WIDTH, "margin": "0 auto"},
+                    children=children)
 
 
 # -- Main layout with navigation -----------------------------------------
@@ -1039,6 +1128,7 @@ def update_map(selected_date, metric_key, per10k_toggle, level):
 
     title = f"Single Day Map"
 
+    col_max = map_df[color_col].max()
     fig = px.choropleth_map(
         map_df,
         geojson=_geojson,
@@ -1046,6 +1136,7 @@ def update_map(selected_date, metric_key, per10k_toggle, level):
         featureidkey="properties.HR_operational_name",
         color=color_col,
         color_continuous_scale="Reds",
+        range_color=[0, col_max],
         map_style="carto-positron",
         center={"lat": 53.5, "lon": -8},
         zoom=5.6,
