@@ -647,55 +647,55 @@ MODEL_DESCRIPTIONS = {
         "fitted":   "",
     },
     "v2.1": {
-        "title":    "V2.1 — AR(1) + Annual Cycle",
+        "title":    "V2.1 — Annual Cycle Only (52-week)",
         "overview": "",
         "mu_fit":   "",
         "fitted":   "",
     },
     "v2.2": {
-        "title":    "V2.2 — AR(1) + Annual + 10-Week Cycle",
+        "title":    "V2.2 — 26-Week Cycle Only (no annual)",
         "overview": "",
         "mu_fit":   "",
         "fitted":   "",
     },
     "v2.3": {
-        "title":    "V2.3 — AR(1) + Annual + 6-Week Cycle",
+        "title":    "V2.3 — 8-Week Cycle Only (no annual)",
         "overview": "",
         "mu_fit":   "",
         "fitted":   "",
     },
     "v2.4": {
-        "title":    "V2.4 — AR(1) + Annual + 26-Week Cycle",
+        "title":    "V2.4 — Annual (52-week) + 6-Month (26-week) Cycle",
         "overview": "",
         "mu_fit":   "",
         "fitted":   "",
     },
     "v2.5": {
-        "title":    "V2.5 — AR(1) + Annual + 4-Week Cycle",
+        "title":    "V2.5 — Annual (52-week) + 8-Week Cycle",
         "overview": "",
         "mu_fit":   "",
         "fitted":   "",
     },
     "v3.1": {
-        "title":    "V3.1 — AR(1) + Annual Cycle + New Year Effect",
+        "title":    "V3.1 — Annual + Global New Year Effect",
         "overview": "",
         "mu_fit":   "",
         "fitted":   "",
     },
     "v3.2": {
-        "title":    "V3.2 — AR(1) + Annual + 10-Week Cycle + New Year Effect",
+        "title":    "V3.2 — Annual + Region-Specific New Year Effect",
         "overview": "",
         "mu_fit":   "",
         "fitted":   "",
     },
     "v3.3": {
-        "title":    "V3.3 — AR(1) + Annual + New Year + MW Reset",
+        "title":    "V3.3 — Annual + Mid West Reset Event (no New Year)",
         "overview": "",
         "mu_fit":   "",
         "fitted":   "",
     },
     "v4.1": {
-        "title":    "V4.1 — AR(1) + Annual + New Year + MW Reset (Selected)",
+        "title":    "V4.1 — Annual + Region-Specific New Year + Mid West Reset (Selected)",
         "overview": "",
         "mu_fit":   "",
         "fitted":   "",
@@ -796,11 +796,15 @@ def model_page(scale="per10k"):
         html.H3("Model Versioning", style={"margin": "0 0 0.5rem", "fontSize": "1rem"}),
         dcc.Markdown(
             "Models are numbered by family and iteration. "
-            "**V0.x** — AR baseline (no cycle). "
-            "**V2.x** — AR + harmonic cycle (varying period). "
-            "**V3.x** — V2 + New Year effect. "
-            "**V4.x** — V3 + mid-winter reset covariate (selected family). "
-            "**V5.x** — V4 + partial pooling across regions. "
+            "**V0.x** — AR baseline with no harmonic component. "
+            "**V2.x** — Period sweep: V2.1–V2.3 each test a single cycle period "
+            "(52-week, 26-week, 8-week); V2.4–V2.5 add a second harmonic to the annual. "
+            "**V3.x** — Annual cycle plus a structural event effect: "
+            "V3.1 adds a global New Year step, V3.2 makes it region-specific, "
+            "V3.3 replaces the New Year term with a Mid West one-time reset. "
+            "**V4.x** — Combines the region-specific New Year effect (V3.2) "
+            "and the Mid West reset (V3.3) — this is the selected family. "
+            "**V5.x** — V4.1 with partial pooling of region-level parameters. "
             "V1.x and V6.x are intentionally absent (deprecated branches). "
             "The selected model is **V4.1**, chosen by lowest DIC.",
             style={"fontSize": "0.8125rem", "lineHeight": "1.7", "margin": "0"},
