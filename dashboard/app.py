@@ -17,7 +17,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from dash import ALL, Dash, Input, Output, State, dash_table, dcc, html
 
-from config import HOSPITAL_COORDS
+from config import (HOSPITAL_COORDS, REGION_BEDS, REGION_BUDGET_BILLIONS,
+                    REGION_BUDGET_PER_CAPITA)
 from queries import (get_connection, load_day_by_region, load_day_by_hospital,
                      load_available_dates, load_weekly_national,
                      load_weekly_by_region, load_daily_national,
@@ -224,6 +225,21 @@ REGION_COLORS = {
 }
 
 
+MODIFIER_DIVISORS = {
+    "per_bed":           REGION_BEDS,
+    "per_budget":        REGION_BUDGET_BILLIONS,
+    "per_budget_capita": REGION_BUDGET_PER_CAPITA,
+}
+
+MODIFIER_LABELS = {
+    "count":             "",
+    "per10k":            " per 10k Pop.",
+    "per_bed":           " per Inpatient Bed",
+    "per_budget":        " per €B Budget",
+    "per_budget_capita": " per Budget/Capita",
+}
+
+
 def _with_alpha(hex_color, alpha):
     """Convert #rrggbb to rgba(r,g,b,a)."""
     h = hex_color.lstrip("#")
@@ -311,8 +327,11 @@ def map_page(date=None, metric="trolleys", level="region", per10k="count"):
                         dcc.RadioItems(
                             id="metric-toggle",
                             options=[
-                                {"label": "Count", "value": "count"},
-                                {"label": "Per 10k Population", "value": "per10k"},
+                                {"label": "Count",              "value": "count"},
+                                {"label": "Per 10k Pop.",       "value": "per10k"},
+                                {"label": "Per Inpatient Bed",  "value": "per_bed"},
+                                {"label": "Per €B Budget",      "value": "per_budget"},
+                                {"label": "Per Budget/Capita",  "value": "per_budget_capita"},
                             ],
                             value=per10k,
                             inline=True,
@@ -486,8 +505,11 @@ def trends_page(scope="region", freq="weekly", rate="count"):
                         dcc.RadioItems(
                             id="trends-rate-toggle",
                             options=[
-                                {"label": "Count", "value": "count"},
-                                {"label": "Per 10k Pop.", "value": "per10k"},
+                                {"label": "Count",              "value": "count"},
+                                {"label": "Per 10k Pop.",       "value": "per10k"},
+                                {"label": "Per Inpatient Bed",  "value": "per_bed"},
+                                {"label": "Per €B Budget",      "value": "per_budget"},
+                                {"label": "Per Budget/Capita",  "value": "per_budget_capita"},
                             ],
                             value=rate,
                             inline=True,
@@ -968,16 +990,28 @@ def update_map(selected_date, metric_key, per10k_toggle, level):
 
     cfg = METRIC_CONFIG[metric_key]
     is_hospital = level == "hospital"
-    use_per10k = per10k_toggle == "per10k" and cfg["per10k_col"] is not None
+    modifier = per10k_toggle
+    use_per10k = modifier == "per10k" and cfg["per10k_col"] is not None
+    use_custom = modifier in MODIFIER_DIVISORS
     report_date = df["report_date"].iloc[0]
     subtitle = f"Data for {report_date.strftime('%d %B %Y')}"
 
-    # Region choropleth colour column
-    color_col = cfg["per10k_col"] if use_per10k else cfg["region_col"]
-    color_label = "Per 10k" if use_per10k else cfg["label"]
-
     map_df = df.copy()
     map_df["geojson_name"] = map_df["region"].map(NAME_MAP)
+
+    # Region choropleth colour column
+    if use_per10k:
+        color_col = cfg["per10k_col"]
+    elif use_custom:
+        divisor_map = MODIFIER_DIVISORS[modifier]
+        map_df["_scaled"] = map_df.apply(
+            lambda r: round(r[cfg["region_col"]] / divisor_map.get(r["region"], float("nan")), 4),
+            axis=1,
+        )
+        color_col = "_scaled"
+    else:
+        color_col = cfg["region_col"]
+    color_label = (cfg["label"] + MODIFIER_LABELS.get(modifier, "")).strip()
 
     title = f"Single Day Map"
 
@@ -1042,7 +1076,7 @@ def update_map(selected_date, metric_key, per10k_toggle, level):
                 continue
             short = row["region"].replace("HSE ", "").replace(" and ", " & ")
             val = row[color_col]
-            fmt = f"{val:.2f}" if use_per10k else f"{val:.0f}"
+            fmt = f"{val:.4f}" if use_custom else (f"{val:.2f}" if use_per10k else f"{val:.0f}")
             lats.append(lat)
             lons.append(lon)
             texts.append(f"{short}<br>{fmt}")
@@ -1149,14 +1183,27 @@ def update_trends(scope, freq, rate, event_checks):
     df = loader(conn)
     conn.close()
 
-    use_per10k = rate == "per10k"
-
-    if use_per10k and not df.empty and "population" in df.columns:
-        for col, _, _ in TRENDS_METRICS:
-            df[col] = (df[col].astype(float) / df["population"] * 10000).round(2)
+    if not df.empty:
+        if rate == "per10k" and "population" in df.columns:
+            for col, _, _ in TRENDS_METRICS:
+                df[col] = (df[col].astype(float) / df["population"] * 10000).round(4)
+        elif rate in MODIFIER_DIVISORS:
+            divisor_map = MODIFIER_DIVISORS[rate]
+            if scope == "national":
+                nat_divisor = sum(divisor_map.values())
+                for col, _, _ in TRENDS_METRICS:
+                    df[col] = (df[col].astype(float) / nat_divisor).round(6)
+            else:
+                for col, _, _ in TRENDS_METRICS:
+                    df[col] = df.apply(
+                        lambda r, c=col: round(
+                            float(r[c]) / divisor_map.get(r["region"], float("nan")), 6
+                        ),
+                        axis=1,
+                    )
 
     rows, cols = 4, 2
-    suffix = " per 10k" if use_per10k else ""
+    suffix = MODIFIER_LABELS.get(rate, "")
     subplot_titles = [f"{label}{suffix}" for _, label, _ in TRENDS_METRICS]
 
     fig = make_subplots(

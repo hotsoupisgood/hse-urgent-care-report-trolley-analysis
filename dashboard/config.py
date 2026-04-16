@@ -115,3 +115,29 @@ REGION_POPULATIONS = {
     "HSE Mid West":              413059,
     "HSE West and North West":   759652,
 }
+
+# Region -> total inpatient beds (sum of tx_inpatient from supplementary data/beds_per_hospital_region.csv)
+REGION_BEDS = {
+    "HSE Dublin and Midlands":   2590,
+    "HSE Dublin and North East": 2827,
+    "HSE Dublin and South East": 2278,
+    "HSE Mid West":               891,
+    "HSE South West":            1583,
+    "HSE West and North West":   1894,
+}
+
+# Region -> budget in billions € (from supplementary data/2026_hr_budget.xlsx, raw values / 1e9)
+REGION_BUDGET_BILLIONS = {
+    "HSE Dublin and Midlands":   3.670,
+    "HSE Dublin and North East": 3.395,
+    "HSE Dublin and South East": 2.659,
+    "HSE Mid West":              1.182,
+    "HSE South West":            2.002,
+    "HSE West and North West":   2.512,
+}
+
+# Region -> budget per capita in € (budget_billions * 1e9 / population)
+REGION_BUDGET_PER_CAPITA = {
+    region: REGION_BUDGET_BILLIONS[region] * 1e9 / REGION_POPULATIONS[region]
+    for region in REGION_POPULATIONS
+}
