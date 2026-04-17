@@ -263,6 +263,14 @@ class BaseModel(ABC):
         dic_row = {'version': self.version, 'description': self.name, **result.dic}
         pd.DataFrame([dic_row]).to_csv(od / 'dic.csv', index=False)
         result.gelman.to_csv(od / 'gelman.csv', index=False)
+        gelman_summary = (
+            result.gelman
+            .assign(param=result.gelman['param'].str.replace(r'\[\d+\]$', '', regex=True))
+            .groupby('param', sort=False)[['Point est.', 'Upper C.I.']]
+            .max()
+            .reset_index()
+        )
+        gelman_summary.to_csv(od / 'gelman_summary.csv', index=False)
         result.df_fitted.to_csv(od / 'fitted.csv', index=False)
         result.df_mu.to_csv(od / 'mu.csv', index=False)
         result.df_mu_lower.to_csv(od / 'mu_lower.csv', index=False)

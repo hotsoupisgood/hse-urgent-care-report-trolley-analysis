@@ -63,7 +63,8 @@ class Model(BaseModel):
     def monitor_params(self):
         return ['alpha', 'beta', 'gamma', 'tau', 'phi',
                 'delta_pre', 'delta_mid', 'delta_post',
-                'sigma_pre', 'sigma_mid', 'sigma_post']
+                'sigma_pre', 'sigma_mid', 'sigma_post',
+                'mu', 'fullmod', 'resid']
 
     def jags_data(self, y, n_region, n_weeks, regions):
         ev = build_event_indicators(n_weeks, regions)

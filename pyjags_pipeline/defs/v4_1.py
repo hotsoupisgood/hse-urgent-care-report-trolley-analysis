@@ -66,7 +66,8 @@ class Model(BaseModel):
         return ['alpha', 'beta', 'gamma', 'tau', 'phi',
                 'delta_pre', 'delta_mid', 'delta_post',
                 'sigma_pre', 'sigma_mid', 'sigma_post',
-                'mu_alpha', 'tau_alpha']
+                'mu_alpha', 'tau_alpha',
+                'mu', 'fullmod', 'resid']
 
     def jags_data(self, y, n_region, n_weeks, regions):
         ev = build_event_indicators(n_weeks, regions)

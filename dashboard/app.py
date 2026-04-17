@@ -558,10 +558,13 @@ _MODEL_DATA_BASE = os.path.join(
     _SCALE_DATA_DIRS["per10k"],
 )
 
-def _load_dic_table():
-    """Load DIC CSVs for all fitted versions; auto-discovers from the per10k output dir."""
+def _load_dic_table(scale="per10k"):
+    """Load DIC CSVs for all fitted versions for a given scale."""
+    base = os.path.join(
+        os.path.dirname(__file__), "..", "data", "models", _SCALE_DATA_DIRS[scale],
+    )
     rows = []
-    for dic_path in sorted(Path(_MODEL_DATA_BASE).glob("*/dic.csv")):
+    for dic_path in sorted(Path(base).glob("*/dic.csv")):
         v = dic_path.parent.name
         df = pd.read_csv(dic_path)
         rows.append({
@@ -577,6 +580,28 @@ def _load_dic_table():
     best = out["DIC"].idxmin()
     out["_best"] = out.index == best
     return out
+
+
+def _load_gelman_csv(path):
+    """Read a gelman CSV and return a renamed DataFrame, or None if absent."""
+    if not os.path.exists(path):
+        return None
+    df = pd.read_csv(path)
+    df.columns = ["Parameter", "R̂ (Point Est.)", "Upper C.I."]
+    for col in ["R̂ (Point Est.)", "Upper C.I."]:
+        df[col] = df[col].round(6)
+    return df
+
+
+def _load_gelman(scale, version):
+    """Return (summary_df, full_df) for a given scale + version.
+    summary_df: one row per parameter (max R-hat); full_df: all indexed params.
+    Either may be None if the file is absent."""
+    base = os.path.join(os.path.dirname(__file__), "..", "data", "models",
+                        _SCALE_DATA_DIRS[scale], version)
+    summary_df = _load_gelman_csv(os.path.join(base, "gelman_summary.csv"))
+    full_df    = _load_gelman_csv(os.path.join(base, "gelman.csv"))
+    return summary_df, full_df
 
 
 def _load_version_ranks(scale, version):
@@ -724,6 +749,64 @@ def _build_model_sections(scale):
         else:
             ranks_drawer = None
 
+        # -- Gelman-Rubin drawer --
+        gelman_summary_df, gelman_full_df = _load_gelman(scale, version)
+        if gelman_summary_df is not None or gelman_full_df is not None:
+            _table_style = dict(
+                sort_action="native",
+                style_table={"overflowX": "auto", "marginTop": "0.5rem"},
+                style_cell={"textAlign": "left", "padding": "0.4rem 0.75rem",
+                             "fontSize": "0.8125rem", "fontFamily": FONT},
+                style_header={"fontWeight": "600", "backgroundColor": "#f0f0f0",
+                               "borderBottom": "2px solid #dee2e6"},
+                style_data_conditional=[
+                    {"if": {"row_index": "odd"}, "backgroundColor": "#f8f9fa"},
+                ],
+            )
+            drawer_children = [
+                html.Summary(
+                    "MCMC Convergence (Gelman-Rubin)",
+                    style={"cursor": "pointer", "fontSize": "0.8125rem",
+                           "fontWeight": "600", "color": "#444",
+                           "userSelect": "none", "marginBottom": "0.5rem"},
+                ),
+            ]
+            if gelman_summary_df is not None:
+                drawer_children += [
+                    html.P("Summary (max R̂ per parameter)",
+                           style={"fontSize": "0.75rem", "fontWeight": "600",
+                                  "color": "#555", "margin": "0.5rem 0 0.25rem"}),
+                    dash_table.DataTable(
+                        columns=[{"name": c, "id": c} for c in gelman_summary_df.columns],
+                        data=gelman_summary_df.to_dict("records"),
+                        **_table_style,
+                    ),
+                ]
+            if gelman_full_df is not None:
+                drawer_children += [
+                    html.P("Full table (all indexed parameters)",
+                           style={"fontSize": "0.75rem", "fontWeight": "600",
+                                  "color": "#555", "margin": "1rem 0 0.25rem"}),
+                    dash_table.DataTable(
+                        columns=[{"name": c, "id": c} for c in gelman_full_df.columns],
+                        data=gelman_full_df.to_dict("records"),
+                        **_table_style,
+                    ),
+                ]
+            drawer_children.append(
+                html.P("R̂ values < 1.01 indicate convergence.",
+                       style={"fontSize": "0.7rem", "color": "#888",
+                              "marginTop": "0.4rem", "marginBottom": "0"}),
+            )
+            gelman_drawer = html.Details(
+                open=False,
+                style={"marginTop": "1rem", "borderTop": "1px solid #eee",
+                       "paddingTop": "0.75rem"},
+                children=drawer_children,
+            )
+        else:
+            gelman_drawer = None
+
         sections.append(html.Div(
             style={**CARD, "marginBottom": "1rem"},
             children=[
@@ -752,67 +835,52 @@ def _build_model_sections(scale):
                 ),
                 # Collapsible rankings drawer
                 ranks_drawer,
+                # Collapsible Gelman-Rubin drawer
+                gelman_drawer,
             ],
         ))
         first = False
     return sections
 
 
+def _build_dic_card(scale):
+    """Render the DIC comparison table card for a given scale."""
+    dic_df = _load_dic_table(scale)
+    if dic_df is None:
+        return []
+    return html.Div(style=CARD, children=[
+        html.H3("Model Comparison — DIC",
+                style={"margin": "0 0 0.5rem", "fontSize": "1rem"}),
+        html.P(
+            "Lower DIC indicates better out-of-sample predictive accuracy. "
+            "Penalty = effective number of parameters (pD). "
+            "✓ marks the selected model.",
+            style={"fontSize": "0.8125rem", "color": "#666",
+                   "margin": "0 0 0.75rem"},
+        ),
+        dash_table.DataTable(
+            columns=[{"name": c, "id": c} for c in dic_df.columns if c != "_best"],
+            data=dic_df.to_dict("records"),
+            sort_action="native",
+            style_table={"overflowX": "auto"},
+            style_cell={"textAlign": "left", "padding": "0.4rem 0.75rem",
+                         "fontSize": "0.8125rem", "fontFamily": FONT},
+            style_header={"fontWeight": "600", "backgroundColor": "#f0f0f0",
+                          "borderBottom": "2px solid #dee2e6"},
+            style_data_conditional=[
+                {"if": {"filter_query": "{_best} = True"},
+                 "backgroundColor": "#eaf4ea", "fontWeight": "600"},
+                {"if": {"row_index": "odd"}, "backgroundColor": "#f8f9fa"},
+            ],
+        ),
+    ])
+
+
 def model_page(scale="per10k"):
     """Model results tab — static plot gallery with scale toggle."""
     children = []
 
-    # -- Version scheme explanation card --
-    children.append(html.Div(style=CARD, children=[
-        html.H3("Model Versioning", style={"margin": "0 0 0.5rem", "fontSize": "1rem"}),
-        dcc.Markdown(
-            "Models are numbered by family and iteration. "
-            "**V0.x** — AR baseline with no harmonic component. "
-            "**V2.x** — Period sweep: V2.1–V2.3 each test a single cycle period "
-            "(52-week, 26-week, 8-week); V2.4–V2.5 add a second harmonic to the annual. "
-            "**V3.x** — Annual cycle plus a structural event effect: "
-            "V3.1 adds a global New Year step, V3.2 makes it region-specific, "
-            "V3.3 replaces the New Year term with a Mid West one-time reset. "
-            "**V4.x** — Combines the region-specific New Year effect (V3.2) "
-            "and the Mid West reset (V3.3) — this is the selected family. "
-            "**V5.x** — V4.1 with partial pooling of region-level parameters. "
-            "V1.x and V6.x are intentionally absent (deprecated branches). "
-            "The selected model is **V4.1**, chosen by lowest DIC.",
-            style={"fontSize": "0.8125rem", "lineHeight": "1.7", "margin": "0"},
-        ),
-    ]))
-
-    # -- DIC comparison table --
-    dic_df = _load_dic_table()
-    if dic_df is not None:
-        children.append(html.Div(style=CARD, children=[
-            html.H3("Model Comparison — DIC",
-                    style={"margin": "0 0 0.5rem", "fontSize": "1rem"}),
-            html.P(
-                "Lower DIC indicates better out-of-sample predictive accuracy. "
-                "Penalty = effective number of parameters (pD). "
-                "✓ marks the selected model.",
-                style={"fontSize": "0.8125rem", "color": "#666",
-                       "margin": "0 0 0.75rem"},
-            ),
-            dash_table.DataTable(
-                columns=[{"name": c, "id": c} for c in dic_df.columns if c != "_best"],
-                data=dic_df.to_dict("records"),
-                sort_action="native",
-                style_table={"overflowX": "auto"},
-                style_cell={"textAlign": "left", "padding": "0.4rem 0.75rem",
-                             "fontSize": "0.8125rem", "fontFamily": FONT},
-                style_header={"fontWeight": "600", "backgroundColor": "#f0f0f0",
-                              "borderBottom": "2px solid #dee2e6"},
-                style_data_conditional=[
-                    {"if": {"filter_query": "{_best} = True"},
-                     "backgroundColor": "#eaf4ea", "fontWeight": "600"},
-                    {"if": {"row_index": "odd"}, "backgroundColor": "#f8f9fa"},
-                ],
-            ),
-        ]))
-
-    # -- Scale toggle card --
+    # -- Scale toggle card (top) --
     children.append(html.Div(style=CARD, children=[
         html.Div(
             style={"display": "flex", "alignItems": "center", "gap": "1rem",
@@ -839,6 +907,30 @@ def model_page(scale="per10k"):
                    "lineHeight": "1.5"},
         ),
     ]))
+
+    # -- Version scheme explanation card --
+    children.append(html.Div(style=CARD, children=[
+        html.H3("Model Versioning", style={"margin": "0 0 0.5rem", "fontSize": "1rem"}),
+        dcc.Markdown(
+            "Models are numbered by family and iteration. "
+            "**V0.x** — AR baseline with no harmonic component. "
+            "**V2.x** — Period sweep: V2.1–V2.3 each test a single cycle period "
+            "(52-week, 26-week, 8-week); V2.4–V2.5 add a second harmonic to the annual. "
+            "**V3.x** — Annual cycle plus a structural event effect: "
+            "V3.1 adds a global New Year step, V3.2 makes it region-specific, "
+            "V3.3 replaces the New Year term with a Mid West one-time reset. "
+            "**V4.x** — Combines the region-specific New Year effect (V3.2) "
+            "and the Mid West reset (V3.3) — this is the selected family. "
+            "**V5.x** — V4.1 with partial pooling of region-level parameters. "
+            "V1.x and V6.x are intentionally absent (deprecated branches). "
+            "The selected model is **V4.1**, chosen by lowest DIC.",
+            style={"fontSize": "0.8125rem", "lineHeight": "1.7", "margin": "0"},
+        ),
+    ]))
+
+    # -- DIC comparison table (rebuilt by callback) --
+    children.append(html.Div(id="model-dic-content",
+                             children=_build_dic_card(scale)))
 
     # -- Model gallery (rebuilt by callback) --
     children.append(html.Div(id="model-content",
@@ -1432,11 +1524,12 @@ def update_trends(scope, freq, rate, event_checks):
 # -- Model tab callback ---------------------------------------------------
 
 @app.callback(
+    Output("model-dic-content", "children"),
     Output("model-content", "children"),
     Input("model-scale-toggle", "value"),
 )
 def update_model_scale(scale):
-    return _build_model_sections(scale)
+    return _build_dic_card(scale), _build_model_sections(scale)
 
 
 # -- Run ------------------------------------------------------------------

@@ -63,6 +63,12 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Data Collection \label{sect:data-collection}
 
+\newpage
+
+# Methods \label{chap:methods}
+
+## Data Collection Pipeline \label{sect:data-pipeline}
+
 \begin{figure}[h]
 \centering
 \resizebox{\textwidth}{!}{%
@@ -92,14 +98,10 @@ knitr::opts_chunk$set(echo = FALSE)
 \label{fig:data-pipeline}
 \end{figure}
 
-\newpage
-
-# Methods \label{chap:methods}
-
 ## Model Development \label{sect:model-development}
 
-Models were developed iteratively with increasing complexity as described in @gelman_exploratory_2004, and visualised in figure \@ref(fig:model-inheritance). Model components were tested based on a priori expectation, and residual patterns. For instance: On trolley counts vary over time, so autoregressive components were first modeled. Then tested against each other on which minimised the Deviance Information Criterion (DIC) and residuals. Table \@ref(tab:spine-dic-hrpop) reads as a record of this model selection.
-Below is the components added to the models. The full model definitions can be found in \@ref(full-model-specs). 
+Models were developed iteratively with increasing complexity as described in @gelman_exploratory_2004, and visualised in appendix figure \@ref(fig:model-inheritance). Model components were tested based on a priori expectation, and residual patterns. For instance: On trolley counts vary over time, so autoregressive components were first modeled. Then tested against each other on which minimised the Deviance Information Criterion (DIC) and residuals. Table \@ref(tab:spine-dic-hrpop) reads as a record of this model selection.
+Below is the components added to the models. The full model definitions can be found in Appendix \@ref(full-model-specs). 
 
 ### Base Likelihood {-}
 All models share the same Normal likelihood:
@@ -163,46 +165,36 @@ The New Years effect was captured by fitting independent components to the 51st 
 
 Global New Year effect:
 
+$$
 \begin{aligned}
-
   \text{ny}_{t} &= \delta_{\text{pre}} \cdot \mathbf{1}(t \bmod 52 = 0)
   + \delta_{\text{mid}}  \cdot \mathbf{1}(t \bmod 52 = 1)
-  + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2)
-  \\
-  \\
-  \delta_{\text{pre}},\ \delta_{\text{mid}},\ \delta_{\text{post}} & \sim \mathcal{N}(0,\ 0.001) 
-(\#eq:global-ny)
-
+  + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2) \\
+  \delta_{\text{pre}},\ \delta_{\text{mid}},\ \delta_{\text{post}} & \sim \mathcal{N}(0,\ 0.001)
 \end{aligned}
+$$
 
 Regional ($i$) New Year effect:
 
+$$
 \begin{aligned}
-
   \text{ny}_{i,t} &= \delta_{\text{pre},i} \cdot \mathbf{1}(t \bmod 52 = 0)
   + \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
-  + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2)
-  \\
-  \\
-  \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i}&\sim \mathcal{N}(0,\ 0.001) 
-  (\#eq:regional-ny)
-
+  + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2) \\
+  \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001)
 \end{aligned}
-
+$$
 
 Mid West reset effect:
 
+$$
 \begin{aligned}
-
   \text{mwr}_{i=\text{mid west},t} &= \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86)
   + \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87)
-  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88)
-  \\
-  \\
+  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \\
   \sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
-
-(\#eq:mw-reset)
 \end{aligned}
+$$
 
 ### Hierarchical intercepts {-}
 
@@ -271,6 +263,10 @@ $$
 $$
 Where $r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j>\hat{r}_i)$.
 
+## Code and Data Availability \label{sect:code}
+
+\textit{[Placeholder: link to GitHub repository, languages and tools used (Python, R, JAGS), and note that source data is publicly available from the HSE Urgent and Emergency Care portal.]}
+
 # Results \label{chap:results}
 
 ## Model Comparison \label{sect:dic-results}
@@ -324,8 +320,6 @@ kableExtra::kbl(
 \newpage
 
 # Appendix
-
-Todo: full posterior trace plots, Gelman stats, residual diagnostics.
 
 ## Model Inheritance
 
@@ -426,7 +420,7 @@ selected path; thin arrows indicate branches.}
 \label{fig:model-inheritance}
 \end{figure}
 
-## Full Model Specifications {full-model-specs}
+## Full Model Specifications {#full-model-specs}
 Let $y_{i,t}$ denote the scaled trolley count for region $i$ at week $t$, for $i \in \{1,\ldots,6\}$ and $t \in \{1,\ldots,T\}$.
 
 ### Model v0.1 {-}
@@ -834,3 +828,19 @@ kableExtra::kbl(
     background = "#e8f4f8"
   )
 ```
+
+## Residual Diagnostics {#app:residuals}
+
+\textit{[Residual diagnostic plots for each model.]}
+
+## Posterior Mean Fit {#app:mu-plots}
+
+\textit{[Posterior mean $\mu_{i,t}$ overlaid on observed $y_{i,t}$ for each spine model.]}
+
+## Gelman-Rubin Convergence Summary {#app:gelman}
+
+\textit{[Gelman-Rubin $\hat{R}$ summary table for each spine model.]}
+
+## Posterior Parameter Estimates {#app:posteriors}
+
+\textit{[Posterior means and 95\% credible intervals for each spine model.]}
