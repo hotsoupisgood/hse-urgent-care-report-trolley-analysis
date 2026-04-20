@@ -217,8 +217,10 @@ class BaseModel(ABC):
         _plot.plot_residuals_periodogram(result.df_std_resid, plot_dir / 'residuals_periodogram.png')
 
         if result.pyjags_samples is not None:
-            _diag.trace_with_lowess(result.pyjags_samples,
-                                    ['phi', 'alpha'], save_dir=plot_dir)
+            _time_params = {'mu', 'fullmod', 'resid'}
+            trace_vars = [p for p in self.monitor_params if p not in _time_params]
+            _diag.trace_with_dist(result.pyjags_samples,
+                                  trace_vars, save_dir=plot_dir)
 
         self.extra_plots(result, plot_dir)
         print(f'[{self.version}] Plots saved to {plot_dir}')

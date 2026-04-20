@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+from scipy.stats import gaussian_kde
 from statsmodels.nonparametric.smoothers_lowess import lowess
 from pyjags import from_pyjags
 import arviz as az
@@ -34,8 +36,8 @@ def convergence_summary(pyjags_samples, var_names=None):
     return pd.DataFrame(rows)
 
 
-def trace_with_lowess(pyjags_samples, var_names, save_dir=None, frac=0.1):
-    """Trace plots with LOWESS smoother per chain — all params in one figure.
+def trace_with_dist(pyjags_samples, var_names, save_dir=None, frac=0.1):
+    """Trace + LOWESS (left) with per-chain rotated KDE (right), y-axes shared.
 
     Parameters
     ----------
@@ -44,11 +46,10 @@ def trace_with_lowess(pyjags_samples, var_names, save_dir=None, frac=0.1):
     var_names : list[str]
         Which parameters to plot.
     save_dir : Path, optional
-        If provided, saves as traces.png.
+        If provided, saves as traces.pdf (one parameter per page).
     frac : float
         LOWESS bandwidth fraction.
     """
-    # collect all (label, array) pairs to determine subplot count
     panels = []
     for var in var_names:
         if var not in pyjags_samples:
@@ -66,29 +67,62 @@ def trace_with_lowess(pyjags_samples, var_names, save_dir=None, frac=0.1):
     if not panels:
         return
 
-    n = len(panels)
     n_chains = panels[0][1].shape[1]
-    fig, axes = plt.subplots(n, 1, figsize=(10, 2 * n), layout='constrained')
-    if n == 1:
-        axes = [axes]
 
-    for ax, (label, data) in zip(axes, panels):
+    def _draw_panel(ax_tr, ax_kd, label, data, show_legend, show_xlabel):
+        ax_kd.sharey(ax_tr)
         n_iter = data.shape[0]
         x = np.arange(n_iter)
         for c in range(n_chains):
             vals = data[:, c]
             color = f'C{c}'
-            ax.plot(x, vals, alpha=0.2, lw=0.4, color=color)
+            ax_tr.plot(x, vals, alpha=0.2, lw=0.4, color=color)
             smooth = lowess(vals, x, frac=frac, return_sorted=True)
-            ax.plot(smooth[:, 0], smooth[:, 1], color=color, lw=1.5,
-                    label=f'chain {c + 1}')
-        ax.set_ylabel(label, fontsize=9)
-        ax.tick_params(labelbottom=False)
-
-    axes[-1].tick_params(labelbottom=True)
-    axes[-1].set_xlabel('Iteration')
-    axes[0].legend(loc='upper right', fontsize=8)
+            ax_tr.plot(smooth[:, 0], smooth[:, 1], color=color, lw=1.5,
+                       label=f'chain {c + 1}')
+            kde = gaussian_kde(vals)
+            y_grid = np.linspace(vals.min(), vals.max(), 300)
+            density = kde(y_grid)
+            ax_kd.plot(density, y_grid, color=color, lw=1.5)
+        ax_tr.set_ylabel('')
+        ax_tr.set_title(label, fontsize=9, loc='left')
+        ax_kd.tick_params(left=False, labelleft=False, labelbottom=False)
+        ax_kd.spines['left'].set_visible(False)
+        ax_kd.spines['right'].set_visible(False)
+        ax_kd.spines['top'].set_visible(False)
+        ax_kd.set_yticks([])
+        if show_xlabel:
+            ax_tr.set_xlabel('Iteration')
+        if show_legend:
+            ax_tr.legend(loc='upper right', fontsize=8)
 
     if save_dir:
-        fig.savefig(save_dir / 'traces.png', dpi=150, bbox_inches='tight')
-    plt.close(fig)
+        with PdfPages(save_dir / 'traces.pdf') as pdf:
+            for i, (label, data) in enumerate(panels):
+                fig, axes = plt.subplots(
+                    1, 2,
+                    figsize=(12, 3),
+                    gridspec_kw={'width_ratios': [3, 1]},
+                    layout='constrained',
+                )
+                _draw_panel(axes[0], axes[1], label, data,
+                            show_legend=True, show_xlabel=True)
+                pdf.savefig(fig)
+                plt.close(fig)
+    else:
+        for i, (label, data) in enumerate(panels):
+            fig, axes = plt.subplots(
+                1, 2,
+                figsize=(12, 3),
+                gridspec_kw={'width_ratios': [3, 1]},
+                layout='constrained',
+            )
+            _draw_panel(axes[0], axes[1], label, data,
+                        show_legend=True, show_xlabel=True)
+            plt.show()
+            plt.close(fig)
+
+
+def trace_with_lowess(pyjags_samples, var_names, save_dir=None, frac=0.1):
+    """Deprecated alias for trace_with_dist."""
+    trace_with_dist(pyjags_samples, var_names, save_dir=save_dir, frac=frac)
