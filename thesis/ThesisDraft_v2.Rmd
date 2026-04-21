@@ -27,7 +27,7 @@ header-includes:
 
 	\Huge{A Bayesian Time-Series Framework for Comparing Hospital Pressure Across Irish HSE Health Regions}
 
-	\Large{Evan Bergin, Lucas Henry}
+	\Large{Lucas Henry, Evan Bergin}
 
 	\Large{Supervisor: Dr. Carl Scarrott}
 
@@ -68,6 +68,7 @@ knitr::opts_chunk$set(echo = FALSE)
 # Methods \label{chap:methods}
 
 ## Data Collection Pipeline \label{sect:data-pipeline}
+A pipeline was created to extract daily on trolley counts from each HSE hospital and transform them into a csv file. The code for this can be found on github [@henry_hse_2026].
 
 \begin{figure}[h]
 \centering
@@ -98,125 +99,99 @@ knitr::opts_chunk$set(echo = FALSE)
 \label{fig:data-pipeline}
 \end{figure}
 
-## Model Development \label{sect:model-development}
-
-Models were developed iteratively with increasing complexity as described in @gelman_exploratory_2004, and visualised in appendix figure \@ref(fig:model-inheritance). Model components were tested based on a priori expectation, and residual patterns. For instance: On trolley counts vary over time, so autoregressive components were first modeled. Then tested against each other on which minimised the Deviance Information Criterion (DIC) and residuals. Table \@ref(tab:spine-dic-hrpop) reads as a record of this model selection.
-Below is the components added to the models. The full model definitions can be found in Appendix \@ref(full-model-specs). 
-
-### Base Likelihood {-}
-All models share the same Normal likelihood:
-
-$$
-\begin{aligned}
-y_{i,t} &\sim \mathcal{N}(\mu_{i,t},\ \tau_i^{-1}) \\[4pt]
-\tau_i   &\sim \Gamma(0.001,\ 0.001)
-\end{aligned}
-$$
-Where $i$ and $t$ define the region and week since January 1st 2023 respectively.
-The models differ in the mean function $\mu_{i,t}$, the prior structure on $\alpha_i$, and autoregressive component, $\phi$.
-
-### AR structure {-}
-
-Autoregressive component of lag 1 and 2 were initially added to the mean of the model. 
-AR(1):
-$$
-\begin{aligned}
-y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + z_{i,t},\ \tau_i^{-1}\right), \quad t > 1 \\
-\text{where} \quad &z_{i,t} = \phi\,(y_{i,t-1} - \mu_{i,t-1}) \\
-\text{with} \quad &\phi \sim \mathrm{Uniform}(-1,1)
-\end{aligned}
-$$
-
-AR(2):
-$$
-\begin{aligned}
-&\phi_1(y_{i,t-1} - \mu_{i,t-1}) + \phi_2(y_{i,t-2} - \mu_{i,t-2})\\
-\text{with} \quad &\phi_1, \phi_2 \sim \text{Uniform}(-1,1)
-\end{aligned}
-(\#eq:v02)
-$$
-
-### Cycles {-}
-Three cycles, 8 week, 26 week and 52 weeks, were tested alone, and together. A single cycle with period $P$ (weeks) is defined as:
-
-$$
-\text{cycle}_i(t;\,P) = \beta_i \cos\!\left(\tfrac{2\pi t}{P}\right) + \gamma_i \sin\!\left(\tfrac{2\pi t}{P}\right)
-(\#eq:cycle-component)
-$$
-
-Where $P \in \{52, 26, 8\}$.
-
-Dual cycle models sum the best preforming 52 week cycle with the 8 and 26 week cycles:
-$$
-\text{cycles}_{i,t} = \text{cycle}_{1,i}(t;\,P_1) + \text{cycle}_{2,i}(t;\,P_2)
-(\#eq:dual-cycle)
-$$
-
-Where $(P_1, P_2) \in \{(52, 26),\,(52, 8)\}$.
-
-Cycle coefficients share the same weakly informative priors across all models:
-$$
-\beta_i \sim \mathcal{N}(0,\ 0.001), \qquad \gamma_i \sim \mathcal{N}(0,\ 0.001)
-$$
-
-### Event effects {-}
-
-The New Years effect was captured by fitting independent components to the 51st and 52nd weeks of each year, and the 1st week of each new year. The Mid West Region specific reset was modeled with three independent components on the 86th, 87th, and 88th weeks since January 1st, 2023 (the same as the 34th, 35th and 36th weeks of 2024).  
-
-Global New Year effect:
-
-$$
-\begin{aligned}
-  \text{ny}_{t} &= \delta_{\text{pre}} \cdot \mathbf{1}(t \bmod 52 = 0)
-  + \delta_{\text{mid}}  \cdot \mathbf{1}(t \bmod 52 = 1)
-  + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2) \\
-  \delta_{\text{pre}},\ \delta_{\text{mid}},\ \delta_{\text{post}} & \sim \mathcal{N}(0,\ 0.001)
-\end{aligned}
-$$
-
-Regional ($i$) New Year effect:
-
-$$
-\begin{aligned}
-  \text{ny}_{i,t} &= \delta_{\text{pre},i} \cdot \mathbf{1}(t \bmod 52 = 0)
-  + \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
-  + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2) \\
-  \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001)
-\end{aligned}
-$$
-
-Mid West reset effect:
-
-$$
-\begin{aligned}
-  \text{mwr}_{i=\text{mid west},t} &= \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86)
-  + \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87)
-  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \\
-  \sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
-\end{aligned}
-$$
-
-### Hierarchical intercepts {-}
-
-Replaces the independent priors on $\alpha_i$ with a hierarchical structure:
-
-$$
-\alpha_i \sim \mathcal{N}(\mu_\alpha,\ \tau_\alpha^{-1})
-(\#eq:v4-hier)
-$$
-
-with hyperpriors $\mu_\alpha \sim \mathcal{N}(0, 0.001)$ and $\tau_\alpha \sim \Gamma(0.001, 0.001)$. 
-
 
 ## Response Scaling \label{sect:standardisation}
-The on trolley counts were standardised to 10,000 people in each health region, 
-Raw trolley counts vary across regions primarily because of population size rather than differences in hospital pressure. To enable fair comparison, counts were standardised to a rate per 10,000 catchment population.
+The on trolley counts were standardised to a rate of count per 10,000 people in each health region to control for catchment population size. Counts were standardised to a rate per 10,000 catchment population.
 
 $$
 y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region catchment population}_i} \times 10{,}000
 $$
 
-This transforms the outcome into patients on trolley per 10,000 population per week, removing the confounding effect of region size and allowing direct comparison of hospital pressure across the six HSE health regions.
+
+## Model Development \label{sect:model-development}
+
+Models were developed iteratively with increasing complexity as described in @gelman_exploratory_2004. Model iteration can be visualised in appendix figure \@ref(fig:model-inheritance). Components were added to the model according to the residual patterns, resulting in the base model \eqref{eq:base-likelihood}.
+
+The base model likelihood initialises at $t=1$ and propagates an AR(1) carryover at $t>1$.
+
+\begin{equation}
+y_{i,1} \sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1})
+\label{eq:base-likelihood-init}
+\end{equation}
+
+\begin{equation}
+y_{i,t} \sim \mathcal{N}\!\left(\mu_{i,t} + \mathcal{E}^{1}_{i,t},\ \tau_i^{-1}\right), \quad t > 1
+\label{eq:base-likelihood}
+\end{equation}
+
+The AR(1) term captures week-to-week autocorrelation in the residuals.
+
+\begin{equation}
+\mathcal{E}^{1}_{i,t} = \phi\,(y_{i,t-1} - \mu_{i,t-1})
+\label{eq:base-ar1}
+\end{equation}
+
+The mean function decomposes the expected trolley rate into a baseline level ($\alpha_i$), an annual cycle ($\mathcal{C}_{i,t}^{52}$), a regional New Year effect ($\mathcal{R}_{i,t}$), and a Mid West funding reset ($\mathcal{W}_{i,t}$).
+
+\begin{equation}
+\mu_{i,t} = \alpha_i + \mathcal{C}_{i,t}^{52} + \mathcal{R}_{i,t} + \mathcal{W}_{i,t}
+\label{eq:base-mean}
+\end{equation}
+
+The annual cycle is captured with the $\mathcal{C}_{i,t}^{52}$ component.
+
+\begin{equation}
+\mathcal{C}_{i,t}^{52} = \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right) + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
+\end{equation}
+
+The regional New Year effect allows each region to respond differently across the three week New Year window.
+
+\begin{equation}
+\begin{aligned}
+\mathcal{R}_{i,t} &= \delta_{\text{pre},i}\,\mathbf{1}(t \bmod 52 = 0) \\
+                  &+ \delta_{\text{mid},i}\,\mathbf{1}(t \bmod 52 = 1) \\
+                  &+ \delta_{\text{post},i}\,\mathbf{1}(t \bmod 52 = 2)
+\end{aligned}
+\label{eq:base-newyear}
+\end{equation}
+
+The Mid West reset captures a three week window around August 8th 2024, where numerous cases were deferred.
+
+\begin{equation}
+\begin{aligned}
+\mathcal{W}_{i,t} = \mathbf{1}(i = \text{HSE Mid West})\cdot\bigl(&\sigma_{\text{pre}}\,\mathbf{1}(t = 86) \\
+  +\,&\sigma_{\text{mid}}\,\mathbf{1}(t = 87) \\
+  +\,&\sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)
+\end{aligned}
+\label{eq:base-mwreset}
+\end{equation}
+
+Extending the base model described above, two models were added. One with an added AR(2) component. 
+
+\begin{equation}
+  \begin{aligned}
+    &y_{i,t} \sim \mathcal{N}\!\left(\mu_{i,t} + 
+    \mathcal{E}^{1}_{i,t} + 
+    \mathcal{E}^{2}_{i,t},\ \tau_i^{-1}\right)\\
+    &\mu_{i,t} = \alpha_i + \mathcal{C}_{i,t}^{52} + \mathcal{R}_{i,t} + \mathcal{W}_{i,t}
+    
+  \end{aligned}
+  \label{eq:extended-AR2}
+\end{equation}
+
+A second with an added 6-month cycle.
+
+\begin{equation}
+  \begin{aligned}
+    &y_{i,t} \sim \mathcal{N}\!\left(\mu_{i,t} + 
+    \mathcal{E}^{1}_{i,t},\ \tau_i^{-1}\right)\\
+    &\mu_{i,t} = \alpha_i + 
+    \mathcal{C}_{i,t}^{52} + 
+    \mathcal{C}_{i,t}^{26} + \mathcal{R}_{i,t} + \mathcal{W}_{i,t}
+    
+  \end{aligned}
+  \label{eq:extended-6-month}
+\end{equation}
 
 ## Posterior Sampling and Bayesian Ranking \label{sect:ranking}
 Posterior sampling was preformed using *Just another Gibbs sampler* (*JAGs*)[@Plummer2003], implemented by pyJAGS [@Nowotny2024pyjags], a Python interface to JAGS. Health region baselines, $\alpha^s_j$, were used for ranking. Where $j$ is one of the 6 HSE health regions, $j\in\{1,...,6\}$, and $s$ is the draw index, for $s\in\{1,...,n\}$ and total samples is defined as $n=20{,}000$.
@@ -241,9 +216,9 @@ $$
     r_1^n & \cdots & r_j^n & \cdots & r_6^n\\
   \end{array} } \right]
 $$
-Where $r_j^s=\text{rank}(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s>\alpha_i^s)$. Given a tie, ranks are increased by $\frac{1}{2}$ steps for each tied value:
+Where $r_j^s=\text{rank}(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s>\alpha_i^s)$. Given a tie, ranks were increased by $\frac{1}{2}$ steps for each tied value:
 $$r^s_j= \sum_{i=1}^{6} \left[ \mathbf{1}(\alpha_j^s > \alpha_i^s) + \tfrac{1}{2}\mathbf{1}(\alpha_j^s = \alpha_i^s) \right]$$
-Then posterior rank averages, $\hat{r}_i$, are calculated taking the mean across samples.
+Then posterior rank averages, $\hat{r}_i$, were calculated taking the mean across samples.
 $$\hat{r}_j=\displaystyle \frac{1}{n}\sum^n_{s=1} r_j^s$$
 $$
   \hat{R} =
@@ -251,7 +226,7 @@ $$
     \hat{r}_1, \hat{r}_2, \hat{r}_3, \hat{r}_4, \hat{r}_5,  \hat{r}_6
   \end{array} } \right]
 $$
-Then posterior ranked averages are ranked once again to achieve ranked posterior ranked averages are calculated.
+Then posterior ranked averages were ranked once again to achieve ranked posterior ranked averages were calculated.
 $$
 r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*>\alpha_i^*)
 $$
@@ -280,7 +255,7 @@ dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full
 dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
 dic <- dic[order(dic$DIC), ]
 
-selected <- c("v0.1", "v1.1", "v2.2", "v3.1", "v4.1")
+selected <- c("v0.1", "v1.1", "v2.1")
 
 kableExtra::kbl(
   dic[, c("version", "description", "deviance", "penalty", "DIC")],
@@ -359,87 +334,81 @@ kableExtra::kbl(
 
   % --- Row 0: AR baseline ---
   \node[model] (v0_1) {\textbf{v0.1}\\AR(1) Only};
-  \node[unselected, right=2.8cm of v0_1] (v0_2) {\textbf{v0.2}\\AR(2) Only};
 
-  % --- Row 2: Cycle tests ---
+  % --- Row 1: Cycle ---
   \node[model, below=of v0_1] (v1_1) {\textbf{v1.1}\\Annual Cycle};
-  \node[unselected, right=of v1_1] (v1_2) {\textbf{v1.2}\\26-Week Cycle};
-  \node[unselected, right=of v1_2] (v1_3) {\textbf{v1.3}\\8-Week Cycle};
-  \node[unselected, right=of v1_3] (v1_4) {\textbf{v1.4}\\Annual + 6-Month};
-  \node[unselected, right=of v1_4] (v1_5) {\textbf{v1.5}\\Annual + 8-Week};
 
-  % --- Row 3: New Year / MW reset ---
-  \node[model, below=of v1_1] (v2_2) {\textbf{v2.2}\\Regional New Year};
-  \node[unselected, left=of v2_2] (v2_1) {\textbf{v2.1}\\Global New Year};
-  \node[unselected, right=of v2_2] (v2_3) {\textbf{v2.3}\\MW Reset Only};
+  % --- Row 2: Event + MW reset ---
+  \node[model, below=of v1_1] (v2_1) {\textbf{v2.1}\\Regional NY + MW Reset};
+  \node[unselected, left=of v2_1] (v2_3) {\textbf{v2.3}\\Regional New Year};
+  \node[unselected, left=of v2_3] (v2_2) {\textbf{v2.2}\\Global New Year};
+  \node[unselected, right=of v2_1] (v2_4) {\textbf{v2.4}\\MW Reset Only};
 
-  % --- Spine ---
-  \node[model, below=of v2_2] (v3_1) {\textbf{v3.1}\\Regional NY + MW Reset};
-  \node[model, below=of v3_1] (v4_1) {\textbf{v4.1}\\Hierarchical Intercepts};
+  % --- Row 3: Extensions (unselected robustness checks) ---
+  \node[unselected, below=of v2_1] (v3_2) {\textbf{v3.2}\\v2.1 + 6-Month Cycle};
+  \node[unselected, left=of v3_2] (v3_1) {\textbf{v3.1}\\v2.1 + 2-Month Cycle};
+  \node[unselected, right=of v3_2] (v3_3) {\textbf{v3.3}\\v2.1 + AR(2)};
 
   % --- Row side labels ---
-  \coordinate (llabel) at ($(v2_1.west) + (-0.4, 0)$);
+  \coordinate (llabel) at ($(v2_2.west) + (-0.4, 0)$);
   \node[row label, anchor=east] at (llabel |- v0_1) {AR order};
   \node[row label, anchor=east] at (llabel |- v1_1) {Cycle type};
-  \node[row label, anchor=east] at (llabel |- v2_2) {Event effects};
-  \node[row label, anchor=east] at (llabel |- v3_1) {MW reset};
-  \node[row label, anchor=east] at (llabel |- v4_1) {Pooling};
+  \node[row label, anchor=east] at (llabel |- v2_1) {Event + MW reset};
+  \node[row label, anchor=east] at (llabel |- v3_2) {Extensions};
 
   % --- Horizontal dividers ---
-  \coordinate (left)  at ($(v2_1.west) + (-2.8, 0)$);
-  \coordinate (right) at ($(v1_5.east)  + ( 0.4, 0)$);
+  \coordinate (left)  at ($(v2_2.west) + (-2.8, 0)$);
+  \coordinate (right) at ($(v2_4.east)  + ( 0.4, 0)$);
 
   \draw[dashed, color=divider, line width=0.6pt]
     ($(left |- v0_1.south) + (0,-0.5)$) -- ($(right |- v0_1.south) + (0,-0.5)$);
   \draw[dashed, color=divider, line width=0.6pt]
     ($(left |- v1_1.south) + (0,-0.5)$) -- ($(right |- v1_1.south) + (0,-0.5)$);
   \draw[dashed, color=divider, line width=0.6pt]
-    ($(left |- v2_2.south) + (0,-0.5)$) -- ($(right |- v2_2.south) + (0,-0.5)$);
-  \draw[dashed, color=divider, line width=0.6pt]
-    ($(left |- v3_1.south) + (0,-0.5)$) -- ($(right |- v3_1.south) + (0,-0.5)$);
+    ($(left |- v2_1.south) + (0,-0.5)$) -- ($(right |- v2_1.south) + (0,-0.5)$);
 
   % --- Diagram title ---
   \node[font=\small\itshape, text=bordergrey,
-    above=0.7cm of v0_1, xshift=5.5cm, anchor=center]
+    above=0.7cm of v0_1, xshift=0cm, anchor=center]
     {Population-scaled response: trolleys per 10{,}000 population per week};
 
   % --- Spine arrows ---
   \draw[arr] (v0_1) -- (v1_1);
-  \draw[arr] (v1_1) -- (v2_2);
-  \draw[arr] (v2_2) -- (v3_1);
-  \draw[arr] (v3_1) -- (v4_1);
-
-  % --- Branch arrows ---
-  \draw[arr branch] (v1_1) -| (v2_1);
+  \draw[arr] (v1_1) -- (v2_1);
 
 \end{tikzpicture}%
 }% end resizebox
 \caption{Model inheritance diagram. Spine nodes (blue) form the selected
-model sequence; grey nodes are tested variants. Thick arrows indicate the
+model sequence; grey nodes were tested variants. Thick arrows indicate the
 selected path; thin arrows indicate branches.}
 \label{fig:model-inheritance}
 \end{figure}
 
 ## Full Model Specifications {#full-model-specs}
-Let $y_{i,t}$ denote the scaled trolley count for region $i$ at week $t$, for $i \in \{1,\ldots,6\}$ and $t \in \{1,\ldots,T\}$.
 
 ### Model v0.1 {-}
 
-AR(1) component with a baseline. Constant region-level intercept, no cycle, no event effects.
+- AR(1) baseline; no cycle, no event effects
 
 **Likelihood**
 
 $$
 \begin{aligned}
-y_{i,1} &\sim \mathcal{N}(\alpha_i,\ \tau_i^{-1}) \\[4pt]
-y_{i,t} &\sim \mathcal{N}\!\left(\alpha_i + \phi\,(y_{i,t-1} - \alpha_i),\ \tau_i^{-1}\right), \quad t > 1
+y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \mathcal{E}^{1}_{i,t},\ \tau_i^{-1}\right), \quad t > 1\\
 \end{aligned}
 $$
-
-**Mean function**
-
+Where $\mu_{i,t}$ is the baseline mean for region $i$ at time $t$.
 $$
-\mu_{i,t} = \alpha_i
+\begin{aligned}
+\mu_{i,t} &= \alpha_i \\[4pt]
+\end{aligned}
+$$
+$\mathcal{E}^{1}_{i,t}$ is the AR(1) error term.
+$$
+\begin{aligned}
+\mathcal{E}^{1}_{i,t} &= \phi\,(y_{i,t-1} - \mu_{i,t-1})\\
+\end{aligned}
 $$
 
 **Priors**
@@ -452,55 +421,20 @@ $$
 \end{aligned}
 $$
 
-### Model v0.2 {-}
+### Model v1.1 {-}
 
-AR(2) baseline. Extends v0.1 with a second autoregressive lag.
-
-**Likelihood**
-
-$$
-\begin{aligned}
-y_{i,1} &\sim \mathcal{N}(\alpha_i,\ \tau_i^{-1}) \\[4pt]
-y_{i,2} &\sim \mathcal{N}\!\left(\alpha_i + \phi_1\,(y_{i,1} - \alpha_i),\ \tau_i^{-1}\right) \\[4pt]
-y_{i,t} &\sim \mathcal{N}\!\left(\alpha_i + \phi_1\,(y_{i,t-1} - \alpha_i) + \phi_2\,(y_{i,t-2} - \alpha_i),\ \tau_i^{-1}\right), \quad t > 2
-\end{aligned}
-$$
-
-**Mean function**
-
-$$
-\mu_{i,t} = \alpha_i
-$$
-
-**Priors**
-
-$$
-\begin{aligned}
-\alpha_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
-\tau_i   &\sim \Gamma(0.001,\ 0.001) \\[4pt]
-\phi_1,\ \phi_2 &\sim \mathrm{Uniform}(-1,\ 1)
-\end{aligned}
-$$
-
-### Model v2.1 {-}
-
-Extends v0.1. Adds a region-specific 52-week (annual) cycle.
+- Extends v0.1; adds annual cycle
 
 **Likelihood**
 
 $$
 \begin{aligned}
+\mu_{i,t} &= \alpha_i
+              + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+              + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\[4pt]
 y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
 y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
 \end{aligned}
-$$
-
-**Mean function**
-
-$$
-\mu_{i,t} = \alpha_i
-  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
-  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
 $$
 
 **Priors**
@@ -508,6 +442,40 @@ $$
 $$
 \begin{aligned}
 \alpha_i,\ \beta_i,\ \gamma_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+$$
+
+### Model v2.1 \label{sect:model} {-}
+
+- Extends v1.1; adds regional New Year effect and Mid West funding reset
+
+**Likelihood**
+
+$$
+\begin{aligned}
+\mu_{i,t} &= \alpha_i
+              + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+              + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\[4pt]
+           &\quad + \delta_{\text{pre},i}\,\mathbf{1}(t \bmod 52 = 0)
+              + \delta_{\text{mid},i}\,\mathbf{1}(t \bmod 52 = 1)
+              + \delta_{\text{post},i}\,\mathbf{1}(t \bmod 52 = 2) \\[4pt]
+           &\quad + \bigl(\sigma_{\text{pre}}\,\mathbf{1}(t = 86)
+              + \sigma_{\text{mid}}\,\mathbf{1}(t = 87)
+              + \sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
+y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
+\end{aligned}
+$$
+
+**Priors**
+
+$$
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
 \phi   &\sim \mathrm{Uniform}(-1,\ 1)
 \end{aligned}
@@ -515,87 +483,21 @@ $$
 
 ### Model v2.2 {-}
 
-Extends v0.1. Adds a region-specific 26-week (semi-annual) cycle.
+- Extends v1.1; adds global New Year effect (shared across regions)
 
-**Mean function**
-
-$$
-\mu_{i,t} = \alpha_i
-  + \beta_i  \cos\!\left(\tfrac{2\pi t}{26}\right)
-  + \gamma_i \sin\!\left(\tfrac{2\pi t}{26}\right)
-$$
-
-Likelihood and priors identical to v2.1.
-
-### Model v2.3 {-}
-
-Extends v0.1. Adds a region-specific 8-week cycle (pre-computed harmonic vectors).
-
-**Mean function**
-
-$$
-\mu_{i,t} = \alpha_i
-  + \beta_i\,\cos_8[t]
-  + \gamma_i\,\sin_8[t]
-$$
-
-where $\cos_8[t] = \cos(2\pi t / 8)$ and $\sin_8[t] = \sin(2\pi t / 8)$.
-
-Likelihood and priors identical to v2.1.
-
-### Model v2.4 {-}
-
-Extends v2.1. Adds a second harmonic at 26 weeks (dual cycle: annual + semi-annual).
-
-**Mean function**
-
-$$
-\mu_{i,t} = \alpha_i
-  + \beta_{1,i}  \cos\!\left(\tfrac{2\pi t}{52}\right)
-  + \gamma_{1,i} \sin\!\left(\tfrac{2\pi t}{52}\right)
-  + \beta_{2,i}  \cos_{26}[t]
-  + \gamma_{2,i} \sin_{26}[t]
-$$
-
-**Priors**
+**Likelihood**
 
 $$
 \begin{aligned}
-\alpha_i,\ \beta_{1,i},\ \gamma_{1,i},\ \beta_{2,i},\ \gamma_{2,i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
-\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
-\phi   &\sim \mathrm{Uniform}(-1,\ 1)
+\mu_{i,t} &= \alpha_i
+              + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+              + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\[4pt]
+           &\quad + \delta_{\text{pre}}\,\mathbf{1}(t \bmod 52 = 0)
+              + \delta_{\text{mid}}\,\mathbf{1}(t \bmod 52 = 1)
+              + \delta_{\text{post}}\,\mathbf{1}(t \bmod 52 = 2) \\[4pt]
+y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
 \end{aligned}
-$$
-
-### Model v2.5 {-}
-
-Extends v2.1. Adds a second harmonic at 8 weeks (dual cycle: annual + 8-week).
-
-**Mean function**
-
-$$
-\mu_{i,t} = \alpha_i
-  + \beta_{1,i}  \cos\!\left(\tfrac{2\pi t}{52}\right)
-  + \gamma_{1,i} \sin\!\left(\tfrac{2\pi t}{52}\right)
-  + \beta_{2,i}  \cos_8[t]
-  + \gamma_{2,i} \sin_8[t]
-$$
-
-Priors identical to v2.4.
-
-### Model v3.1 {-}
-
-Extends v2.1. Adds a global (shared across all regions) three-week New Year effect.
-
-**Mean function**
-
-$$
-\mu_{i,t} = \alpha_i
-  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
-  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
-  + \delta_{\text{pre}}  \cdot \mathbf{1}(t \bmod 52 = 0)
-  + \delta_{\text{mid}}  \cdot \mathbf{1}(t \bmod 52 = 1)
-  + \delta_{\text{post}} \cdot \mathbf{1}(t \bmod 52 = 2)
 $$
 
 **Priors**
@@ -603,32 +505,139 @@ $$
 $$
 \begin{aligned}
 \alpha_i,\ \beta_i,\ \gamma_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\delta_{\text{pre}},\ \delta_{\text{mid}},\ \delta_{\text{post}} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
-\phi   &\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
-\delta_{\text{pre}},\ \delta_{\text{mid}},\ \delta_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
+\phi   &\sim \mathrm{Uniform}(-1,\ 1)
 \end{aligned}
 $$
 
-### Model v3.2 {-}
+### Model v2.3 {-}
 
-Extends v3.1. New Year effect is region-specific rather than global.
+- Extends v1.1; adds regional New Year effect (no MW reset)
 
-**Mean function**
+**Likelihood**
 
 $$
-\mu_{i,t} = \alpha_i
-  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
-  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
-  + \delta_{\text{pre},i}  \cdot \mathbf{1}(t \bmod 52 = 0)
-  + \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
-  + \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2)
+\begin{aligned}
+\mu_{i,t} &= \alpha_i
+              + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+              + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\[4pt]
+           &\quad + \delta_{\text{pre},i}\,\mathbf{1}(t \bmod 52 = 0)
+              + \delta_{\text{mid},i}\,\mathbf{1}(t \bmod 52 = 1)
+              + \delta_{\text{post},i}\,\mathbf{1}(t \bmod 52 = 2) \\[4pt]
+y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
+\end{aligned}
 $$
 
 **Priors**
 
 $$
 \begin{aligned}
-\alpha_i,\ \beta_i,\ \gamma_i,\ \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\alpha_i,\ \beta_i,\ \gamma_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+$$
+
+### Model v2.4 {-}
+
+- Extends v1.1; adds Mid West funding reset (no New Year effect)
+
+**Likelihood**
+
+$$
+\begin{aligned}
+\mu_{i,t} &= \alpha_i
+              + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+              + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\[4pt]
+           &\quad + \bigl(\sigma_{\text{pre}}\,\mathbf{1}(t = 86)
+              + \sigma_{\text{mid}}\,\mathbf{1}(t = 87)
+              + \sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
+y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
+\end{aligned}
+$$
+
+**Priors**
+
+$$
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+$$
+
+### Model v3.1 {-}
+
+- Extends v2.1; adds 8-week sub-annual cycle
+
+**Likelihood**
+
+$$
+\begin{aligned}
+\mu_{i,t} &= \alpha_i
+              + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+              + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\[4pt]
+           &\quad + \beta_{2,i} \cos\!\left(\tfrac{2\pi t}{8}\right)
+                  + \gamma_{2,i} \sin\!\left(\tfrac{2\pi t}{8}\right) \\[4pt]
+           &\quad + \delta_{\text{pre},i}\,\mathbf{1}(t \bmod 52 = 0)
+              + \delta_{\text{mid},i}\,\mathbf{1}(t \bmod 52 = 1)
+              + \delta_{\text{post},i}\,\mathbf{1}(t \bmod 52 = 2) \\[4pt]
+           &\quad + \bigl(\sigma_{\text{pre}}\,\mathbf{1}(t = 86)
+              + \sigma_{\text{mid}}\,\mathbf{1}(t = 87)
+              + \sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
+y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
+\end{aligned}
+$$
+
+**Priors**
+
+$$
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i,\ \beta_{2,i},\ \gamma_{2,i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
+\phi   &\sim \mathrm{Uniform}(-1,\ 1)
+\end{aligned}
+$$
+
+### Model v3.2 {-}
+
+- Extends v2.1; adds 26-week sub-annual cycle
+
+**Likelihood**
+
+$$
+\begin{aligned}
+\mu_{i,t} &= \alpha_i
+              + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+              + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\[4pt]
+           &\quad + \beta_{2,i} \cos\!\left(\tfrac{2\pi t}{26}\right)
+                  + \gamma_{2,i} \sin\!\left(\tfrac{2\pi t}{26}\right) \\[4pt]
+           &\quad + \delta_{\text{pre},i}\,\mathbf{1}(t \bmod 52 = 0)
+              + \delta_{\text{mid},i}\,\mathbf{1}(t \bmod 52 = 1)
+              + \delta_{\text{post},i}\,\mathbf{1}(t \bmod 52 = 2) \\[4pt]
+           &\quad + \bigl(\sigma_{\text{pre}}\,\mathbf{1}(t = 86)
+              + \sigma_{\text{mid}}\,\mathbf{1}(t = 87)
+              + \sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
+y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
+\end{aligned}
+$$
+
+**Priors**
+
+$$
+\begin{aligned}
+\alpha_i,\ \beta_i,\ \gamma_i,\ \beta_{2,i},\ \gamma_{2,i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
 \phi   &\sim \mathrm{Uniform}(-1,\ 1)
 \end{aligned}
@@ -636,130 +645,41 @@ $$
 
 ### Model v3.3 {-}
 
-Extends v2.1. Adds a global Mid West funding reset effect (no New Year effect).
+- Extends v2.1; replaces AR(1) with AR(2)
 
-**Mean function**
+**Likelihood**
 
 $$
-\mu_{i,t} = \alpha_i
-  + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
-  + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
-  + \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
-  + \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
-  + \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
+\begin{aligned}
+\mu_{i,t} &= \alpha_i
+              + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
+              + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\[4pt]
+           &\quad + \delta_{\text{pre},i}\,\mathbf{1}(t \bmod 52 = 0)
+              + \delta_{\text{mid},i}\,\mathbf{1}(t \bmod 52 = 1)
+              + \delta_{\text{post},i}\,\mathbf{1}(t \bmod 52 = 2) \\[4pt]
+           &\quad + \bigl(\sigma_{\text{pre}}\,\mathbf{1}(t = 86)
+              + \sigma_{\text{mid}}\,\mathbf{1}(t = 87)
+              + \sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
+y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
+y_{i,2} &\sim \mathcal{N}\!\left(\mu_{i,2} + \phi_1\,(y_{i,1} - \mu_{i,1}),\ \tau_i^{-1}\right) \\[4pt]
+y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi_1\,(y_{i,t-1} - \mu_{i,t-1})
+              + \phi_2\,(y_{i,t-2} - \mu_{i,t-2}),\ \tau_i^{-1}\right), \quad t > 2
+\end{aligned}
 $$
-
-where $\mathrm{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})$.
 
 **Priors**
 
 $$
 \begin{aligned}
 \alpha_i,\ \beta_i,\ \gamma_i &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
-\phi   &\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
-\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
+\phi_1,\ \phi_2 &\sim \mathcal{N}(0,\ 0.01)
 \end{aligned}
 $$
 
-### Model v4.1 {-}
-
-Extends v3.2. Combines region-level New Year effects with the global Mid West funding reset.
-
-**Mean function**
-
-$$
-\begin{aligned}
-\mu_{i,t} &= \alpha_i
-               + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
-               + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\
-            &\quad + \delta_{\text{pre},i}  \cdot \mathbf{1}(t \bmod 52 = 0)
-               +    \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
-               +    \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2) \\
-            &\quad + \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
-               +    \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
-               +    \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
-\end{aligned}
-$$
-
-**Priors**
-
-$$
-\begin{aligned}
-\alpha_i,\ \beta_i,\ \gamma_i,\ \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
-\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
-\phi   &\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
-\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
-\end{aligned}
-$$
-
-### Model v5.1 \label{sect:model}
-
-Let $y_{i,t}$ denote the scaled trolley count for region $i$ at week $t$, for $i \in \{1,\ldots,6\}$ and $t \in \{1,\ldots,T\}$.
-
-**Likelihood**
-
-$$
-\begin{aligned}
-y_{i,1} &\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
-y_{i,t} &\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t > 1
-\end{aligned}
-$$
-
-**Mean function**
-
-$$
-\begin{aligned}
-  \mu_{i,t} &= \alpha_i
-               + \beta_i  \cos\!\left(\tfrac{2\pi t}{52}\right)
-               + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \nonumber \\
-            &\quad + \delta_{\text{pre},i}  \cdot \mathbf{1}(t \bmod 52 = 0)
-               +    \delta_{\text{mid},i}  \cdot \mathbf{1}(t \bmod 52 = 1)
-               +    \delta_{\text{post},i} \cdot \mathbf{1}(t \bmod 52 = 2) \nonumber \\
-            &\quad + \sigma_{\text{pre}}  \cdot \mathbf{1}(t = 86) \cdot \mathrm{mw}_i
-               +    \sigma_{\text{mid}}  \cdot \mathbf{1}(t = 87) \cdot \mathrm{mw}_i
-               +    \sigma_{\text{post}} \cdot \mathbf{1}(t = 88) \cdot \mathrm{mw}_i
-\end{aligned}
-  (\#eq:model)
-$$
-
-```{=html}
-<div style="text-align:center; font-size:0.9em; color:#666; margin-top:-0.75em; margin-bottom:1em;"><em>Model v5.1 mean function</em></div>
-```
-
-```{=latex}
-\begin{center}\small\emph{Model v5.1 mean function}\end{center}
-```
-
- Where $\mathrm{mw}_i = \mathbf{1}(\text{region } i = \text{HSE Mid West})$. The $\beta_i$ and $\gamma_i$ coefficients capture the annual seasonal cycle, $\frac{\gamma_i}{\beta_i}$. The $\delta_{\text{pre/mid/post},i}$ components are region level new year effects. The $\sigma_{\cdot}$ component captures the Mid West funding reset.
-
- The term $\phi\,(y_{i,t-1} - \mu_{i,t-1})$ in Equation \@ref(eq:model) adds an AR(1) component, allowing each weeks observation to depend on the previous week's derivation from the mean.
-
-**Priors**
-
-The baseline parameters $\alpha_i$ are given a hierarchical prior, treating the six HSE regions as exchangeable within the same national health system:
-
-$$
-\begin{aligned}
-\alpha_i &\sim \mathcal{N}(\mu_\alpha,\ \tau_\alpha^{-1}) \\[4pt]
-\mu_\alpha &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
-\tau_\alpha &\sim \Gamma(0.001,\ 0.001)
-\end{aligned}
-(\#eq:alpha-prior)
-$$
-
-Remaining priors are independent and uninformative:
-
-$$
-\begin{aligned}
-\beta_i,\ \gamma_i,\ \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &\sim \mathcal{N}(0,\ 0.001) \\[4pt]
-\tau_i &\sim \Gamma(0.001,\ 0.001) \\[4pt]
-\phi &\sim \mathrm{Uniform}(-1,\ 1) \\[4pt]
-\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &\sim \mathcal{N}(0,\ 0.001)
-\end{aligned}
-$$
-
-## Alternative Response Scales
+## Alternative Response Scales \label{sect:alt-scales}
 
 The primary analysis uses population-scaled trolley counts (per 10,000 catchment population). Two sensitivity scalings were also fitted to assess robustness of model selection and regional rankings to the choice of denominator.
 
@@ -779,7 +699,7 @@ dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full
 dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
 dic <- dic[order(dic$DIC), ]
 
-selected <- c("v0.1", "v1.1", "v2.2", "v3.1", "v4.1")
+selected <- c("v0.1", "v1.1", "v2.1")
 
 kableExtra::kbl(
   dic[, c("version", "description", "deviance", "penalty", "DIC")],
@@ -804,7 +724,7 @@ $$
 y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region inpatient beds}_i} \times 100
 $$
 
-where $\text{health region inpatient beds}_i$ is the total inpatient bed count across hospitals in region $i$, summed from the June 2025 bed census. Hospitals with missing bed counts are excluded from the regional sum.
+where $\text{health region inpatient beds}_i$ is the total inpatient bed count across hospitals in region $i$, summed from the June 2025 bed census. Hospitals with missing bed counts were excluded from the regional sum.
 
 ```{r spine-dic-bed-count, results='asis'}
 dic_dir <- "../data/models/wide_weekly_scaledPerBed"
@@ -812,7 +732,7 @@ dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full
 dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
 dic <- dic[order(dic$DIC), ]
 
-selected <- c("v0.1", "v1.1", "v2.2", "v3.1", "v4.1")
+selected <- c("v0.1", "v1.1", "v2.1")
 
 kableExtra::kbl(
   dic[, c("version", "description", "deviance", "penalty", "DIC")],

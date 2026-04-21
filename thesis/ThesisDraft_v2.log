@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025/Homebrew) (preloaded format=pdflatex 2025.3.15)  17 APR 2026 09:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025/Homebrew) (preloaded format=pdflatex 2025.3.15)  20 APR 2026 20:55
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**_main.tex
-(./_main.tex
+**ThesisDraft_v2.tex
+(./ThesisDraft_v2.tex
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
 
@@ -1027,8 +1027,8 @@ File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count349
 \l__pdf_internal_box=\box87
-) (./_main.aux)
-\openout1 = `_main.aux'.
+) (./ThesisDraft_v2.aux)
+\openout1 = `ThesisDraft_v2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 134.
 LaTeX Font Info:    ... okay on input line 134.
@@ -1219,9 +1219,9 @@ been already used, duplicate ignored
 l.165 \newpage
                [1
 
-] (./_main.toc)
+] (./ThesisDraft_v2.toc)
 \tf@toc=\write4
-\openout4 = `_main.toc'.
+\openout4 = `ThesisDraft_v2.toc'.
 
 
 
@@ -1229,82 +1229,91 @@ l.165 \newpage
 
 [3]
 
+LaTeX Warning: Reference `(' on page 4 undefined on input line 214.
+
+
+LaTeX Warning: Reference `tab:spine-dic-hrpop' on page 4 undefined on input lin
+e 217.
+
+
+
 [4{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/lm/
 lm-mathit.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/e
-nc/dvips/lm/lm-mathsy.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-
-dist/fonts/enc/dvips/lm/lm-rm.enc}{/opt/homebrew/Cellar/texlive/20250308_1/shar
+nc/dvips/lm/lm-rm.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist
+/fonts/enc/dvips/lm/lm-mathsy.enc}{/opt/homebrew/Cellar/texlive/20250308_1/shar
 e/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}]
 
 [5]
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-
 
 [6]
 
 [7]
 
 [8]
-
-[9]
-
-[10]
-
-[11]
-
-[12]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 9
-05.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 4
+69.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/ts1lmr.f
 d
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 
-[13{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/lm
-/lm-ts1.enc}]
+[9{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/lm/
+lm-ts1.enc}]
 
-[14]
+[10]
 
-[15] (./_main.aux)
+[11]
+
+[12]
+
+[13]
+
+Package caption Warning: Unused \captionsetup[table] on input line 107.
+See the caption package documentation for explanation.
+
+
+
+[14] (./ThesisDraft_v2.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
+
+LaTeX Warning: There were undefined references.
+
  ) 
 Here is how much of TeX's memory you used:
- 27651 strings out of 473190
- 517811 string characters out of 5704335
- 934237 words of memory out of 5000000
- 50196 multiletter control sequences out of 15000+600000
- 635751 words of font info for 136 fonts, out of 8000000 for 9000
+ 27594 strings out of 473190
+ 517181 string characters out of 5704335
+ 929909 words of memory out of 5000000
+ 50154 multiletter control sequences out of 15000+600000
+ 635327 words of font info for 131 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,10n,93p,1002b,955s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,11n,93p,1011b,955s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/
 lm/lmbx10.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/t
 ype1/public/lm/lmbx12.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-
 dist/fonts/type1/public/lm/lmbx9.pfb></opt/homebrew/Cellar/texlive/20250308_1/s
 hare/texmf-dist/fonts/type1/public/lm/lmex10.pfb></opt/homebrew/Cellar/texlive/
 20250308_1/share/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></opt/homebrew/Cel
-lar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmmi5.pfb></opt/h
-omebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmmi7.
+lar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></opt/h
+omebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmr10.
 pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/publi
-c/lm/lmr10.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/
-type1/public/lm/lmr12.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-
-dist/fonts/type1/public/lm/lmr17.pfb></opt/homebrew/Cellar/texlive/20250308_1/s
-hare/texmf-dist/fonts/type1/public/lm/lmr7.pfb></opt/homebrew/Cellar/texlive/20
-250308_1/share/texmf-dist/fonts/type1/public/lm/lmr9.pfb></opt/homebrew/Cellar/
-texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmri10.pfb></opt/home
-brew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmri7.pfb
+c/lm/lmr12.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/
+type1/public/lm/lmr17.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-
+dist/fonts/type1/public/lm/lmr7.pfb></opt/homebrew/Cellar/texlive/20250308_1/sh
+are/texmf-dist/fonts/type1/public/lm/lmr9.pfb></opt/homebrew/Cellar/texlive/202
+50308_1/share/texmf-dist/fonts/type1/public/lm/lmri10.pfb></opt/homebrew/Cellar
+/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmri7.pfb></opt/home
+brew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmri9.pfb
 ></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/l
-m/lmri9.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/typ
-e1/public/lm/lmsy10.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-di
-st/fonts/type1/public/lm/lmsy7.pfb>
-Output written on _main.pdf (16 pages, 571276 bytes).
+m/lmsy10.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/ty
+pe1/public/lm/lmsy7.pfb>
+Output written on ThesisDraft_v2.pdf (15 pages, 556144 bytes).
 PDF statistics:
- 465 PDF objects out of 1000 (max. 8388607)
- 388 compressed objects within 4 object streams
- 71 named destinations out of 1000 (max. 500000)
- 45522 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 420 PDF objects out of 1000 (max. 8388607)
+ 346 compressed objects within 4 object streams
+ 66 named destinations out of 1000 (max. 500000)
+ 45466 words of extra memory for PDF output out of 51595 (max. 10000000)
 
