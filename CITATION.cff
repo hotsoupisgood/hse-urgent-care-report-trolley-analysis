@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: HSE Urgent Care Report Bayesian Analysis
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: Henry
+    given-names: Lucas
+    affiliation: University of Galway
+  - family-names: Bergin
+    given-names: Evan
+    affiliation: University of Galway
+repository-code: https://github.com/hotsoupisgood/scraping-hse-trolly-data
+year: 2026
+license: MIT
+abstract: >
+  Bayesian time series analysis of Irish HSE emergency department trolley
+  counts, using JAGS models with hierarchical structure across hospitals
+  and regions. Includes data scraping, preprocessing, model fitting,
+  and an interactive dashboard.
