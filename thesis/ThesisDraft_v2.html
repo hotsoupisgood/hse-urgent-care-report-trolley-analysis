@@ -189,7 +189,6 @@ y_{i,t} \sim \mathcal{N}\!\left(\mu_{i,t} + \mathcal{E}^{1}_{i,t},\ \tau_i^{-1}\
     \mathcal{E}^{1}_{i,t} +
     \mathcal{E}^{2}_{i,t},\ \tau_i^{-1}\right)\\
     &amp;\mu_{i,t} = \alpha_i + \mathcal{C}_{i,t}^{52} + \mathcal{R}_{i,t} + \mathcal{W}_{i,t}
-    
   \end{aligned}
   \label{eq:extended-AR2}
 \end{equation}\]</span></p>
@@ -201,7 +200,6 @@ y_{i,t} \sim \mathcal{N}\!\left(\mu_{i,t} + \mathcal{E}^{1}_{i,t},\ \tau_i^{-1}\
     &amp;\mu_{i,t} = \alpha_i +
     \mathcal{C}_{i,t}^{52} +
     \mathcal{C}_{i,t}^{26} + \mathcal{R}_{i,t} + \mathcal{W}_{i,t}
-    
   \end{aligned}
   \label{eq:extended-6-month}
 \end{equation}\]</span></p>
@@ -249,108 +247,6 @@ r_j^*=rank(\alpha_j^*)=\sum^6_{i=1}I(\alpha_j^*&gt;\alpha_i^*)
 <h1>Results </h1>
 <section id="model-comparison" class="level2">
 <h2 class="anchored" data-anchor-id="model-comparison">Model Comparison </h2>
-<p>Model fit was compared using the DIC. A DIC table was generated at every response scale.</p>
-<section id="scaled-by-2022-health-region-population-per-10000-people" class="level3">
-<h3 class="anchored" data-anchor-id="scaled-by-2022-health-region-population-per-10000-people">Scaled by 2022 health region population (per 10,000 people)</h3>
-<table class="table caption-top">
-<caption>DIC comparison across the models with a trolley rate per 10,000 people. Bold rows indicate the selected spine.</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">Model</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">Description</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">Deviance</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">pD</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">DIC</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">v3.1</td>
-<td style="text-align: left;">V2.2 + Mid West Reset</td>
-<td style="text-align: right;">4555.9</td>
-<td style="text-align: right;">93.6</td>
-<td style="text-align: right;">4649.5</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">v4.1</td>
-<td style="text-align: left;">V3.1 + Partial Pooling</td>
-<td style="text-align: right;">4556.1</td>
-<td style="text-align: right;">94.1</td>
-<td style="text-align: right;">4650.2</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">v2.2</td>
-<td style="text-align: left;">V1.1 + Regional New Year</td>
-<td style="text-align: right;">4604.6</td>
-<td style="text-align: right;">87.3</td>
-<td style="text-align: right;">4691.9</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v2.1</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">V1.1 + Global New Year</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4682.7</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">57.5</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">4740.2</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">v2.3</td>
-<td style="text-align: left;">V1.1 + Mid West Reset</td>
-<td style="text-align: right;">5259.2</td>
-<td style="text-align: right;">57.2</td>
-<td style="text-align: right;">5316.4</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v1.1</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">V0.1 + Annual Cycle</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5294.9</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">51.2</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5346.1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">v0.2</td>
-<td style="text-align: left;">V0.1 + AR(2)</td>
-<td style="text-align: right;">5331.5</td>
-<td style="text-align: right;">28.6</td>
-<td style="text-align: right;">5360.1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">v1.5</td>
-<td style="text-align: left;">V1.1 + 8-Week Cycle</td>
-<td style="text-align: right;">5284.9</td>
-<td style="text-align: right;">75.3</td>
-<td style="text-align: right;">5360.2</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v0.1</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) Only</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5344.1</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">26.5</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">5370.6</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">v1.4</td>
-<td style="text-align: left;">V1.1 + 6-Month Cycle</td>
-<td style="text-align: right;">5301.3</td>
-<td style="text-align: right;">75.8</td>
-<td style="text-align: right;">5377.1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">v1.3</td>
-<td style="text-align: left;">V0.1 + 8-Week Cycle</td>
-<td style="text-align: right;">5335.3</td>
-<td style="text-align: right;">50.9</td>
-<td style="text-align: right;">5386.1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">v1.2</td>
-<td style="text-align: left;">V0.1 + 26-Week Cycle</td>
-<td style="text-align: right;">5349.4</td>
-<td style="text-align: right;">51.1</td>
-<td style="text-align: right;">5400.5</td>
-</tr>
-</tbody>
-</table>
-</section>
 <section id="regional-baseline" class="level3">
 <h3 class="anchored" data-anchor-id="regional-baseline">Regional Baseline</h3>
 </section>
@@ -681,8 +577,8 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi_1\,(y_{i,t-1} - \mu_{i,t-1
 y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region budget}_i / 10^6}
 \]</span></p>
 <p>where <span class="math inline">\(\text{health region budget}_i\)</span> is the 2026 budget allocation for region <span class="math inline">\(i\)</span> in €thousands. This controls for funding differentials: a region receiving a larger allocation is expected to handle a proportionally larger patient volume.</p>
-<table class="caption-top table">
-<caption>DIC comparison across the models (trolley count scaled by 2026 regional budget). Bold rows indicate the selected spine.</caption>
+<table class="table caption-top">
+<caption>DIC comparison across the models (trolley count scaled by 2026 regional budget).</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">Model</th>
@@ -701,11 +597,11 @@ y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region budget}_i
 <td style="text-align: right;">19938.1</td>
 </tr>
 <tr class="even">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v2.1</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">V1.1 + Global New Year</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19920.3</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">54.9</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">19975.3</td>
+<td style="text-align: left;">v2.1</td>
+<td style="text-align: left;">V1.1 + Global New Year</td>
+<td style="text-align: right;">19920.3</td>
+<td style="text-align: right;">54.9</td>
+<td style="text-align: right;">19975.3</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">v3.1</td>
@@ -729,11 +625,11 @@ y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region budget}_i
 <td style="text-align: right;">20219.9</td>
 </tr>
 <tr class="even">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v1.1</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">V0.1 + Annual Cycle</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">20176.0</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">48.6</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">20224.6</td>
+<td style="text-align: left;">v1.1</td>
+<td style="text-align: left;">V0.1 + Annual Cycle</td>
+<td style="text-align: right;">20176.0</td>
+<td style="text-align: right;">48.6</td>
+<td style="text-align: right;">20224.6</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">v1.5</td>
@@ -750,11 +646,11 @@ y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region budget}_i
 <td style="text-align: right;">20266.0</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v0.1</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) Only</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">20253.9</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">27.0</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">20280.9</td>
+<td style="text-align: left;">v0.1</td>
+<td style="text-align: left;">AR(1) Only</td>
+<td style="text-align: right;">20253.9</td>
+<td style="text-align: right;">27.0</td>
+<td style="text-align: right;">20280.9</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">v0.2</td>
@@ -787,8 +683,8 @@ y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region budget}_i
 y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region inpatient beds}_i} \times 100
 \]</span></p>
 <p>where <span class="math inline">\(\text{health region inpatient beds}_i\)</span> is the total inpatient bed count across hospitals in region <span class="math inline">\(i\)</span>, summed from the June 2025 bed census. Hospitals with missing bed counts were excluded from the regional sum.</p>
-<table class="caption-top table">
-<caption>DIC comparison across models (response scaled by June 2025 health region inpatient bed count). Bold rows indicate the selected spine.</caption>
+<table class="table caption-top">
+<caption>DIC comparison across models (response scaled by June 2025 health region inpatient bed count).</caption>
 <thead>
 <tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th">Model</th>
@@ -821,11 +717,11 @@ y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region inpatient
 <td style="text-align: right;">11557.3</td>
 </tr>
 <tr class="even">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v2.1</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">V1.1 + Global New Year</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11510.1</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">57.2</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11567.3</td>
+<td style="text-align: left;">v2.1</td>
+<td style="text-align: left;">V1.1 + Global New Year</td>
+<td style="text-align: right;">11510.1</td>
+<td style="text-align: right;">57.2</td>
+<td style="text-align: right;">11567.3</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">v2.3</td>
@@ -835,11 +731,11 @@ y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region inpatient
 <td style="text-align: right;">11795.3</td>
 </tr>
 <tr class="even">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v1.1</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">V0.1 + Annual Cycle</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11756.7</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">51.0</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11807.7</td>
+<td style="text-align: left;">v1.1</td>
+<td style="text-align: left;">V0.1 + Annual Cycle</td>
+<td style="text-align: right;">11756.7</td>
+<td style="text-align: right;">51.0</td>
+<td style="text-align: right;">11807.7</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">v1.5</td>
@@ -856,11 +752,11 @@ y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region inpatient
 <td style="text-align: right;">11848.6</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">v0.1</td>
-<td style="text-align: left; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">AR(1) Only</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11828.7</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">26.6</td>
-<td style="text-align: right; font-weight: bold; background-color: rgba(232, 244, 248, 255) !important;">11855.3</td>
+<td style="text-align: left;">v0.1</td>
+<td style="text-align: left;">AR(1) Only</td>
+<td style="text-align: right;">11828.7</td>
+<td style="text-align: right;">26.6</td>
+<td style="text-align: right;">11855.3</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">v0.2</td>

@@ -174,7 +174,6 @@ Extending the base model described above, two models were added. One with an add
     \mathcal{E}^{1}_{i,t} + 
     \mathcal{E}^{2}_{i,t},\ \tau_i^{-1}\right)\\
     &\mu_{i,t} = \alpha_i + \mathcal{C}_{i,t}^{52} + \mathcal{R}_{i,t} + \mathcal{W}_{i,t}
-    
   \end{aligned}
   \label{eq:extended-AR2}
 \end{equation}
@@ -188,7 +187,6 @@ A second with an added 6-month cycle.
     &\mu_{i,t} = \alpha_i + 
     \mathcal{C}_{i,t}^{52} + 
     \mathcal{C}_{i,t}^{26} + \mathcal{R}_{i,t} + \mathcal{W}_{i,t}
-    
   \end{aligned}
   \label{eq:extended-6-month}
 \end{equation}
@@ -245,33 +243,6 @@ Where $r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j>\hat{r}_i)$.
 # Results \label{chap:results}
 
 ## Model Comparison \label{sect:dic-results}
-
-Model fit was compared using the DIC. A DIC table was generated at every response scale.
-
-### Scaled by 2022 health region population (per 10,000 people)
-```{r spine-dic-hrpop, results='asis'}
-dic_dir <- "../data/models/wide_weekly_scaledPer10k"
-dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full.names = TRUE)
-dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
-dic <- dic[order(dic$DIC), ]
-
-selected <- c("v0.1", "v1.1", "v2.1")
-
-kableExtra::kbl(
-  dic[, c("version", "description", "deviance", "penalty", "DIC")],
-  booktabs  = TRUE,
-  digits    = 1,
-  row.names = FALSE,
-  col.names = c("Model", "Description", "Deviance", "pD", "DIC"),
-  caption   = "DIC comparison across the models with a trolley rate per 10,000 people. Bold rows indicate the selected spine."
-) |>
-  kableExtra::row_spec(
-    which(dic$version %in% selected),
-    bold       = TRUE,
-    background = "#e8f4f8"
-  ) |>
-  kableExtra::kable_styling(latex_options = "hold_position")
-```
 
 ### Regional Baseline
 
@@ -707,13 +678,9 @@ kableExtra::kbl(
   digits    = 1,
   row.names = FALSE,
   col.names = c("Model", "Description", "Deviance", "pD", "DIC"),
-  caption   = "DIC comparison across the models (trolley count scaled by 2026 regional budget). Bold rows indicate the selected spine."
+  caption   = "DIC comparison across the models (trolley count scaled by 2026 regional budget)."
 ) |>
-  kableExtra::row_spec(
-    which(dic$version %in% selected),
-    bold       = TRUE,
-    background = "#e8f4f8"
-  )
+  kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
 ### Bed scaling
@@ -740,13 +707,9 @@ kableExtra::kbl(
   digits    = 1,
   row.names = FALSE,
   col.names = c("Model", "Description", "Deviance", "pD", "DIC"),
-  caption   = "DIC comparison across models (response scaled by June 2025 health region inpatient bed count). Bold rows indicate the selected spine."
+  caption   = "DIC comparison across models (response scaled by June 2025 health region inpatient bed count)."
 ) |>
-  kableExtra::row_spec(
-    which(dic$version %in% selected),
-    bold       = TRUE,
-    background = "#e8f4f8"
-  )
+  kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
 ## Residual Diagnostics {#app:residuals}

@@ -10,11 +10,11 @@ class Model(BaseModel):
 
     @property
     def version(self):
-        return 'v4.1'
+        return 'v3.2'
 
     @property
     def name(self):
-        return 'V3.1 + Partial Pooling'
+        return 'V2.1 + 6-Month Cycle'
 
     @property
     def jags_model_string(self):
@@ -30,6 +30,8 @@ class Model(BaseModel):
               mu[i,t] <- alpha[i] +
                          beta[i]       * cos((2 * pi) * (t/52)) +
                          gamma[i]      * sin((2 * pi) * (t/52)) +
+                         beta2[i]      * cos((2 * pi) * (t/26)) +
+                         gamma2[i]     * sin((2 * pi) * (t/26)) +
                          delta_pre[i]  * ny_pre[t]  +
                          delta_mid[i]  * ny_mid[t]  +
                          delta_post[i] * ny_post[t] +
@@ -44,9 +46,11 @@ class Model(BaseModel):
             for(t in 1:T){
               resid[i,t] <- y[i,t] - fullmod[i,t]
             }
-            alpha[i]      ~ dnorm(mu_alpha, tau_alpha)
+            alpha[i]      ~ dnorm(0, 0.001)
             beta[i]       ~ dnorm(0, 0.001)
             gamma[i]      ~ dnorm(0, 0.001)
+            beta2[i]      ~ dnorm(0, 0.001)
+            gamma2[i]     ~ dnorm(0, 0.001)
             tau[i]        ~ dgamma(0.001, 0.001)
             delta_pre[i]  ~ dnorm(0, 0.001)
             delta_mid[i]  ~ dnorm(0, 0.001)
@@ -56,17 +60,14 @@ class Model(BaseModel):
           sigma_pre  ~ dnorm(0, 0.001)
           sigma_mid  ~ dnorm(0, 0.001)
           sigma_post ~ dnorm(0, 0.001)
-          mu_alpha   ~ dnorm(0, 0.001)
-          tau_alpha  ~ dgamma(0.001, 0.001)
         }
         """
 
     @property
     def monitor_params(self):
-        return ['alpha', 'beta', 'gamma', 'tau', 'phi',
+        return ['alpha', 'beta', 'gamma', 'beta2', 'gamma2', 'tau', 'phi',
                 'delta_pre', 'delta_mid', 'delta_post',
                 'sigma_pre', 'sigma_mid', 'sigma_post',
-                'mu_alpha', 'tau_alpha',
                 'mu', 'fullmod', 'resid']
 
     def jags_data(self, y, n_region, n_weeks, regions):
@@ -81,6 +82,8 @@ class Model(BaseModel):
     def reconstruct_mu(self, raw_df, regions, n_weeks, indicators):
         n_region = len(regions)
         ev = indicators
+        cos_26 = np.cos(2 * np.pi * np.arange(1, n_weeks + 1) / 26)
+        sin_26 = np.sin(2 * np.pi * np.arange(1, n_weeks + 1) / 26)
         mu_mean = np.zeros((n_weeks, n_region))
         mu_lower = np.zeros((n_weeks, n_region))
         mu_upper = np.zeros((n_weeks, n_region))
@@ -88,6 +91,8 @@ class Model(BaseModel):
             mu_i = (raw_df[f'alpha[{i+1}]'].values[:,None]
                     + raw_df[f'beta[{i+1}]'].values[:,None] * ev['cos_t'][None,:]
                     + raw_df[f'gamma[{i+1}]'].values[:,None] * ev['sin_t'][None,:]
+                    + raw_df[f'beta2[{i+1}]'].values[:,None] * cos_26[None,:]
+                    + raw_df[f'gamma2[{i+1}]'].values[:,None] * sin_26[None,:]
                     + raw_df[f'delta_pre[{i+1}]'].values[:,None] * ev['ny_pre'][None,:]
                     + raw_df[f'delta_mid[{i+1}]'].values[:,None] * ev['ny_mid'][None,:]
                     + raw_df[f'delta_post[{i+1}]'].values[:,None] * ev['ny_post'][None,:]

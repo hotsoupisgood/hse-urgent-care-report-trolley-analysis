@@ -14,7 +14,7 @@ class Model(BaseModel):
 
     @property
     def name(self):
-        return 'V1.1 + Regional New Year'
+        return 'V1.1 + Global New Year'
 
     @property
     def jags_model_string(self):
@@ -28,11 +28,11 @@ class Model(BaseModel):
             }
             for(t in 1:T){
               mu[i,t] <- alpha[i] +
-                         beta[i]       * cos((2 * pi) * (t/52)) +
-                         gamma[i]      * sin((2 * pi) * (t/52)) +
-                         delta_pre[i]  * ny_pre[t]  +
-                         delta_mid[i]  * ny_mid[t]  +
-                         delta_post[i] * ny_post[t]
+                         beta[i]  * cos((2 * pi) * (t/52)) +
+                         gamma[i] * sin((2 * pi) * (t/52)) +
+                         delta_pre  * ny_pre[t]  +
+                         delta_mid  * ny_mid[t]  +
+                         delta_post * ny_post[t]
             }
             fullmod[i,1] <- mu[i,1]
             for(t in 2:T){
@@ -41,15 +41,15 @@ class Model(BaseModel):
             for(t in 1:T){
               resid[i,t] <- y[i,t] - fullmod[i,t]
             }
-            alpha[i]      ~ dnorm(0, 0.001)
-            beta[i]       ~ dnorm(0, 0.001)
-            gamma[i]      ~ dnorm(0, 0.001)
-            tau[i]        ~ dgamma(0.001, 0.001)
-            delta_pre[i]  ~ dnorm(0, 0.001)
-            delta_mid[i]  ~ dnorm(0, 0.001)
-            delta_post[i] ~ dnorm(0, 0.001)
+            alpha[i] ~ dnorm(0, 0.001)
+            beta[i]  ~ dnorm(0, 0.001)
+            gamma[i] ~ dnorm(0, 0.001)
+            tau[i]   ~ dgamma(0.001, 0.001)
           }
-          phi ~ dunif(-1, 1)
+          phi        ~ dunif(-1, 1)
+          delta_pre  ~ dnorm(0, 0.001)
+          delta_mid  ~ dnorm(0, 0.001)
+          delta_post ~ dnorm(0, 0.001)
         }
         """
 
@@ -66,7 +66,7 @@ class Model(BaseModel):
             ny_pre=ev['ny_pre'], ny_mid=ev['ny_mid'], ny_post=ev['ny_post'],
         )
 
-    def reconstruct_mu_old(self, raw_df, regions, n_weeks, indicators):
+    def reconstruct_mu(self, raw_df, regions, n_weeks, indicators):
         n_region = len(regions)
         ev = indicators
         mu_mean = np.zeros((n_weeks, n_region))
@@ -76,9 +76,9 @@ class Model(BaseModel):
             mu_i = (raw_df[f'alpha[{i+1}]'].values[:,None]
                     + raw_df[f'beta[{i+1}]'].values[:,None] * ev['cos_t'][None,:]
                     + raw_df[f'gamma[{i+1}]'].values[:,None] * ev['sin_t'][None,:]
-                    + raw_df[f'delta_pre[{i+1}]'].values[:,None] * ev['ny_pre'][None,:]
-                    + raw_df[f'delta_mid[{i+1}]'].values[:,None] * ev['ny_mid'][None,:]
-                    + raw_df[f'delta_post[{i+1}]'].values[:,None] * ev['ny_post'][None,:])
+                    + raw_df['delta_pre'].values[:,None] * ev['ny_pre'][None,:]
+                    + raw_df['delta_mid'].values[:,None] * ev['ny_mid'][None,:]
+                    + raw_df['delta_post'].values[:,None] * ev['ny_post'][None,:])
             mu_mean[:,i] = mu_i.mean(axis=0)
             mu_lower[:,i] = np.quantile(mu_i, 0.025, axis=0)
             mu_upper[:,i] = np.quantile(mu_i, 0.975, axis=0)
@@ -86,6 +86,6 @@ class Model(BaseModel):
                 pd.DataFrame(mu_lower, columns=regions),
                 pd.DataFrame(mu_upper, columns=regions))
 
-    def compute_fitted_old(self, df_mu, df_og, raw_df):
+    def compute_fitted(self, df_mu, df_og, raw_df):
         phi_mean = raw_df['phi'].mean()
         return compute_ar1_fitted(df_mu, df_og, phi_mean)

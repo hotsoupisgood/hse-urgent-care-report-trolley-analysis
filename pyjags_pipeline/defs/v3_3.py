@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from ..base import BaseModel
-from ..ar import compute_ar1_fitted
+from ..ar import compute_ar2_fitted
 from ..data import build_event_indicators
 
 
@@ -10,11 +10,11 @@ class Model(BaseModel):
 
     @property
     def version(self):
-        return 'v3.1'
+        return 'v3.3'
 
     @property
     def name(self):
-        return 'V2.1 + 2-Month Cycle'
+        return 'V2.1 + AR(2)'
 
     @property
     def jags_model_string(self):
@@ -22,16 +22,16 @@ class Model(BaseModel):
         model{
           for(i in 1:I){
             y[i,1] ~ dnorm(mu[i,1], tau[i])
-            for(t in 2:T){
+            y[i,2] ~ dnorm(mu[i,2] + phi1 * (y[i,1] - mu[i,1]), tau[i])
+            for(t in 3:T){
               y[i,t] ~ dnorm(mu[i,t] +
-              (phi * (y[i,t-1] - mu[i,t-1])), tau[i])
+                              phi1 * (y[i,t-1] - mu[i,t-1]) +
+                              phi2 * (y[i,t-2] - mu[i,t-2]), tau[i])
             }
             for(t in 1:T){
               mu[i,t] <- alpha[i] +
                          beta[i]       * cos((2 * pi) * (t/52)) +
                          gamma[i]      * sin((2 * pi) * (t/52)) +
-                         beta2[i]      * cos((2 * pi) * (t/8)) +
-                         gamma2[i]     * sin((2 * pi) * (t/8)) +
                          delta_pre[i]  * ny_pre[t]  +
                          delta_mid[i]  * ny_mid[t]  +
                          delta_post[i] * ny_post[t] +
@@ -40,8 +40,11 @@ class Model(BaseModel):
                          sigma_post   * fr_post[t] * mw[i]
             }
             fullmod[i,1] <- mu[i,1]
-            for(t in 2:T){
-              fullmod[i,t] <- mu[i,t] + phi * (y[i,t-1] - mu[i,t-1])
+            fullmod[i,2] <- mu[i,2] + phi1 * (y[i,1] - mu[i,1])
+            for(t in 3:T){
+              fullmod[i,t] <- mu[i,t] +
+                              phi1 * (y[i,t-1] - mu[i,t-1]) +
+                              phi2 * (y[i,t-2] - mu[i,t-2])
             }
             for(t in 1:T){
               resid[i,t] <- y[i,t] - fullmod[i,t]
@@ -49,14 +52,13 @@ class Model(BaseModel):
             alpha[i]      ~ dnorm(0, 0.001)
             beta[i]       ~ dnorm(0, 0.001)
             gamma[i]      ~ dnorm(0, 0.001)
-            beta2[i]      ~ dnorm(0, 0.001)
-            gamma2[i]     ~ dnorm(0, 0.001)
             tau[i]        ~ dgamma(0.001, 0.001)
             delta_pre[i]  ~ dnorm(0, 0.001)
             delta_mid[i]  ~ dnorm(0, 0.001)
             delta_post[i] ~ dnorm(0, 0.001)
           }
-          phi        ~ dunif(-1, 1)
+          phi1       ~ dnorm(0.0, 0.01)
+          phi2       ~ dnorm(0.0, 0.01)
           sigma_pre  ~ dnorm(0, 0.001)
           sigma_mid  ~ dnorm(0, 0.001)
           sigma_post ~ dnorm(0, 0.001)
@@ -65,7 +67,7 @@ class Model(BaseModel):
 
     @property
     def monitor_params(self):
-        return ['alpha', 'beta', 'gamma', 'beta2', 'gamma2', 'tau', 'phi',
+        return ['alpha', 'beta', 'gamma', 'tau', 'phi1', 'phi2',
                 'delta_pre', 'delta_mid', 'delta_post',
                 'sigma_pre', 'sigma_mid', 'sigma_post',
                 'mu', 'fullmod', 'resid']
@@ -82,8 +84,6 @@ class Model(BaseModel):
     def reconstruct_mu(self, raw_df, regions, n_weeks, indicators):
         n_region = len(regions)
         ev = indicators
-        cos_8 = np.cos(2 * np.pi * np.arange(1, n_weeks + 1) / 8)
-        sin_8 = np.sin(2 * np.pi * np.arange(1, n_weeks + 1) / 8)
         mu_mean = np.zeros((n_weeks, n_region))
         mu_lower = np.zeros((n_weeks, n_region))
         mu_upper = np.zeros((n_weeks, n_region))
@@ -91,8 +91,6 @@ class Model(BaseModel):
             mu_i = (raw_df[f'alpha[{i+1}]'].values[:,None]
                     + raw_df[f'beta[{i+1}]'].values[:,None] * ev['cos_t'][None,:]
                     + raw_df[f'gamma[{i+1}]'].values[:,None] * ev['sin_t'][None,:]
-                    + raw_df[f'beta2[{i+1}]'].values[:,None] * cos_8[None,:]
-                    + raw_df[f'gamma2[{i+1}]'].values[:,None] * sin_8[None,:]
                     + raw_df[f'delta_pre[{i+1}]'].values[:,None] * ev['ny_pre'][None,:]
                     + raw_df[f'delta_mid[{i+1}]'].values[:,None] * ev['ny_mid'][None,:]
                     + raw_df[f'delta_post[{i+1}]'].values[:,None] * ev['ny_post'][None,:]
@@ -107,5 +105,6 @@ class Model(BaseModel):
                 pd.DataFrame(mu_upper, columns=regions))
 
     def compute_fitted(self, df_mu, df_og, raw_df):
-        phi_mean = raw_df['phi'].mean()
-        return compute_ar1_fitted(df_mu, df_og, phi_mean)
+        phi1_mean = raw_df['phi1'].mean()
+        phi2_mean = raw_df['phi2'].mean()
+        return compute_ar2_fitted(df_mu, df_og, phi1_mean, phi2_mean)
