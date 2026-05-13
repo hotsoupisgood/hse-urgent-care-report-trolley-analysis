@@ -1,0 +1,47 @@
+% Model V2.1 -- Regional NY + MW Reset
+% Compile: pdflatex v2_1.tex
+% Convert:  magick -density 400 v2_1.pdf -background none -trim v2_1.png
+%       or: dvisvgm --pdf --no-fonts v2_1.pdf
+\documentclass[varwidth=24cm,border=14pt]{standalone}
+\usepackage[fleqn]{mathtools}  % mathtools loads amsmath; fleqn = flush-left display math
+\usepackage{amssymb, bm}
+\setlength{\mathindent}{0pt}
+\begin{document}
+\begin{minipage}{24cm}
+
+\textbf{Likelihood:}
+\[
+y_{i,t} \sim \mathcal{N}\!\left(\mu_{i,t} + \epsilon_{i,t},\; \tau_i^{-1}\right), \quad t > 1
+\]
+\[
+\textit{Where y is the raw weekly rate, i is the health region, and t is week}
+\]  
+\bigskip
+\textbf{Mean structure:}
+\begin{align*}
+\mu_{i,t} =\;& \alpha_i 
+   && \leftarrow \qquad \textbf{Baseline} \\
+&+ \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right) + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right)
+   && \leftarrow \qquad \textbf{Annual cycle} \\
+&+ \delta_{\text{pre},i}\,\mathbf{1}(t \bmod 52 = 0) + \delta_{\text{mid},i}\,\mathbf{1}(t \bmod 52 = 1) + \delta_{\text{post},i}\,\mathbf{1}(t \bmod 52 = 2)
+   && \leftarrow \qquad \textbf{New Year effect} \\
+&+ \kappa_{\text{pre}}\,\mathbf{1}(t = 85, i = \text{MW}) + \kappa_{\text{mid}}\,\mathbf{1}(t = 86, i = \text{MW}) + \kappa_{\text{post}}\,\mathbf{1}(t = 87, i = \text{MW})
+   && \leftarrow \qquad \textbf{Mid West reset}
+\end{align*}
+\bigskip
+\textbf{AR(1) Component:}
+\begin{align*}
+\epsilon_{i,t} = \phi\,(y_{i,t-1} - \mu_{i,t-1})
+\end{align*}
+\bigskip
+\textbf{Uninformative priors:}
+\[
+\alpha_i,\; \beta_i,\; \gamma_i,\; \delta_{\text{pre},i},\; \delta_{\text{mid},i},\; \delta_{\text{post},i},\; \kappa_{\text{pre}},\; \kappa_{\text{mid}},\; \kappa_{\text{post}} \sim \mathcal{N}(0,\; 0.001)
+\]
+\[
+\tau_i \sim \Gamma(0.001,\; 0.001) \qquad \phi \sim \mathrm{Uniform}(-1,\; 1)
+\]
+{\footnotesize\itshape Normal priors $\mathcal{N}(\mu,\tau)$ use precision in the 2nd argument.}\\
+
+\end{minipage}
+\end{document}

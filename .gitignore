@@ -35,3 +35,12 @@ data/
 annual_cycle_period_sweep
 pyjags_pipeline/output
 deprecated
+May_Presentation/tables/*.aux
+May_Presentation/tables/*.log
+May_Presentation/tables/*.pdf
+May_Presentation/tables/*.fdb_latexmk
+May_Presentation/tables/*.fls
+May_Presentation/tables/*.tex
+thesis/ThesisDraft_v*_files
+
+May_Presentation/tables/rendered

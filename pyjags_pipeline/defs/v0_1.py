@@ -1,8 +1,4 @@
-import numpy as np
-import pandas as pd
-
 from ..base import BaseModel
-from ..ar import compute_ar1_fitted
 
 
 class Model(BaseModel):
@@ -13,7 +9,7 @@ class Model(BaseModel):
 
     @property
     def name(self):
-        return 'AR(1) Only'
+        return 'Baseline + AR(1)'
 
     @property
     def jags_model_string(self):
@@ -47,22 +43,3 @@ class Model(BaseModel):
 
     def jags_data(self, y, n_region, n_weeks, regions):
         return dict(y=y, I=n_region, T=n_weeks)
-
-    def reconstruct_mu_old(self, raw_df, regions, n_weeks, indicators):
-        """mu[i,t] = alpha[i] — constant intercept, no seasonality."""
-        n_region = len(regions)
-        mu_mean = np.zeros((n_weeks, n_region))
-        mu_lower = np.zeros((n_weeks, n_region))
-        mu_upper = np.zeros((n_weeks, n_region))
-        for i in range(n_region):
-            alpha_i = raw_df[f'alpha[{i + 1}]'].values
-            mu_mean[:, i] = alpha_i.mean()
-            mu_lower[:, i] = np.quantile(alpha_i, 0.025)
-            mu_upper[:, i] = np.quantile(alpha_i, 0.975)
-        return (pd.DataFrame(mu_mean, columns=regions),
-                pd.DataFrame(mu_lower, columns=regions),
-                pd.DataFrame(mu_upper, columns=regions))
-
-    def compute_fitted_old(self, df_mu, df_og, raw_df):
-        phi_mean = raw_df['phi'].mean()
-        return compute_ar1_fitted(df_mu, df_og, phi_mean)

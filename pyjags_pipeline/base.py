@@ -215,6 +215,10 @@ class BaseModel(ABC):
                                        plot_dir / 'residuals_vs_fitted.png')
         _plot.plot_residuals_qq(result.df_std_resid, plot_dir / 'residuals_qq.png')
         _plot.plot_residuals_periodogram(result.df_std_resid, plot_dir / 'residuals_periodogram.png')
+        _plot.plot_ccf_grid(result.df_og, plot_dir / 'ccf_raw.png',
+                            title='Inter-region CCF (raw observed data)')
+        _plot.plot_ccf_grid(result.df_std_resid, plot_dir / 'ccf_residuals.png',
+                            title=f'[{self.version}] Inter-region CCF (residuals)')
 
         if result.pyjags_samples is not None:
             _time_params = {'mu', 'fullmod', 'resid'}

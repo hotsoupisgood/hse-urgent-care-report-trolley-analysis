@@ -47,23 +47,32 @@ def build_event_indicators(n_weeks, regions):
     week_mod = t_vec % 52
 
     return {
-        't_vec': t_vec,
-        'cos_t': np.cos(2 * np.pi * t_vec / 52),
-        'sin_t': np.sin(2 * np.pi * t_vec / 52),
-        'cos_t26': np.cos(2 * np.pi * t_vec / 26),
-        'sin_t26': np.sin(2 * np.pi * t_vec / 26),
-        'cos_t4': np.cos(2 * np.pi * t_vec / 4),
-        'sin_t4': np.sin(2 * np.pi * t_vec / 4),
-        'cos_t10': np.cos(2 * np.pi * t_vec / 10),
-        'sin_t10': np.sin(2 * np.pi * t_vec / 10),
-        'cos_t8': np.cos(2 * np.pi * t_vec / 8),
-        'sin_t8': np.sin(2 * np.pi * t_vec / 8),
         'ny_pre': (week_mod == 0).astype(float),
         'ny_mid': (week_mod == 1).astype(float),
         'ny_post': (week_mod == 2).astype(float),
         'fr_pre': (t_vec == 86).astype(float),
         'fr_mid': (t_vec == 87).astype(float),
         'fr_post': (t_vec == 88).astype(float),
+        # MW reset per literature (refs 113, 114): 8 Aug - 19 Aug 2024.
+        # pandas freq='W' labels weeks by Sunday end-date, so:
+        #   t==85 -> week ending 2024-08-11 (Aug 5-11, contains Aug 8-11)
+        #   t==86 -> week ending 2024-08-18 (Aug 12-18)
+        #   t==87 -> week ending 2024-08-25 (Aug 19-25, contains Aug 19)
+        'fr2_pre': (t_vec == 85).astype(float),
+        'fr2_mid': (t_vec == 86).astype(float),
+        'fr2_post': (t_vec == 87).astype(float),
+        # MW reset under Monday-start week labels (current data convention).
+        # Column 0 of wide CSV is 2023-01-02 (Mon) -> t==1, so:
+        #   t==84 -> 2024-08-05 (Mon, Aug 5-11; contains Aug 8 reset start)
+        #   t==85 -> 2024-08-12 (Aug 12-18, middle)
+        #   t==86 -> 2024-08-19 (Aug 19-25; contains Aug 19 reset end)
+        #   t==87 -> 2024-08-26 (post week 1)
+        #   t==88 -> 2024-09-02 (post week 2)
+        'fr3_w1': (t_vec == 84).astype(float),
+        'fr3_w2': (t_vec == 85).astype(float),
+        'fr3_w3': (t_vec == 86).astype(float),
+        'fr3_w4': (t_vec == 87).astype(float),
+        'fr3_w5': (t_vec == 88).astype(float),
         'mw': np.array([1.0 if r == 'HSE Mid West' else 0.0 for r in regions]),
     }
 

@@ -8,11 +8,11 @@ Budget stored in thousands of euros (e.g. 3,670,000 = €3.67B).
 Dividing by 1,000,000 gives budget in billions → unit = trolleys per €1B.
 
 Input:
-  - data/raw data/weekly_by_region_202604082051.csv  (raw weekly region-level trolley counts)
-  - data/2026_hr_budget.xlsx                         (HSE regional budgets, single row, regions as columns, units: €thousands)
+  - data/raw data/weekly_by_region_202604082051.csv      (raw weekly region-level trolley counts)
+  - supplementary data/2026_hr_budget.xlsx               (HSE regional budgets, single row, regions as columns, units: €thousands)
 
 Output:
-  - data/wide_weekly_scaledPerBudgetThousands.csv    (wide: rows = regions, cols = week dates)
+  - data/wide_weekly_scaledPerBudgetThousands.csv        (wide: rows = regions, cols = week dates)
 """
 
 import pandas as pd
@@ -20,6 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / 'data'
+SUPP = ROOT / 'supplementary data'
 
 # ── Load raw weekly data (full weeks only) ──
 raw = pd.read_csv(
@@ -28,8 +29,8 @@ raw = pd.read_csv(
 )
 raw = raw[raw['days_in_week'] == 7].copy()
 
-# ── Load budget (single-row, regions as columns) ──
-budget_wide = pd.read_excel(DATA / '2026_hr_budget.xlsx')
+# ── Load budget (single-row, regions as columns; HSE-prefixed) ──
+budget_wide = pd.read_excel(SUPP / '2026_hr_budget.xlsx')
 budget = budget_wide.T.reset_index()
 budget.columns = ['Region', 'Budget']
 

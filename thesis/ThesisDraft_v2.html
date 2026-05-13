@@ -120,23 +120,44 @@ window.Quarto = {
 </section>
 <section id="data" class="level1">
 <h1>Data </h1>
+<p>In this chapter we describe how we extracted, transformed and explored the trolley counts. Data was sourced from the HSE emergency trolley report, aggregated from days to weeks, hospitals to regions, then standardised to investigate several hypothesis. Finally exploring the standardised data to influence our models.</p>
 <section id="data-collection" class="level2">
 <h2 class="anchored" data-anchor-id="data-collection">Data Collection </h2>
+<p>A pipeline was created to extract daily on trolley counts from each HSE hospital and transform them into a csv file. The code for this can be found on github <span class="citation" data-cites="henry_hse_2026">(<a href="#ref-henry_hse_2026" role="doc-biblioref">Henry &amp; Bergin, 2026</a>)</span>.</p>
 <div style="page-break-after: always;"></div>
+</section>
+<section id="exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis </h2>
 </section>
 </section>
 <section id="methods" class="level1">
 <h1>Methods </h1>
-<section id="data-collection-pipeline" class="level2">
-<h2 class="anchored" data-anchor-id="data-collection-pipeline">Data Collection Pipeline </h2>
-<p>A pipeline was created to extract daily on trolley counts from each HSE hospital and transform them into a csv file. The code for this can be found on github <span class="citation" data-cites="henry_hse_2026">(<a href="#ref-henry_hse_2026" role="doc-biblioref">Henry &amp; Bergin, 2026</a>)</span>.</p>
-</section>
+<p>After collection, the on trolley counts are scaled to three different rates to understand their impact on ranks between regions. Informed by EDA, the models were specified.</p>
 <section id="response-scaling" class="level2">
 <h2 class="anchored" data-anchor-id="response-scaling">Response Scaling </h2>
-<p>The on trolley counts were standardised to a rate of count per 10,000 people in each health region to control for catchment population size. Counts were standardised to a rate per 10,000 catchment population.</p>
+<section id="population-scaling" class="level3">
+<h3 class="anchored" data-anchor-id="population-scaling">Population scaling</h3>
+<p>The on trolley counts were standardised to a rate of count per 10,000 people in each health region to control for catchment population size:</p>
 <p><span class="math display">\[
-y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region catchment population}_i} \times 10{,}000
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region catchment population}_i} \times 10{,}000.
 \]</span></p>
+</section>
+<section id="budget-scaling" class="level3">
+<h3 class="anchored" data-anchor-id="budget-scaling">Budget scaling</h3>
+<p>Weekly trolley counts scaled by the 2026 HSE regional budget allocation, expressing the outcome as trolleys per billions of euros allocated to the region:</p>
+<p><span class="math display">\[
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region budget in billion (€)}_i}.
+\]</span></p>
+<p>This controls for funding differentials: a region receiving a larger allocation is expected to handle a proportionally larger patient volume.</p>
+</section>
+<section id="bed-scaling" class="level3">
+<h3 class="anchored" data-anchor-id="bed-scaling">Bed scaling</h3>
+<p>Weekly trolley counts scaled by the number of inpatient beds in each region as of June 2025 inquiry:</p>
+<p><span class="math display">\[
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{number of health region inpatient beds}_i} \times 100.
+\]</span></p>
+<p>This controls for space capacity differentials: a region allocated more space is expected to handle a larger patient volume.</p>
+</section>
 </section>
 <section id="model-development" class="level2">
 <h2 class="anchored" data-anchor-id="model-development">Model Development </h2>
@@ -570,13 +591,8 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi_1\,(y_{i,t-1} - \mu_{i,t-1
 <section id="alternative-response-scales" class="level2">
 <h2 class="anchored" data-anchor-id="alternative-response-scales">Alternative Response Scales </h2>
 <p>The primary analysis uses population-scaled trolley counts (per 10,000 catchment population). Two sensitivity scalings were also fitted to assess robustness of model selection and regional rankings to the choice of denominator.</p>
-<section id="budget-scaling" class="level3">
-<h3 class="anchored" data-anchor-id="budget-scaling">Budget scaling</h3>
-<p>Weekly trolley counts scaled by the 2026 HSE regional budget allocation, expressing the outcome as trolleys per €1 billion allocated to the region.</p>
-<p><span class="math display">\[
-y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region budget}_i / 10^6}
-\]</span></p>
-<p>where <span class="math inline">\(\text{health region budget}_i\)</span> is the 2026 budget allocation for region <span class="math inline">\(i\)</span> in €thousands. This controls for funding differentials: a region receiving a larger allocation is expected to handle a proportionally larger patient volume.</p>
+<section id="budget-scaling-1" class="level3">
+<h3 class="anchored" data-anchor-id="budget-scaling-1">Budget scaling</h3>
 <table class="table caption-top">
 <caption>DIC comparison across the models (trolley count scaled by 2026 regional budget).</caption>
 <thead>
@@ -676,13 +692,8 @@ y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region budget}_i
 </tbody>
 </table>
 </section>
-<section id="bed-scaling" class="level3">
-<h3 class="anchored" data-anchor-id="bed-scaling">Bed scaling</h3>
-<p>Weekly trolley counts scaled by the number of inpatient beds in each region, expressing the outcome as an overcapacity rate: for every 100 inpatient beds, how many patients were waiting on trolleys that week.</p>
-<p><span class="math display">\[
-y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region inpatient beds}_i} \times 100
-\]</span></p>
-<p>where <span class="math inline">\(\text{health region inpatient beds}_i\)</span> is the total inpatient bed count across hospitals in region <span class="math inline">\(i\)</span>, summed from the June 2025 bed census. Hospitals with missing bed counts were excluded from the regional sum.</p>
+<section id="bed-scaling-1" class="level3">
+<h3 class="anchored" data-anchor-id="bed-scaling-1">Bed scaling</h3>
 <table class="table caption-top">
 <caption>DIC comparison across models (response scaled by June 2025 health region inpatient bed count).</caption>
 <thead>

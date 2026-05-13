@@ -3,16 +3,24 @@ import pandas as pd
 
 
 def summarize_global_parameters(raw_df, param_names):
-    """Summarize scalar posterior parameters."""
+    """Summarize scalar posterior parameters.
+
+    Columns: Parameter, Median, Mean, SD, 2.5%, 50%, 97.5%.
+    Median is the recommended point estimate (Vehtari et al. 2021,
+    https://projecteuclid.org/journals/bayesian-analysis/volume-16/issue-2/Rank-Normalization-Folding-and-Localization-An-Improved-Rhat-for/10.1214/20-BA1221.full).
+    """
     rows = []
     for name in param_names:
         vals = raw_df[name].values
+        q025, q500, q975 = np.quantile(vals, [0.025, 0.5, 0.975])
         rows.append({
             'Parameter': name,
+            'Median': q500,
             'Mean': vals.mean(),
             'SD': vals.std(),
-            '2.5%': np.quantile(vals, 0.025),
-            '97.5%': np.quantile(vals, 0.975),
+            '2.5%': q025,
+            '50%': q500,
+            '97.5%': q975,
         })
     return pd.DataFrame(rows).round(4)
 

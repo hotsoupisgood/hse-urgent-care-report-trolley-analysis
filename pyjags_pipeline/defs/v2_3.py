@@ -1,8 +1,6 @@
 import numpy as np
-import pandas as pd
 
 from ..base import BaseModel
-from ..ar import compute_ar1_fitted
 from ..data import build_event_indicators
 
 
@@ -14,7 +12,7 @@ class Model(BaseModel):
 
     @property
     def name(self):
-        return 'V1.1 + Regional New Year'
+        return 'Baseline + AR(1) + Annual Cycle +  Regional New Year'
 
     @property
     def jags_model_string(self):
@@ -66,26 +64,3 @@ class Model(BaseModel):
             ny_pre=ev['ny_pre'], ny_mid=ev['ny_mid'], ny_post=ev['ny_post'],
         )
 
-    def reconstruct_mu(self, raw_df, regions, n_weeks, indicators):
-        n_region = len(regions)
-        ev = indicators
-        mu_mean = np.zeros((n_weeks, n_region))
-        mu_lower = np.zeros((n_weeks, n_region))
-        mu_upper = np.zeros((n_weeks, n_region))
-        for i in range(n_region):
-            mu_i = (raw_df[f'alpha[{i+1}]'].values[:,None]
-                    + raw_df[f'beta[{i+1}]'].values[:,None] * ev['cos_t'][None,:]
-                    + raw_df[f'gamma[{i+1}]'].values[:,None] * ev['sin_t'][None,:]
-                    + raw_df[f'delta_pre[{i+1}]'].values[:,None] * ev['ny_pre'][None,:]
-                    + raw_df[f'delta_mid[{i+1}]'].values[:,None] * ev['ny_mid'][None,:]
-                    + raw_df[f'delta_post[{i+1}]'].values[:,None] * ev['ny_post'][None,:])
-            mu_mean[:,i] = mu_i.mean(axis=0)
-            mu_lower[:,i] = np.quantile(mu_i, 0.025, axis=0)
-            mu_upper[:,i] = np.quantile(mu_i, 0.975, axis=0)
-        return (pd.DataFrame(mu_mean, columns=regions),
-                pd.DataFrame(mu_lower, columns=regions),
-                pd.DataFrame(mu_upper, columns=regions))
-
-    def compute_fitted(self, df_mu, df_og, raw_df):
-        phi_mean = raw_df['phi'].mean()
-        return compute_ar1_fitted(df_mu, df_og, phi_mean)

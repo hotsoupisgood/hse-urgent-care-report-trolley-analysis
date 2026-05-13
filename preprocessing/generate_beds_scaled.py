@@ -21,12 +21,14 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / 'data'
+SUPP = ROOT / 'supplementary data'
 
 # --- beds per region ---------------------------------------------------
-beds_raw = pd.read_csv(ROOT / 'supplementary data' / 'beds_per_hospital_region.csv')
+beds_raw = pd.read_csv(SUPP / '2025_hr_beds_per_hospital.csv')
 
-# fix name mismatch in source file
-beds_raw['region'] = beds_raw['region'].replace({'HSE Midwest': 'HSE Mid West'})
+# Source file region names lack the 'HSE ' prefix used by weekly_by_region;
+# prepend so the downstream merge on region matches.
+beds_raw['region'] = 'HSE ' + beds_raw['region']
 
 beds_by_region = (beds_raw
                   .groupby('region')['tx_inpatient']

@@ -5,6 +5,7 @@ import seaborn as sns
 from statsmodels.nonparametric.smoothers_lowess import lowess
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 from statsmodels.graphics.gofplots import qqplot
+from scipy.stats import pearsonr
 from scipy.signal import welch
 
 
@@ -179,6 +180,51 @@ def plot_residuals_periodogram(df_std_resid, save_path, fs=1.0, nperseg=52):
             ax.axvline(period, color='red', linestyle='--', linewidth=0.8)
             ax.annotate(f'\u25c0{label}', xy=(period, y_top), fontsize=7, va='top')
     fig.savefig(save_path, bbox_inches='tight', dpi=150)
+    plt.close(fig)
+
+
+def plot_ccf_grid(df, save_path, title, max_lag=52, unit='weeks'):
+    # 6x6 panel of pairwise lagged Pearson correlations.
+    # At each lag k, slide col (y) relative to row (x) by k steps and compute
+    # Pearson r on the overlapping segment. Positive lag = row leads col.
+    # Bands: +/- 1.96 / sqrt(n - |k|), the asymptotic null band for Pearson r
+    # on (n - |k|) independent observations.
+    cols = list(df.columns)
+    m = len(cols)
+    arrs = {c: df[c].dropna().values for c in cols}
+    n = min(len(a) for a in arrs.values())
+    arrs = {c: a[:n] for c, a in arrs.items()}
+    lags = np.arange(-max_lag, max_lag + 1)
+    band = 1.96 / np.sqrt(n - np.abs(lags))
+
+    fig, axes = plt.subplots(m, m, figsize=(20, 18), sharey=True,
+                             layout='constrained')
+    for i, row_col in enumerate(cols):
+        for j, col_col in enumerate(cols):
+            ax = axes[i, j]
+            x_arr = arrs[row_col]
+            y_arr = arrs[col_col]
+            cc = np.empty_like(lags, dtype=float)
+            for idx, k in enumerate(lags):
+                if k >= 0:
+                    r, _ = pearsonr(x_arr[:n - k], y_arr[k:])
+                else:
+                    r, _ = pearsonr(x_arr[-k:], y_arr[:n + k])
+                cc[idx] = r
+            ax.fill_between(lags, -band, band, color='#1f77b4', alpha=0.20,
+                            linewidth=0)
+            ax.vlines(lags, 0, cc, color='black', linewidth=1.0)
+            ax.plot(lags, cc, 'o', color='black', markersize=3)
+            ax.axhline(0, color='black', linewidth=0.7)
+            ax.set_ylim(-1.05, 1.05)
+            if i == 0:
+                ax.set_title(col_col, fontsize=9)
+            if j == 0:
+                ax.set_ylabel(row_col, fontsize=9)
+    fig.suptitle(title)
+    fig.supxlabel(f'Lag ({unit})  \u2014  + : row leads col,  \u2212 : col leads row')
+    fig.supylabel('Lagged Pearson r')
+    fig.savefig(save_path, bbox_inches='tight', dpi=450)
     plt.close(fig)
 
 

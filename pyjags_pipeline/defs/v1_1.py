@@ -1,8 +1,6 @@
 import numpy as np
-import pandas as pd
 
 from ..base import BaseModel
-from ..ar import compute_ar1_fitted
 
 
 class Model(BaseModel):
@@ -13,7 +11,7 @@ class Model(BaseModel):
 
     @property
     def name(self):
-        return 'V0.1 + Annual Cycle'
+        return 'Baseline + AR(1) + Annual Cycle'
 
     @property
     def jags_model_string(self):
@@ -52,28 +50,3 @@ class Model(BaseModel):
 
     def jags_data(self, y, n_region, n_weeks, regions):
         return dict(y=y, I=n_region, T=n_weeks, pi=np.pi)
-
-    def reconstruct_mu_old(self, raw_df, regions, n_weeks, indicators):
-        """mu[i,t] = alpha[i] + beta[i]*cos + gamma[i]*sin."""
-        n_region = len(regions)
-        ev = indicators
-        mu_mean = np.zeros((n_weeks, n_region))
-        mu_lower = np.zeros((n_weeks, n_region))
-        mu_upper = np.zeros((n_weeks, n_region))
-
-        for i in range(n_region):
-            mu_i = (raw_df[f'alpha[{i + 1}]'].values[:, None]
-                    + raw_df[f'beta[{i + 1}]'].values[:, None] * ev['cos_t'][None, :]
-                    + raw_df[f'gamma[{i + 1}]'].values[:, None] * ev['sin_t'][None, :])
-
-            mu_mean[:, i] = mu_i.mean(axis=0)
-            mu_lower[:, i] = np.quantile(mu_i, 0.025, axis=0)
-            mu_upper[:, i] = np.quantile(mu_i, 0.975, axis=0)
-
-        return (pd.DataFrame(mu_mean, columns=regions),
-                pd.DataFrame(mu_lower, columns=regions),
-                pd.DataFrame(mu_upper, columns=regions))
-
-    def compute_fitted_old(self, df_mu, df_og, raw_df):
-        phi_mean = raw_df['phi'].mean()
-        return compute_ar1_fitted(df_mu, df_og, phi_mean)
