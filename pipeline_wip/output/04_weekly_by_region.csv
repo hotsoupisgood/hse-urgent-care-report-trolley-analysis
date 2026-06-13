@@ -1,0 +1,1027 @@
+week_start,region,ed_trolleys,ward_trolleys,total_trolleys,days_in_week
+2022-12-26,HSE Dublin and Midlands,97,0,97,1
+2022-12-26,HSE Dublin and North East,79,2,81,1
+2022-12-26,HSE Dublin and South East,63,1,64,1
+2022-12-26,HSE Mid West,36,12,48,1
+2022-12-26,HSE South West,79,0,79,1
+2022-12-26,HSE West and North West,90,7,97,1
+2023-01-02,HSE Dublin and Midlands,720,19,739,7
+2023-01-02,HSE Dublin and North East,580,40,588,7
+2023-01-02,HSE Dublin and South East,531,53,584,7
+2023-01-02,HSE Mid West,156,130,286,7
+2023-01-02,HSE South West,511,18,529,7
+2023-01-02,HSE West and North West,551,291,800,7
+2023-01-09,HSE Dublin and Midlands,572,23,595,7
+2023-01-09,HSE Dublin and North East,374,16,390,7
+2023-01-09,HSE Dublin and South East,395,44,439,7
+2023-01-09,HSE Mid West,46,110,156,7
+2023-01-09,HSE South West,350,19,369,7
+2023-01-09,HSE West and North West,318,164,456,7
+2023-01-16,HSE Dublin and Midlands,550,20,570,7
+2023-01-16,HSE Dublin and North East,281,13,288,7
+2023-01-16,HSE Dublin and South East,292,58,350,7
+2023-01-16,HSE Mid West,55,135,190,7
+2023-01-16,HSE South West,326,46,372,7
+2023-01-16,HSE West and North West,407,196,603,7
+2023-01-23,HSE Dublin and Midlands,436,19,455,7
+2023-01-23,HSE Dublin and North East,235,7,240,7
+2023-01-23,HSE Dublin and South East,331,32,363,7
+2023-01-23,HSE Mid West,52,110,162,7
+2023-01-23,HSE South West,396,42,438,7
+2023-01-23,HSE West and North West,327,166,493,7
+2023-01-30,HSE Dublin and Midlands,469,15,484,7
+2023-01-30,HSE Dublin and North East,200,5,205,7
+2023-01-30,HSE Dublin and South East,260,54,314,7
+2023-01-30,HSE Mid West,57,163,220,7
+2023-01-30,HSE South West,368,15,383,7
+2023-01-30,HSE West and North West,307,155,462,7
+2023-02-06,HSE Dublin and Midlands,549,19,566,7
+2023-02-06,HSE Dublin and North East,204,5,209,7
+2023-02-06,HSE Dublin and South East,346,74,420,7
+2023-02-06,HSE Mid West,96,170,266,7
+2023-02-06,HSE South West,267,15,282,7
+2023-02-06,HSE West and North West,276,157,433,7
+2023-02-13,HSE Dublin and Midlands,586,21,607,7
+2023-02-13,HSE Dublin and North East,405,8,413,7
+2023-02-13,HSE Dublin and South East,345,62,405,7
+2023-02-13,HSE Mid West,139,162,301,7
+2023-02-13,HSE South West,391,46,437,7
+2023-02-13,HSE West and North West,399,193,592,7
+2023-02-20,HSE Dublin and Midlands,634,31,665,7
+2023-02-20,HSE Dublin and North East,406,5,411,7
+2023-02-20,HSE Dublin and South East,315,35,350,7
+2023-02-20,HSE Mid West,153,170,323,7
+2023-02-20,HSE South West,352,82,434,7
+2023-02-20,HSE West and North West,431,175,606,7
+2023-02-27,HSE Dublin and Midlands,579,22,601,7
+2023-02-27,HSE Dublin and North East,290,5,295,7
+2023-02-27,HSE Dublin and South East,388,25,413,7
+2023-02-27,HSE Mid West,134,179,313,7
+2023-02-27,HSE South West,306,65,371,7
+2023-02-27,HSE West and North West,287,214,487,7
+2023-03-06,HSE Dublin and Midlands,792,27,819,7
+2023-03-06,HSE Dublin and North East,248,16,248,7
+2023-03-06,HSE Dublin and South East,398,24,422,7
+2023-03-06,HSE Mid West,135,172,307,7
+2023-03-06,HSE South West,475,74,549,7
+2023-03-06,HSE West and North West,361,219,580,7
+2023-03-13,HSE Dublin and Midlands,668,27,691,7
+2023-03-13,HSE Dublin and North East,252,4,256,7
+2023-03-13,HSE Dublin and South East,364,17,381,7
+2023-03-13,HSE Mid West,150,154,304,7
+2023-03-13,HSE South West,401,56,457,7
+2023-03-13,HSE West and North West,448,212,660,7
+2023-03-20,HSE Dublin and Midlands,733,21,754,7
+2023-03-20,HSE Dublin and North East,315,11,326,7
+2023-03-20,HSE Dublin and South East,421,27,448,7
+2023-03-20,HSE Mid West,177,183,360,7
+2023-03-20,HSE South West,418,54,472,7
+2023-03-20,HSE West and North West,468,261,725,7
+2023-03-27,HSE Dublin and Midlands,710,7,717,7
+2023-03-27,HSE Dublin and North East,325,19,344,7
+2023-03-27,HSE Dublin and South East,356,19,369,7
+2023-03-27,HSE Mid West,192,152,344,7
+2023-03-27,HSE South West,458,64,522,7
+2023-03-27,HSE West and North West,440,229,669,7
+2023-04-03,HSE Dublin and Midlands,484,8,490,7
+2023-04-03,HSE Dublin and North East,254,13,265,7
+2023-04-03,HSE Dublin and South East,187,9,196,7
+2023-04-03,HSE Mid West,161,171,332,7
+2023-04-03,HSE South West,375,58,433,7
+2023-04-03,HSE West and North West,487,217,704,7
+2023-04-10,HSE Dublin and Midlands,544,18,562,7
+2023-04-10,HSE Dublin and North East,165,2,165,7
+2023-04-10,HSE Dublin and South East,283,35,312,7
+2023-04-10,HSE Mid West,118,171,289,7
+2023-04-10,HSE South West,405,55,460,7
+2023-04-10,HSE West and North West,459,185,644,7
+2023-04-17,HSE Dublin and Midlands,581,36,617,7
+2023-04-17,HSE Dublin and North East,223,5,228,7
+2023-04-17,HSE Dublin and South East,367,59,416,7
+2023-04-17,HSE Mid West,144,191,335,7
+2023-04-17,HSE South West,404,84,488,7
+2023-04-17,HSE West and North West,389,225,614,7
+2023-04-24,HSE Dublin and Midlands,589,31,620,7
+2023-04-24,HSE Dublin and North East,209,7,216,7
+2023-04-24,HSE Dublin and South East,411,55,458,7
+2023-04-24,HSE Mid West,154,193,347,7
+2023-04-24,HSE South West,376,69,445,7
+2023-04-24,HSE West and North West,382,174,556,7
+2023-05-01,HSE Dublin and Midlands,674,54,726,7
+2023-05-01,HSE Dublin and North East,310,8,316,7
+2023-05-01,HSE Dublin and South East,455,59,512,7
+2023-05-01,HSE Mid West,181,186,367,7
+2023-05-01,HSE South West,383,53,436,7
+2023-05-01,HSE West and North West,452,224,670,7
+2023-05-08,HSE Dublin and Midlands,749,51,798,7
+2023-05-08,HSE Dublin and North East,304,14,318,7
+2023-05-08,HSE Dublin and South East,385,41,426,7
+2023-05-08,HSE Mid West,98,212,310,7
+2023-05-08,HSE South West,390,79,469,7
+2023-05-08,HSE West and North West,397,277,674,7
+2023-05-15,HSE Dublin and Midlands,484,38,520,7
+2023-05-15,HSE Dublin and North East,266,14,276,7
+2023-05-15,HSE Dublin and South East,271,13,284,7
+2023-05-15,HSE Mid West,75,227,302,7
+2023-05-15,HSE South West,373,76,449,7
+2023-05-15,HSE West and North West,345,243,588,7
+2023-05-22,HSE Dublin and Midlands,471,31,500,7
+2023-05-22,HSE Dublin and North East,310,21,325,7
+2023-05-22,HSE Dublin and South East,313,14,327,7
+2023-05-22,HSE Mid West,122,240,362,7
+2023-05-22,HSE South West,325,60,385,7
+2023-05-22,HSE West and North West,341,200,541,7
+2023-05-29,HSE Dublin and Midlands,430,28,452,7
+2023-05-29,HSE Dublin and North East,193,10,203,7
+2023-05-29,HSE Dublin and South East,188,3,191,7
+2023-05-29,HSE Mid West,115,205,320,7
+2023-05-29,HSE South West,237,27,264,7
+2023-05-29,HSE West and North West,287,154,441,7
+2023-06-05,HSE Dublin and Midlands,347,2,349,7
+2023-06-05,HSE Dublin and North East,56,7,63,7
+2023-06-05,HSE Dublin and South East,209,0,209,7
+2023-06-05,HSE Mid West,99,229,328,7
+2023-06-05,HSE South West,160,22,182,7
+2023-06-05,HSE West and North West,346,168,514,7
+2023-06-12,HSE Dublin and Midlands,460,25,483,7
+2023-06-12,HSE Dublin and North East,57,2,55,7
+2023-06-12,HSE Dublin and South East,264,1,265,7
+2023-06-12,HSE Mid West,79,232,311,7
+2023-06-12,HSE South West,253,35,288,7
+2023-06-12,HSE West and North West,319,220,539,7
+2023-06-19,HSE Dublin and Midlands,465,39,498,7
+2023-06-19,HSE Dublin and North East,109,4,109,7
+2023-06-19,HSE Dublin and South East,177,32,209,7
+2023-06-19,HSE Mid West,92,244,336,7
+2023-06-19,HSE South West,242,38,280,7
+2023-06-19,HSE West and North West,337,264,601,7
+2023-06-26,HSE Dublin and Midlands,507,52,559,7
+2023-06-26,HSE Dublin and North East,47,3,50,7
+2023-06-26,HSE Dublin and South East,175,18,193,7
+2023-06-26,HSE Mid West,131,263,394,7
+2023-06-26,HSE South West,163,37,200,7
+2023-06-26,HSE West and North West,296,148,442,7
+2023-07-03,HSE Dublin and Midlands,515,40,553,7
+2023-07-03,HSE Dublin and North East,33,1,32,7
+2023-07-03,HSE Dublin and South East,244,21,265,7
+2023-07-03,HSE Mid West,121,246,367,7
+2023-07-03,HSE South West,146,11,157,7
+2023-07-03,HSE West and North West,194,138,328,7
+2023-07-10,HSE Dublin and Midlands,471,35,504,7
+2023-07-10,HSE Dublin and North East,97,3,96,7
+2023-07-10,HSE Dublin and South East,210,17,227,7
+2023-07-10,HSE Mid West,93,260,353,7
+2023-07-10,HSE South West,245,17,262,7
+2023-07-10,HSE West and North West,285,162,447,7
+2023-07-17,HSE Dublin and Midlands,257,8,265,7
+2023-07-17,HSE Dublin and North East,105,11,112,7
+2023-07-17,HSE Dublin and South East,202,18,220,7
+2023-07-17,HSE Mid West,99,251,350,7
+2023-07-17,HSE South West,267,16,283,7
+2023-07-17,HSE West and North West,256,191,447,7
+2023-07-24,HSE Dublin and Midlands,284,9,293,7
+2023-07-24,HSE Dublin and North East,92,0,92,7
+2023-07-24,HSE Dublin and South East,266,36,302,7
+2023-07-24,HSE Mid West,112,267,379,7
+2023-07-24,HSE South West,308,26,334,7
+2023-07-24,HSE West and North West,305,166,471,7
+2023-07-31,HSE Dublin and Midlands,273,23,296,7
+2023-07-31,HSE Dublin and North East,86,2,84,7
+2023-07-31,HSE Dublin and South East,260,30,290,7
+2023-07-31,HSE Mid West,100,228,328,7
+2023-07-31,HSE South West,276,47,323,7
+2023-07-31,HSE West and North West,353,175,528,7
+2023-08-07,HSE Dublin and Midlands,283,21,304,7
+2023-08-07,HSE Dublin and North East,226,12,238,7
+2023-08-07,HSE Dublin and South East,225,42,253,7
+2023-08-07,HSE Mid West,99,222,321,7
+2023-08-07,HSE South West,177,8,185,7
+2023-08-07,HSE West and North West,405,191,596,7
+2023-08-14,HSE Dublin and Midlands,423,29,452,7
+2023-08-14,HSE Dublin and North East,229,10,239,7
+2023-08-14,HSE Dublin and South East,215,35,250,7
+2023-08-14,HSE Mid West,123,170,293,7
+2023-08-14,HSE South West,254,30,284,7
+2023-08-14,HSE West and North West,307,205,508,7
+2023-08-21,HSE Dublin and Midlands,372,15,387,7
+2023-08-21,HSE Dublin and North East,197,11,204,7
+2023-08-21,HSE Dublin and South East,233,28,261,7
+2023-08-21,HSE Mid West,105,207,312,7
+2023-08-21,HSE South West,381,52,433,7
+2023-08-21,HSE West and North West,299,182,481,7
+2023-08-28,HSE Dublin and Midlands,390,26,414,7
+2023-08-28,HSE Dublin and North East,145,13,154,7
+2023-08-28,HSE Dublin and South East,187,27,214,7
+2023-08-28,HSE Mid West,120,232,352,7
+2023-08-28,HSE South West,453,60,513,7
+2023-08-28,HSE West and North West,306,208,514,7
+2023-09-04,HSE Dublin and Midlands,466,40,506,7
+2023-09-04,HSE Dublin and North East,177,10,187,7
+2023-09-04,HSE Dublin and South East,191,31,222,7
+2023-09-04,HSE Mid West,164,241,405,7
+2023-09-04,HSE South West,395,46,441,7
+2023-09-04,HSE West and North West,378,224,602,7
+2023-09-11,HSE Dublin and Midlands,465,29,494,7
+2023-09-11,HSE Dublin and North East,160,7,165,7
+2023-09-11,HSE Dublin and South East,191,47,238,7
+2023-09-11,HSE Mid West,137,241,378,7
+2023-09-11,HSE South West,308,30,338,7
+2023-09-11,HSE West and North West,300,194,474,7
+2023-09-18,HSE Dublin and Midlands,456,22,478,7
+2023-09-18,HSE Dublin and North East,214,13,221,7
+2023-09-18,HSE Dublin and South East,311,38,349,7
+2023-09-18,HSE Mid West,138,247,385,7
+2023-09-18,HSE South West,347,47,394,7
+2023-09-18,HSE West and North West,269,144,411,7
+2023-09-25,HSE Dublin and Midlands,569,40,607,7
+2023-09-25,HSE Dublin and North East,262,21,277,7
+2023-09-25,HSE Dublin and South East,235,44,279,7
+2023-09-25,HSE Mid West,173,246,419,7
+2023-09-25,HSE South West,438,52,490,7
+2023-09-25,HSE West and North West,232,187,417,7
+2023-10-02,HSE Dublin and Midlands,545,49,594,7
+2023-10-02,HSE Dublin and North East,266,11,275,7
+2023-10-02,HSE Dublin and South East,218,58,276,7
+2023-10-02,HSE Mid West,171,246,417,7
+2023-10-02,HSE South West,381,29,410,7
+2023-10-02,HSE West and North West,302,164,466,7
+2023-10-09,HSE Dublin and Midlands,543,72,615,7
+2023-10-09,HSE Dublin and North East,304,19,305,7
+2023-10-09,HSE Dublin and South East,236,68,304,7
+2023-10-09,HSE Mid West,154,207,361,7
+2023-10-09,HSE South West,345,60,405,7
+2023-10-09,HSE West and North West,259,198,457,7
+2023-10-16,HSE Dublin and Midlands,440,44,484,7
+2023-10-16,HSE Dublin and North East,250,10,254,7
+2023-10-16,HSE Dublin and South East,221,63,284,7
+2023-10-16,HSE Mid West,149,241,390,7
+2023-10-16,HSE South West,307,53,360,7
+2023-10-16,HSE West and North West,257,175,410,7
+2023-10-23,HSE Dublin and Midlands,504,42,546,7
+2023-10-23,HSE Dublin and North East,285,8,291,7
+2023-10-23,HSE Dublin and South East,280,42,322,7
+2023-10-23,HSE Mid West,96,235,331,7
+2023-10-23,HSE South West,348,47,395,7
+2023-10-23,HSE West and North West,276,148,424,7
+2023-10-30,HSE Dublin and Midlands,612,36,648,7
+2023-10-30,HSE Dublin and North East,328,11,339,7
+2023-10-30,HSE Dublin and South East,260,40,300,7
+2023-10-30,HSE Mid West,64,222,286,7
+2023-10-30,HSE South West,383,60,443,7
+2023-10-30,HSE West and North West,255,186,441,7
+2023-11-06,HSE Dublin and Midlands,668,53,721,7
+2023-11-06,HSE Dublin and North East,337,10,347,7
+2023-11-06,HSE Dublin and South East,325,55,380,7
+2023-11-06,HSE Mid West,101,239,340,7
+2023-11-06,HSE South West,376,60,436,7
+2023-11-06,HSE West and North West,322,181,503,7
+2023-11-13,HSE Dublin and Midlands,575,62,637,7
+2023-11-13,HSE Dublin and North East,349,12,361,7
+2023-11-13,HSE Dublin and South East,325,38,363,7
+2023-11-13,HSE Mid West,150,249,399,7
+2023-11-13,HSE South West,389,74,463,7
+2023-11-13,HSE West and North West,292,259,551,7
+2023-11-20,HSE Dublin and Midlands,480,10,490,7
+2023-11-20,HSE Dublin and North East,323,11,334,7
+2023-11-20,HSE Dublin and South East,310,26,336,7
+2023-11-20,HSE Mid West,141,224,365,7
+2023-11-20,HSE South West,312,63,375,7
+2023-11-20,HSE West and North West,210,171,381,7
+2023-11-27,HSE Dublin and Midlands,466,9,475,7
+2023-11-27,HSE Dublin and North East,272,12,284,7
+2023-11-27,HSE Dublin and South East,332,62,394,7
+2023-11-27,HSE Mid West,112,228,340,7
+2023-11-27,HSE South West,368,81,449,7
+2023-11-27,HSE West and North West,235,154,389,7
+2023-12-04,HSE Dublin and Midlands,706,9,715,7
+2023-12-04,HSE Dublin and North East,362,10,372,7
+2023-12-04,HSE Dublin and South East,318,23,341,7
+2023-12-04,HSE Mid West,193,200,393,7
+2023-12-04,HSE South West,299,66,365,7
+2023-12-04,HSE West and North West,354,257,611,7
+2023-12-11,HSE Dublin and Midlands,622,95,717,7
+2023-12-11,HSE Dublin and North East,319,10,329,7
+2023-12-11,HSE Dublin and South East,335,43,378,7
+2023-12-11,HSE Mid West,165,252,417,7
+2023-12-11,HSE South West,435,54,489,7
+2023-12-11,HSE West and North West,424,259,683,7
+2023-12-18,HSE Dublin and Midlands,262,14,276,7
+2023-12-18,HSE Dublin and North East,107,10,117,7
+2023-12-18,HSE Dublin and South East,215,39,254,7
+2023-12-18,HSE Mid West,81,157,238,7
+2023-12-18,HSE South West,219,22,241,7
+2023-12-18,HSE West and North West,219,160,379,7
+2023-12-25,HSE Dublin and Midlands,116,1,117,7
+2023-12-25,HSE Dublin and North East,24,0,24,7
+2023-12-25,HSE Dublin and South East,87,1,88,7
+2023-12-25,HSE Mid West,18,97,115,7
+2023-12-25,HSE South West,146,0,146,7
+2023-12-25,HSE West and North West,121,35,156,7
+2024-01-01,HSE Dublin and Midlands,421,19,440,7
+2024-01-01,HSE Dublin and North East,243,5,248,7
+2024-01-01,HSE Dublin and South East,145,14,159,7
+2024-01-01,HSE Mid West,52,240,292,7
+2024-01-01,HSE South West,437,71,508,7
+2024-01-01,HSE West and North West,378,194,572,7
+2024-01-08,HSE Dublin and Midlands,399,27,426,7
+2024-01-08,HSE Dublin and North East,358,8,366,7
+2024-01-08,HSE Dublin and South East,208,52,260,7
+2024-01-08,HSE Mid West,67,251,318,7
+2024-01-08,HSE South West,387,93,480,7
+2024-01-08,HSE West and North West,270,210,480,7
+2024-01-15,HSE Dublin and Midlands,441,37,478,7
+2024-01-15,HSE Dublin and North East,351,18,369,7
+2024-01-15,HSE Dublin and South East,276,25,301,7
+2024-01-15,HSE Mid West,98,260,358,7
+2024-01-15,HSE South West,414,141,555,7
+2024-01-15,HSE West and North West,280,133,413,7
+2024-01-22,HSE Dublin and Midlands,498,56,554,7
+2024-01-22,HSE Dublin and North East,337,12,349,7
+2024-01-22,HSE Dublin and South East,256,28,284,7
+2024-01-22,HSE Mid West,133,288,421,7
+2024-01-22,HSE South West,408,143,551,7
+2024-01-22,HSE West and North West,278,239,517,7
+2024-01-29,HSE Dublin and Midlands,397,28,425,7
+2024-01-29,HSE Dublin and North East,307,18,325,7
+2024-01-29,HSE Dublin and South East,254,67,321,7
+2024-01-29,HSE Mid West,137,310,447,7
+2024-01-29,HSE South West,261,89,350,7
+2024-01-29,HSE West and North West,247,220,467,7
+2024-02-05,HSE Dublin and Midlands,464,44,508,7
+2024-02-05,HSE Dublin and North East,397,4,401,7
+2024-02-05,HSE Dublin and South East,328,89,417,7
+2024-02-05,HSE Mid West,192,309,501,7
+2024-02-05,HSE South West,250,65,315,7
+2024-02-05,HSE West and North West,269,242,511,7
+2024-02-12,HSE Dublin and Midlands,403,9,412,7
+2024-02-12,HSE Dublin and North East,297,8,305,7
+2024-02-12,HSE Dublin and South East,325,76,401,7
+2024-02-12,HSE Mid West,139,278,417,7
+2024-02-12,HSE South West,227,61,288,7
+2024-02-12,HSE West and North West,313,273,586,7
+2024-02-19,HSE Dublin and Midlands,472,22,494,7
+2024-02-19,HSE Dublin and North East,388,2,390,7
+2024-02-19,HSE Dublin and South East,223,50,273,7
+2024-02-19,HSE Mid West,117,270,387,7
+2024-02-19,HSE South West,217,35,252,7
+2024-02-19,HSE West and North West,247,227,474,7
+2024-02-26,HSE Dublin and Midlands,506,37,543,7
+2024-02-26,HSE Dublin and North East,285,0,285,7
+2024-02-26,HSE Dublin and South East,255,33,288,7
+2024-02-26,HSE Mid West,135,286,421,7
+2024-02-26,HSE South West,265,81,346,7
+2024-02-26,HSE West and North West,182,186,368,7
+2024-03-04,HSE Dublin and Midlands,485,27,512,7
+2024-03-04,HSE Dublin and North East,277,0,277,7
+2024-03-04,HSE Dublin and South East,286,16,302,7
+2024-03-04,HSE Mid West,151,247,398,7
+2024-03-04,HSE South West,213,54,267,7
+2024-03-04,HSE West and North West,172,145,315,7
+2024-03-11,HSE Dublin and Midlands,498,27,525,7
+2024-03-11,HSE Dublin and North East,362,2,364,7
+2024-03-11,HSE Dublin and South East,321,26,347,7
+2024-03-11,HSE Mid West,101,267,368,7
+2024-03-11,HSE South West,268,79,347,7
+2024-03-11,HSE West and North West,150,171,321,7
+2024-03-18,HSE Dublin and Midlands,403,28,431,7
+2024-03-18,HSE Dublin and North East,322,0,322,7
+2024-03-18,HSE Dublin and South East,224,46,270,7
+2024-03-18,HSE Mid West,161,259,420,7
+2024-03-18,HSE South West,298,78,376,7
+2024-03-18,HSE West and North West,224,199,423,7
+2024-03-25,HSE Dublin and Midlands,449,34,483,7
+2024-03-25,HSE Dublin and North East,265,2,267,7
+2024-03-25,HSE Dublin and South East,256,61,317,7
+2024-03-25,HSE Mid West,133,291,424,7
+2024-03-25,HSE South West,214,56,270,7
+2024-03-25,HSE West and North West,216,172,368,7
+2024-04-01,HSE Dublin and Midlands,476,36,512,7
+2024-04-01,HSE Dublin and North East,257,0,257,7
+2024-04-01,HSE Dublin and South East,336,45,381,7
+2024-04-01,HSE Mid West,117,245,362,7
+2024-04-01,HSE South West,312,81,393,7
+2024-04-01,HSE West and North West,303,209,512,7
+2024-04-08,HSE Dublin and Midlands,489,57,546,7
+2024-04-08,HSE Dublin and North East,339,0,339,7
+2024-04-08,HSE Dublin and South East,271,58,329,7
+2024-04-08,HSE Mid West,103,248,351,7
+2024-04-08,HSE South West,331,69,400,7
+2024-04-08,HSE West and North West,352,295,647,7
+2024-04-15,HSE Dublin and Midlands,453,36,489,7
+2024-04-15,HSE Dublin and North East,350,0,350,7
+2024-04-15,HSE Dublin and South East,304,55,359,7
+2024-04-15,HSE Mid West,135,267,402,7
+2024-04-15,HSE South West,216,27,243,7
+2024-04-15,HSE West and North West,279,180,459,7
+2024-04-22,HSE Dublin and Midlands,340,27,367,7
+2024-04-22,HSE Dublin and North East,343,0,343,7
+2024-04-22,HSE Dublin and South East,260,62,322,7
+2024-04-22,HSE Mid West,144,272,416,7
+2024-04-22,HSE South West,240,40,280,7
+2024-04-22,HSE West and North West,156,147,303,7
+2024-04-29,HSE Dublin and Midlands,336,42,378,7
+2024-04-29,HSE Dublin and North East,256,3,259,7
+2024-04-29,HSE Dublin and South East,240,35,275,7
+2024-04-29,HSE Mid West,102,224,326,7
+2024-04-29,HSE South West,291,85,376,7
+2024-04-29,HSE West and North West,174,123,297,7
+2024-05-06,HSE Dublin and Midlands,308,18,326,7
+2024-05-06,HSE Dublin and North East,300,2,302,7
+2024-05-06,HSE Dublin and South East,204,36,240,7
+2024-05-06,HSE Mid West,98,217,315,7
+2024-05-06,HSE South West,149,28,177,7
+2024-05-06,HSE West and North West,244,160,404,7
+2024-05-13,HSE Dublin and Midlands,388,80,468,7
+2024-05-13,HSE Dublin and North East,352,4,352,7
+2024-05-13,HSE Dublin and South East,176,30,206,7
+2024-05-13,HSE Mid West,150,281,431,7
+2024-05-13,HSE South West,167,22,189,7
+2024-05-13,HSE West and North West,277,218,495,7
+2024-05-20,HSE Dublin and Midlands,372,28,400,7
+2024-05-20,HSE Dublin and North East,400,2,402,7
+2024-05-20,HSE Dublin and South East,167,44,211,7
+2024-05-20,HSE Mid West,147,290,437,7
+2024-05-20,HSE South West,240,69,309,7
+2024-05-20,HSE West and North West,139,138,277,7
+2024-05-27,HSE Dublin and Midlands,420,65,485,7
+2024-05-27,HSE Dublin and North East,247,0,247,7
+2024-05-27,HSE Dublin and South East,145,16,161,7
+2024-05-27,HSE Mid West,171,251,422,7
+2024-05-27,HSE South West,258,41,299,7
+2024-05-27,HSE West and North West,227,144,371,7
+2024-06-03,HSE Dublin and Midlands,403,57,460,7
+2024-06-03,HSE Dublin and North East,278,0,278,7
+2024-06-03,HSE Dublin and South East,179,38,217,7
+2024-06-03,HSE Mid West,109,203,312,7
+2024-06-03,HSE South West,331,60,391,7
+2024-06-03,HSE West and North West,200,179,379,7
+2024-06-10,HSE Dublin and Midlands,367,47,414,7
+2024-06-10,HSE Dublin and North East,335,0,335,7
+2024-06-10,HSE Dublin and South East,196,32,228,7
+2024-06-10,HSE Mid West,103,200,303,7
+2024-06-10,HSE South West,288,74,362,7
+2024-06-10,HSE West and North West,336,240,576,7
+2024-06-17,HSE Dublin and Midlands,347,12,359,7
+2024-06-17,HSE Dublin and North East,328,0,328,7
+2024-06-17,HSE Dublin and South East,220,16,236,7
+2024-06-17,HSE Mid West,98,184,282,7
+2024-06-17,HSE South West,253,47,300,7
+2024-06-17,HSE West and North West,279,198,477,7
+2024-06-24,HSE Dublin and Midlands,331,0,331,7
+2024-06-24,HSE Dublin and North East,346,7,353,7
+2024-06-24,HSE Dublin and South East,255,15,270,7
+2024-06-24,HSE Mid West,154,209,363,7
+2024-06-24,HSE South West,219,29,248,7
+2024-06-24,HSE West and North West,256,204,460,7
+2024-07-01,HSE Dublin and Midlands,244,5,249,7
+2024-07-01,HSE Dublin and North East,284,0,284,7
+2024-07-01,HSE Dublin and South East,179,31,210,7
+2024-07-01,HSE Mid West,156,220,376,7
+2024-07-01,HSE South West,240,20,260,7
+2024-07-01,HSE West and North West,199,145,340,7
+2024-07-08,HSE Dublin and Midlands,258,0,258,7
+2024-07-08,HSE Dublin and North East,170,0,170,7
+2024-07-08,HSE Dublin and South East,205,38,243,7
+2024-07-08,HSE Mid West,196,268,464,7
+2024-07-08,HSE South West,290,45,335,7
+2024-07-08,HSE West and North West,229,204,433,7
+2024-07-15,HSE Dublin and Midlands,329,3,332,7
+2024-07-15,HSE Dublin and North East,198,0,198,7
+2024-07-15,HSE Dublin and South East,149,22,171,7
+2024-07-15,HSE Mid West,154,235,389,7
+2024-07-15,HSE South West,256,30,286,7
+2024-07-15,HSE West and North West,253,210,463,7
+2024-07-22,HSE Dublin and Midlands,368,14,382,7
+2024-07-22,HSE Dublin and North East,203,0,203,7
+2024-07-22,HSE Dublin and South East,128,36,164,7
+2024-07-22,HSE Mid West,112,208,320,7
+2024-07-22,HSE South West,270,46,316,7
+2024-07-22,HSE West and North West,241,208,449,7
+2024-07-29,HSE Dublin and Midlands,325,20,345,7
+2024-07-29,HSE Dublin and North East,210,0,210,7
+2024-07-29,HSE Dublin and South East,144,40,184,7
+2024-07-29,HSE Mid West,118,200,318,7
+2024-07-29,HSE South West,140,20,160,7
+2024-07-29,HSE West and North West,231,203,434,7
+2024-08-05,HSE Dublin and Midlands,315,20,335,7
+2024-08-05,HSE Dublin and North East,216,0,216,7
+2024-08-05,HSE Dublin and South East,207,19,226,7
+2024-08-05,HSE Mid West,130,243,373,7
+2024-08-05,HSE South West,213,23,236,7
+2024-08-05,HSE West and North West,228,194,422,7
+2024-08-12,HSE Dublin and Midlands,291,37,328,7
+2024-08-12,HSE Dublin and North East,149,0,149,7
+2024-08-12,HSE Dublin and South East,180,8,188,7
+2024-08-12,HSE Mid West,37,125,162,7
+2024-08-12,HSE South West,188,39,227,7
+2024-08-12,HSE West and North West,193,191,384,7
+2024-08-19,HSE Dublin and Midlands,228,34,262,7
+2024-08-19,HSE Dublin and North East,214,0,214,7
+2024-08-19,HSE Dublin and South East,231,20,251,7
+2024-08-19,HSE Mid West,0,0,0,7
+2024-08-19,HSE South West,158,16,174,7
+2024-08-19,HSE West and North West,172,183,355,7
+2024-08-26,HSE Dublin and Midlands,308,48,356,7
+2024-08-26,HSE Dublin and North East,249,0,249,7
+2024-08-26,HSE Dublin and South East,241,18,259,7
+2024-08-26,HSE Mid West,6,97,103,7
+2024-08-26,HSE South West,168,21,189,7
+2024-08-26,HSE West and North West,190,179,369,7
+2024-09-02,HSE Dublin and Midlands,258,35,293,7
+2024-09-02,HSE Dublin and North East,284,0,284,7
+2024-09-02,HSE Dublin and South East,227,37,264,7
+2024-09-02,HSE Mid West,13,185,198,7
+2024-09-02,HSE South West,181,20,201,7
+2024-09-02,HSE West and North West,173,188,361,7
+2024-09-09,HSE Dublin and Midlands,208,4,212,7
+2024-09-09,HSE Dublin and North East,274,0,274,7
+2024-09-09,HSE Dublin and South East,291,48,339,7
+2024-09-09,HSE Mid West,40,209,249,7
+2024-09-09,HSE South West,289,64,353,7
+2024-09-09,HSE West and North West,209,201,410,7
+2024-09-16,HSE Dublin and Midlands,331,18,349,7
+2024-09-16,HSE Dublin and North East,265,0,265,7
+2024-09-16,HSE Dublin and South East,267,56,323,7
+2024-09-16,HSE Mid West,97,182,279,7
+2024-09-16,HSE South West,286,63,349,7
+2024-09-16,HSE West and North West,268,236,504,7
+2024-09-23,HSE Dublin and Midlands,303,48,351,7
+2024-09-23,HSE Dublin and North East,333,0,333,7
+2024-09-23,HSE Dublin and South East,244,53,297,7
+2024-09-23,HSE Mid West,101,215,316,7
+2024-09-23,HSE South West,272,44,316,7
+2024-09-23,HSE West and North West,261,270,531,7
+2024-09-30,HSE Dublin and Midlands,359,55,414,7
+2024-09-30,HSE Dublin and North East,397,0,397,7
+2024-09-30,HSE Dublin and South East,306,45,351,7
+2024-09-30,HSE Mid West,132,257,389,7
+2024-09-30,HSE South West,317,80,397,7
+2024-09-30,HSE West and North West,259,255,512,7
+2024-10-07,HSE Dublin and Midlands,374,79,453,7
+2024-10-07,HSE Dublin and North East,299,0,299,7
+2024-10-07,HSE Dublin and South East,265,61,326,7
+2024-10-07,HSE Mid West,129,234,363,7
+2024-10-07,HSE South West,217,67,284,7
+2024-10-07,HSE West and North West,213,250,459,7
+2024-10-14,HSE Dublin and Midlands,307,36,343,7
+2024-10-14,HSE Dublin and North East,311,0,311,7
+2024-10-14,HSE Dublin and South East,274,56,330,7
+2024-10-14,HSE Mid West,108,226,334,7
+2024-10-14,HSE South West,191,35,226,7
+2024-10-14,HSE West and North West,251,172,423,7
+2024-10-21,HSE Dublin and Midlands,263,74,337,7
+2024-10-21,HSE Dublin and North East,287,0,287,7
+2024-10-21,HSE Dublin and South East,191,38,229,7
+2024-10-21,HSE Mid West,81,193,274,7
+2024-10-21,HSE South West,156,48,204,7
+2024-10-21,HSE West and North West,204,189,393,7
+2024-10-28,HSE Dublin and Midlands,291,31,322,7
+2024-10-28,HSE Dublin and North East,327,0,327,7
+2024-10-28,HSE Dublin and South East,173,38,211,7
+2024-10-28,HSE Mid West,134,239,373,7
+2024-10-28,HSE South West,178,42,220,7
+2024-10-28,HSE West and North West,213,142,355,7
+2024-11-04,HSE Dublin and Midlands,322,40,362,7
+2024-11-04,HSE Dublin and North East,362,0,362,7
+2024-11-04,HSE Dublin and South East,262,65,327,7
+2024-11-04,HSE Mid West,185,267,452,7
+2024-11-04,HSE South West,269,88,357,7
+2024-11-04,HSE West and North West,284,190,474,7
+2024-11-11,HSE Dublin and Midlands,365,40,405,7
+2024-11-11,HSE Dublin and North East,298,0,298,7
+2024-11-11,HSE Dublin and South East,216,54,270,7
+2024-11-11,HSE Mid West,157,241,398,7
+2024-11-11,HSE South West,176,60,236,7
+2024-11-11,HSE West and North West,302,192,494,7
+2024-11-18,HSE Dublin and Midlands,332,43,375,7
+2024-11-18,HSE Dublin and North East,378,0,378,7
+2024-11-18,HSE Dublin and South East,228,66,294,7
+2024-11-18,HSE Mid West,140,266,406,7
+2024-11-18,HSE South West,192,59,251,7
+2024-11-18,HSE West and North West,259,205,464,7
+2024-11-25,HSE Dublin and Midlands,444,43,487,7
+2024-11-25,HSE Dublin and North East,475,1,476,7
+2024-11-25,HSE Dublin and South East,298,110,408,7
+2024-11-25,HSE Mid West,109,251,360,7
+2024-11-25,HSE South West,306,65,371,7
+2024-11-25,HSE West and North West,248,188,436,7
+2024-12-02,HSE Dublin and Midlands,390,54,444,7
+2024-12-02,HSE Dublin and North East,442,5,447,7
+2024-12-02,HSE Dublin and South East,302,104,406,7
+2024-12-02,HSE Mid West,152,274,426,7
+2024-12-02,HSE South West,250,69,319,7
+2024-12-02,HSE West and North West,227,195,418,7
+2024-12-09,HSE Dublin and Midlands,456,63,519,7
+2024-12-09,HSE Dublin and North East,427,0,427,7
+2024-12-09,HSE Dublin and South East,286,84,370,7
+2024-12-09,HSE Mid West,113,249,362,7
+2024-12-09,HSE South West,210,52,262,7
+2024-12-09,HSE West and North West,213,217,430,7
+2024-12-16,HSE Dublin and Midlands,438,62,500,7
+2024-12-16,HSE Dublin and North East,352,0,352,7
+2024-12-16,HSE Dublin and South East,147,66,213,7
+2024-12-16,HSE Mid West,145,276,421,7
+2024-12-16,HSE South West,286,72,358,7
+2024-12-16,HSE West and North West,202,199,401,7
+2024-12-23,HSE Dublin and Midlands,160,2,162,7
+2024-12-23,HSE Dublin and North East,133,0,133,7
+2024-12-23,HSE Dublin and South East,92,7,99,7
+2024-12-23,HSE Mid West,78,128,206,7
+2024-12-23,HSE South West,113,16,129,7
+2024-12-23,HSE West and North West,129,66,195,7
+2024-12-30,HSE Dublin and Midlands,377,46,423,7
+2024-12-30,HSE Dublin and North East,213,0,213,7
+2024-12-30,HSE Dublin and South East,243,96,339,7
+2024-12-30,HSE Mid West,168,269,437,7
+2024-12-30,HSE South West,326,66,392,7
+2024-12-30,HSE West and North West,344,201,545,7
+2025-01-06,HSE Dublin and Midlands,499,86,585,7
+2025-01-06,HSE Dublin and North East,382,0,382,7
+2025-01-06,HSE Dublin and South East,244,93,337,7
+2025-01-06,HSE Mid West,199,287,486,7
+2025-01-06,HSE South West,438,100,538,7
+2025-01-06,HSE West and North West,347,261,608,7
+2025-01-13,HSE Dublin and Midlands,387,90,477,7
+2025-01-13,HSE Dublin and North East,380,0,380,7
+2025-01-13,HSE Dublin and South East,246,109,355,7
+2025-01-13,HSE Mid West,189,272,461,7
+2025-01-13,HSE South West,381,139,520,7
+2025-01-13,HSE West and North West,306,319,625,7
+2025-01-20,HSE Dublin and Midlands,332,50,382,7
+2025-01-20,HSE Dublin and North East,413,3,416,7
+2025-01-20,HSE Dublin and South East,305,185,490,7
+2025-01-20,HSE Mid West,98,254,352,7
+2025-01-20,HSE South West,382,99,481,7
+2025-01-20,HSE West and North West,351,293,644,7
+2025-01-27,HSE Dublin and Midlands,436,34,470,7
+2025-01-27,HSE Dublin and North East,485,0,485,7
+2025-01-27,HSE Dublin and South East,226,148,374,7
+2025-01-27,HSE Mid West,112,281,393,7
+2025-01-27,HSE South West,350,119,469,7
+2025-01-27,HSE West and North West,384,348,732,7
+2025-02-03,HSE Dublin and Midlands,381,47,428,7
+2025-02-03,HSE Dublin and North East,537,0,537,7
+2025-02-03,HSE Dublin and South East,279,133,412,7
+2025-02-03,HSE Mid West,100,281,381,7
+2025-02-03,HSE South West,278,86,364,7
+2025-02-03,HSE West and North West,407,334,741,7
+2025-02-10,HSE Dublin and Midlands,434,45,479,7
+2025-02-10,HSE Dublin and North East,452,0,452,7
+2025-02-10,HSE Dublin and South East,190,54,244,7
+2025-02-10,HSE Mid West,106,243,349,7
+2025-02-10,HSE South West,237,75,312,7
+2025-02-10,HSE West and North West,290,258,548,7
+2025-02-17,HSE Dublin and Midlands,459,24,483,7
+2025-02-17,HSE Dublin and North East,445,0,445,7
+2025-02-17,HSE Dublin and South East,249,93,342,7
+2025-02-17,HSE Mid West,122,307,429,7
+2025-02-17,HSE South West,255,79,334,7
+2025-02-17,HSE West and North West,304,262,566,7
+2025-02-24,HSE Dublin and Midlands,413,72,485,7
+2025-02-24,HSE Dublin and North East,306,0,306,7
+2025-02-24,HSE Dublin and South East,184,73,255,7
+2025-02-24,HSE Mid West,107,305,412,7
+2025-02-24,HSE South West,274,76,350,7
+2025-02-24,HSE West and North West,360,284,644,7
+2025-03-03,HSE Dublin and Midlands,341,47,388,7
+2025-03-03,HSE Dublin and North East,212,0,212,7
+2025-03-03,HSE Dublin and South East,219,75,294,7
+2025-03-03,HSE Mid West,102,265,367,7
+2025-03-03,HSE South West,212,47,259,7
+2025-03-03,HSE West and North West,283,219,502,7
+2025-03-10,HSE Dublin and Midlands,294,42,336,7
+2025-03-10,HSE Dublin and North East,227,0,227,7
+2025-03-10,HSE Dublin and South East,182,42,224,7
+2025-03-10,HSE Mid West,70,256,326,7
+2025-03-10,HSE South West,114,41,155,7
+2025-03-10,HSE West and North West,263,209,472,7
+2025-03-17,HSE Dublin and Midlands,280,4,284,7
+2025-03-17,HSE Dublin and North East,127,0,127,7
+2025-03-17,HSE Dublin and South East,161,28,189,7
+2025-03-17,HSE Mid West,32,227,259,7
+2025-03-17,HSE South West,226,58,284,7
+2025-03-17,HSE West and North West,159,148,307,7
+2025-03-24,HSE Dublin and Midlands,325,38,363,7
+2025-03-24,HSE Dublin and North East,307,2,309,7
+2025-03-24,HSE Dublin and South East,111,20,131,7
+2025-03-24,HSE Mid West,102,283,385,7
+2025-03-24,HSE South West,285,66,351,7
+2025-03-24,HSE West and North West,242,202,444,7
+2025-03-31,HSE Dublin and Midlands,253,10,263,7
+2025-03-31,HSE Dublin and North East,364,0,364,7
+2025-03-31,HSE Dublin and South East,129,27,156,7
+2025-03-31,HSE Mid West,73,246,319,7
+2025-03-31,HSE South West,237,67,304,7
+2025-03-31,HSE West and North West,193,182,375,7
+2025-04-07,HSE Dublin and Midlands,337,23,360,7
+2025-04-07,HSE Dublin and North East,176,0,176,7
+2025-04-07,HSE Dublin and South East,146,15,161,7
+2025-04-07,HSE Mid West,89,225,314,7
+2025-04-07,HSE South West,133,38,171,7
+2025-04-07,HSE West and North West,152,185,337,7
+2025-04-14,HSE Dublin and Midlands,392,35,427,7
+2025-04-14,HSE Dublin and North East,281,0,281,7
+2025-04-14,HSE Dublin and South East,132,30,162,7
+2025-04-14,HSE Mid West,96,265,361,7
+2025-04-14,HSE South West,127,42,169,7
+2025-04-14,HSE West and North West,200,163,363,7
+2025-04-21,HSE Dublin and Midlands,363,53,416,7
+2025-04-21,HSE Dublin and North East,151,0,151,7
+2025-04-21,HSE Dublin and South East,152,36,188,7
+2025-04-21,HSE Mid West,103,294,397,7
+2025-04-21,HSE South West,155,41,196,7
+2025-04-21,HSE West and North West,232,187,419,7
+2025-04-28,HSE Dublin and Midlands,256,5,261,7
+2025-04-28,HSE Dublin and North East,159,0,159,7
+2025-04-28,HSE Dublin and South East,153,20,173,7
+2025-04-28,HSE Mid West,78,269,347,7
+2025-04-28,HSE South West,120,36,156,7
+2025-04-28,HSE West and North West,205,144,349,7
+2025-05-05,HSE Dublin and Midlands,236,22,258,7
+2025-05-05,HSE Dublin and North East,142,0,142,7
+2025-05-05,HSE Dublin and South East,165,30,195,7
+2025-05-05,HSE Mid West,96,255,351,7
+2025-05-05,HSE South West,150,48,198,7
+2025-05-05,HSE West and North West,187,225,412,7
+2025-05-12,HSE Dublin and Midlands,281,9,290,7
+2025-05-12,HSE Dublin and North East,120,0,120,7
+2025-05-12,HSE Dublin and South East,150,28,178,7
+2025-05-12,HSE Mid West,99,283,382,7
+2025-05-12,HSE South West,134,41,175,7
+2025-05-12,HSE West and North West,261,215,476,7
+2025-05-19,HSE Dublin and Midlands,303,28,331,7
+2025-05-19,HSE Dublin and North East,180,0,180,7
+2025-05-19,HSE Dublin and South East,187,46,233,7
+2025-05-19,HSE Mid West,87,265,352,7
+2025-05-19,HSE South West,123,40,163,7
+2025-05-19,HSE West and North West,198,156,354,7
+2025-05-26,HSE Dublin and Midlands,295,5,300,7
+2025-05-26,HSE Dublin and North East,217,0,217,7
+2025-05-26,HSE Dublin and South East,163,43,206,7
+2025-05-26,HSE Mid West,86,264,350,7
+2025-05-26,HSE South West,98,19,117,7
+2025-05-26,HSE West and North West,225,215,440,7
+2025-06-02,HSE Dublin and Midlands,178,3,181,7
+2025-06-02,HSE Dublin and North East,231,0,231,7
+2025-06-02,HSE Dublin and South East,171,50,221,7
+2025-06-02,HSE Mid West,90,246,336,7
+2025-06-02,HSE South West,133,23,156,7
+2025-06-02,HSE West and North West,247,218,465,7
+2025-06-09,HSE Dublin and Midlands,246,3,249,7
+2025-06-09,HSE Dublin and North East,209,0,209,7
+2025-06-09,HSE Dublin and South East,129,25,154,7
+2025-06-09,HSE Mid West,91,267,358,7
+2025-06-09,HSE South West,103,27,130,7
+2025-06-09,HSE West and North West,264,224,488,7
+2025-06-16,HSE Dublin and Midlands,338,59,397,7
+2025-06-16,HSE Dublin and North East,186,0,186,7
+2025-06-16,HSE Dublin and South East,127,48,175,7
+2025-06-16,HSE Mid West,58,214,272,7
+2025-06-16,HSE South West,151,32,183,7
+2025-06-16,HSE West and North West,254,195,449,7
+2025-06-23,HSE Dublin and Midlands,263,31,294,7
+2025-06-23,HSE Dublin and North East,150,0,150,7
+2025-06-23,HSE Dublin and South East,134,46,180,7
+2025-06-23,HSE Mid West,91,308,399,7
+2025-06-23,HSE South West,193,61,254,7
+2025-06-23,HSE West and North West,290,197,487,7
+2025-06-30,HSE Dublin and Midlands,223,61,284,7
+2025-06-30,HSE Dublin and North East,189,0,189,7
+2025-06-30,HSE Dublin and South East,133,36,169,7
+2025-06-30,HSE Mid West,88,281,369,7
+2025-06-30,HSE South West,149,71,220,7
+2025-06-30,HSE West and North West,221,205,426,7
+2025-07-07,HSE Dublin and Midlands,171,17,188,7
+2025-07-07,HSE Dublin and North East,178,0,178,7
+2025-07-07,HSE Dublin and South East,154,47,201,7
+2025-07-07,HSE Mid West,70,205,275,7
+2025-07-07,HSE South West,186,61,247,7
+2025-07-07,HSE West and North West,185,164,349,7
+2025-07-14,HSE Dublin and Midlands,175,39,214,7
+2025-07-14,HSE Dublin and North East,181,0,181,7
+2025-07-14,HSE Dublin and South East,192,48,240,7
+2025-07-14,HSE Mid West,81,241,322,7
+2025-07-14,HSE South West,144,39,183,7
+2025-07-14,HSE West and North West,282,255,537,7
+2025-07-21,HSE Dublin and Midlands,162,34,196,7
+2025-07-21,HSE Dublin and North East,201,0,201,7
+2025-07-21,HSE Dublin and South East,157,53,210,7
+2025-07-21,HSE Mid West,79,276,355,7
+2025-07-21,HSE South West,188,53,241,7
+2025-07-21,HSE West and North West,277,265,542,7
+2025-07-28,HSE Dublin and Midlands,195,23,218,7
+2025-07-28,HSE Dublin and North East,113,0,113,7
+2025-07-28,HSE Dublin and South East,154,31,185,7
+2025-07-28,HSE Mid West,93,297,390,7
+2025-07-28,HSE South West,193,41,234,7
+2025-07-28,HSE West and North West,287,240,527,7
+2025-08-04,HSE Dublin and Midlands,175,26,201,7
+2025-08-04,HSE Dublin and North East,158,0,158,7
+2025-08-04,HSE Dublin and South East,178,16,194,7
+2025-08-04,HSE Mid West,66,214,280,7
+2025-08-04,HSE South West,136,35,171,7
+2025-08-04,HSE West and North West,282,181,463,7
+2025-08-11,HSE Dublin and Midlands,233,39,272,7
+2025-08-11,HSE Dublin and North East,220,0,220,7
+2025-08-11,HSE Dublin and South East,201,26,227,7
+2025-08-11,HSE Mid West,57,173,230,7
+2025-08-11,HSE South West,173,45,218,7
+2025-08-11,HSE West and North West,334,254,588,7
+2025-08-18,HSE Dublin and Midlands,152,2,154,7
+2025-08-18,HSE Dublin and North East,221,0,221,7
+2025-08-18,HSE Dublin and South East,225,51,276,7
+2025-08-18,HSE Mid West,107,280,387,7
+2025-08-18,HSE South West,137,63,200,7
+2025-08-18,HSE West and North West,357,269,626,7
+2025-08-25,HSE Dublin and Midlands,268,9,277,7
+2025-08-25,HSE Dublin and North East,193,0,193,7
+2025-08-25,HSE Dublin and South East,192,61,249,7
+2025-08-25,HSE Mid West,96,284,380,7
+2025-08-25,HSE South West,215,51,266,7
+2025-08-25,HSE West and North West,346,258,604,7
+2025-09-01,HSE Dublin and Midlands,262,11,273,7
+2025-09-01,HSE Dublin and North East,182,0,182,7
+2025-09-01,HSE Dublin and South East,170,60,230,7
+2025-09-01,HSE Mid West,95,288,383,7
+2025-09-01,HSE South West,271,73,344,7
+2025-09-01,HSE West and North West,323,219,542,7
+2025-09-08,HSE Dublin and Midlands,189,5,194,7
+2025-09-08,HSE Dublin and North East,207,0,207,7
+2025-09-08,HSE Dublin and South East,225,90,315,7
+2025-09-08,HSE Mid West,78,251,329,7
+2025-09-08,HSE South West,160,72,232,7
+2025-09-08,HSE West and North West,365,287,652,7
+2025-09-15,HSE Dublin and Midlands,203,9,212,7
+2025-09-15,HSE Dublin and North East,210,0,210,7
+2025-09-15,HSE Dublin and South East,235,112,347,7
+2025-09-15,HSE Mid West,82,285,367,7
+2025-09-15,HSE South West,195,38,233,7
+2025-09-15,HSE West and North West,313,238,551,7
+2025-09-22,HSE Dublin and Midlands,180,4,184,7
+2025-09-22,HSE Dublin and North East,224,0,224,7
+2025-09-22,HSE Dublin and South East,181,54,235,7
+2025-09-22,HSE Mid West,93,292,385,7
+2025-09-22,HSE South West,238,77,315,7
+2025-09-22,HSE West and North West,158,152,310,7
+2025-09-29,HSE Dublin and Midlands,242,19,261,7
+2025-09-29,HSE Dublin and North East,273,9,282,7
+2025-09-29,HSE Dublin and South East,170,37,207,7
+2025-09-29,HSE Mid West,134,308,442,7
+2025-09-29,HSE South West,251,85,336,7
+2025-09-29,HSE West and North West,197,205,402,7
+2025-10-06,HSE Dublin and Midlands,215,51,266,7
+2025-10-06,HSE Dublin and North East,195,0,195,7
+2025-10-06,HSE Dublin and South East,210,59,269,7
+2025-10-06,HSE Mid West,82,206,288,7
+2025-10-06,HSE South West,294,92,386,7
+2025-10-06,HSE West and North West,286,237,523,7
+2025-10-13,HSE Dublin and Midlands,136,51,187,7
+2025-10-13,HSE Dublin and North East,148,0,148,7
+2025-10-13,HSE Dublin and South East,185,102,287,7
+2025-10-13,HSE Mid West,54,132,186,7
+2025-10-13,HSE South West,342,78,420,7
+2025-10-13,HSE West and North West,189,174,363,7
+2025-10-20,HSE Dublin and Midlands,164,21,185,7
+2025-10-20,HSE Dublin and North East,152,0,152,7
+2025-10-20,HSE Dublin and South East,189,89,278,7
+2025-10-20,HSE Mid West,49,105,154,7
+2025-10-20,HSE South West,262,58,320,7
+2025-10-20,HSE West and North West,258,165,423,7
+2025-10-27,HSE Dublin and Midlands,222,23,245,7
+2025-10-27,HSE Dublin and North East,173,0,173,7
+2025-10-27,HSE Dublin and South East,216,49,265,7
+2025-10-27,HSE Mid West,58,118,176,7
+2025-10-27,HSE South West,317,59,376,7
+2025-10-27,HSE West and North West,207,158,365,7
+2025-11-03,HSE Dublin and Midlands,277,19,296,7
+2025-11-03,HSE Dublin and North East,245,0,245,7
+2025-11-03,HSE Dublin and South East,289,144,433,7
+2025-11-03,HSE Mid West,63,112,175,7
+2025-11-03,HSE South West,326,133,459,7
+2025-11-03,HSE West and North West,276,216,492,7
+2025-11-10,HSE Dublin and Midlands,285,44,329,7
+2025-11-10,HSE Dublin and North East,250,1,251,7
+2025-11-10,HSE Dublin and South East,268,107,375,7
+2025-11-10,HSE Mid West,51,132,183,7
+2025-11-10,HSE South West,163,63,226,7
+2025-11-10,HSE West and North West,237,228,465,7
+2025-11-17,HSE Dublin and Midlands,265,29,294,7
+2025-11-17,HSE Dublin and North East,224,0,224,7
+2025-11-17,HSE Dublin and South East,109,39,148,7
+2025-11-17,HSE Mid West,19,62,81,7
+2025-11-17,HSE South West,212,94,306,7
+2025-11-17,HSE West and North West,218,199,417,7
+2025-11-24,HSE Dublin and Midlands,346,43,389,7
+2025-11-24,HSE Dublin and North East,249,0,249,7
+2025-11-24,HSE Dublin and South East,265,61,326,7
+2025-11-24,HSE Mid West,51,144,195,7
+2025-11-24,HSE South West,260,78,338,7
+2025-11-24,HSE West and North West,276,204,480,7
+2025-12-01,HSE Dublin and Midlands,349,36,385,7
+2025-12-01,HSE Dublin and North East,334,0,334,7
+2025-12-01,HSE Dublin and South East,252,38,290,7
+2025-12-01,HSE Mid West,86,189,275,7
+2025-12-01,HSE South West,335,63,398,7
+2025-12-01,HSE West and North West,241,171,412,7
+2025-12-08,HSE Dublin and Midlands,379,55,434,7
+2025-12-08,HSE Dublin and North East,327,0,327,7
+2025-12-08,HSE Dublin and South East,226,54,280,7
+2025-12-08,HSE Mid West,58,146,204,7
+2025-12-08,HSE South West,288,105,393,7
+2025-12-08,HSE West and North West,350,219,569,7
+2025-12-15,HSE Dublin and Midlands,230,34,264,7
+2025-12-15,HSE Dublin and North East,187,0,187,7
+2025-12-15,HSE Dublin and South East,153,10,163,7
+2025-12-15,HSE Mid West,37,92,129,7
+2025-12-15,HSE South West,192,42,234,7
+2025-12-15,HSE West and North West,241,166,407,7
+2025-12-22,HSE Dublin and Midlands,33,0,33,7
+2025-12-22,HSE Dublin and North East,21,0,21,7
+2025-12-22,HSE Dublin and South East,90,10,100,7
+2025-12-22,HSE Mid West,14,29,43,7
+2025-12-22,HSE South West,103,3,106,7
+2025-12-22,HSE West and North West,71,40,111,7
+2025-12-29,HSE Dublin and Midlands,99,0,99,7
+2025-12-29,HSE Dublin and North East,56,0,56,7
+2025-12-29,HSE Dublin and South East,131,10,141,7
+2025-12-29,HSE Mid West,12,15,27,7
+2025-12-29,HSE South West,240,52,292,7
+2025-12-29,HSE West and North West,173,85,258,7
+2026-01-05,HSE Dublin and Midlands,254,28,282,7
+2026-01-05,HSE Dublin and North East,325,0,325,7
+2026-01-05,HSE Dublin and South East,245,71,316,7
+2026-01-05,HSE Mid West,75,237,312,7
+2026-01-05,HSE South West,476,207,683,7
+2026-01-05,HSE West and North West,462,304,766,7
+2026-01-12,HSE Dublin and Midlands,453,52,505,7
+2026-01-12,HSE Dublin and North East,311,0,311,7
+2026-01-12,HSE Dublin and South East,297,123,420,7
+2026-01-12,HSE Mid West,100,308,408,7
+2026-01-12,HSE South West,423,204,627,7
+2026-01-12,HSE West and North West,341,263,604,7
+2026-01-19,HSE Dublin and Midlands,393,70,463,7
+2026-01-19,HSE Dublin and North East,280,0,280,7
+2026-01-19,HSE Dublin and South East,281,83,364,7
+2026-01-19,HSE Mid West,92,345,437,7
+2026-01-19,HSE South West,268,84,352,7
+2026-01-19,HSE West and North West,447,318,765,7
+2026-01-26,HSE Dublin and Midlands,323,40,363,7
+2026-01-26,HSE Dublin and North East,259,0,259,7
+2026-01-26,HSE Dublin and South East,270,105,375,7
+2026-01-26,HSE Mid West,91,292,383,7
+2026-01-26,HSE South West,281,97,378,7
+2026-01-26,HSE West and North West,353,283,636,7
+2026-02-02,HSE Dublin and Midlands,364,79,443,7
+2026-02-02,HSE Dublin and North East,261,0,261,7
+2026-02-02,HSE Dublin and South East,331,131,462,7
+2026-02-02,HSE Mid West,103,303,406,7
+2026-02-02,HSE South West,362,167,529,7
+2026-02-02,HSE West and North West,383,325,708,7
+2026-02-09,HSE Dublin and Midlands,322,59,381,7
+2026-02-09,HSE Dublin and North East,322,0,322,7
+2026-02-09,HSE Dublin and South East,326,139,465,7
+2026-02-09,HSE Mid West,117,248,365,7
+2026-02-09,HSE South West,366,191,557,7
+2026-02-09,HSE West and North West,370,309,679,7
+2026-02-16,HSE Dublin and Midlands,257,45,302,7
+2026-02-16,HSE Dublin and North East,218,0,218,7
+2026-02-16,HSE Dublin and South East,265,90,355,7
+2026-02-16,HSE Mid West,81,252,333,7
+2026-02-16,HSE South West,289,110,399,7
+2026-02-16,HSE West and North West,326,283,609,7
+2026-02-23,HSE Dublin and Midlands,292,47,339,7
+2026-02-23,HSE Dublin and North East,228,0,228,7
+2026-02-23,HSE Dublin and South East,349,100,449,7
+2026-02-23,HSE Mid West,67,244,311,7
+2026-02-23,HSE South West,326,126,452,7
+2026-02-23,HSE West and North West,348,306,654,7
+2026-03-02,HSE Dublin and Midlands,354,39,393,7
+2026-03-02,HSE Dublin and North East,216,0,216,7
+2026-03-02,HSE Dublin and South East,233,56,289,7
+2026-03-02,HSE Mid West,60,204,264,7
+2026-03-02,HSE South West,400,139,539,7
+2026-03-02,HSE West and North West,297,256,553,7
+2026-03-09,HSE Dublin and Midlands,282,10,292,7
+2026-03-09,HSE Dublin and North East,144,0,144,7
+2026-03-09,HSE Dublin and South East,293,77,370,7
+2026-03-09,HSE Mid West,32,163,195,7
+2026-03-09,HSE South West,402,124,526,7
+2026-03-09,HSE West and North West,269,229,498,7
+2026-03-16,HSE Dublin and Midlands,312,18,330,7
+2026-03-16,HSE Dublin and North East,172,0,172,7
+2026-03-16,HSE Dublin and South East,250,45,295,7
+2026-03-16,HSE Mid West,32,109,141,7
+2026-03-16,HSE South West,323,65,388,7
+2026-03-16,HSE West and North West,190,236,426,7
+2026-03-23,HSE Dublin and Midlands,407,38,445,7
+2026-03-23,HSE Dublin and North East,291,0,291,7
+2026-03-23,HSE Dublin and South East,278,67,345,7
+2026-03-23,HSE Mid West,81,259,340,7
+2026-03-23,HSE South West,285,133,418,7
+2026-03-23,HSE West and North West,255,241,496,7
+2026-03-30,HSE Dublin and Midlands,306,33,339,7
+2026-03-30,HSE Dublin and North East,226,0,226,7
+2026-03-30,HSE Dublin and South East,219,49,268,7
+2026-03-30,HSE Mid West,60,247,307,7
+2026-03-30,HSE South West,344,143,487,7
+2026-03-30,HSE West and North West,255,221,476,7

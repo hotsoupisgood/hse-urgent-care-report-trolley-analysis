@@ -28,9 +28,9 @@ class Model(BaseModel):
               mu[i,t] <- alpha[i] +
                          beta[i]      * cos((2 * pi) * (t/52)) +
                          gamma[i]     * sin((2 * pi) * (t/52)) +
-                         sigma_pre   * fr_pre[t]  * mw[i] +
-                         sigma_mid   * fr_mid[t]  * mw[i] +
-                         sigma_post  * fr_post[t] * mw[i]
+                         psi_pre   * fr_pre[t]  * mw[i] +
+                         psi_mid   * fr_mid[t]  * mw[i] +
+                         psi_post  * fr_post[t] * mw[i]
             }
             fullmod[i,1] <- mu[i,1]
             for(t in 2:T){
@@ -45,16 +45,16 @@ class Model(BaseModel):
             tau[i]   ~ dgamma(0.001, 0.001)
           }
           phi ~ dunif(-1, 1)
-          sigma_pre  ~ dnorm(0, 0.001)
-          sigma_mid  ~ dnorm(0, 0.001)
-          sigma_post ~ dnorm(0, 0.001)
+          psi_pre  ~ dnorm(0, 0.001)
+          psi_mid  ~ dnorm(0, 0.001)
+          psi_post ~ dnorm(0, 0.001)
         }
         """
 
     @property
     def monitor_params(self):
         return ['alpha', 'beta', 'gamma', 'tau', 'phi',
-                'sigma_pre', 'sigma_mid', 'sigma_post',
+                'psi_pre', 'psi_mid', 'psi_post',
                 'mu', 'fullmod', 'resid']
 
     def jags_data(self, y, n_region, n_weeks, regions):

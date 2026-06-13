@@ -31,9 +31,9 @@ class Model(BaseModel):
                          delta_pre[i]  * ny_pre[t]  +
                          delta_mid[i]  * ny_mid[t]  +
                          delta_post[i] * ny_post[t] +
-                         sigma_pre    * fr2_pre[t]  * mw[i] +
-                         sigma_mid    * fr2_mid[t]  * mw[i] +
-                         sigma_post   * fr2_post[t] * mw[i]
+                         psi_pre    * fr2_pre[t]  * mw[i] +
+                         psi_mid    * fr2_mid[t]  * mw[i] +
+                         psi_post   * fr2_post[t] * mw[i]
             }
             fullmod[i,1] <- mu[i,1]
             for(t in 2:T){
@@ -51,9 +51,9 @@ class Model(BaseModel):
             delta_post[i] ~ dnorm(0, 0.001)
           }
           phi        ~ dunif(-1, 1)
-          sigma_pre  ~ dnorm(0, 0.001)
-          sigma_mid  ~ dnorm(0, 0.001)
-          sigma_post ~ dnorm(0, 0.001)
+          psi_pre  ~ dnorm(0, 0.001)
+          psi_mid  ~ dnorm(0, 0.001)
+          psi_post ~ dnorm(0, 0.001)
         }
         """
 
@@ -61,7 +61,7 @@ class Model(BaseModel):
     def monitor_params(self):
         return ['alpha', 'beta', 'gamma', 'tau', 'phi',
                 'delta_pre', 'delta_mid', 'delta_post',
-                'sigma_pre', 'sigma_mid', 'sigma_post',
+                'psi_pre', 'psi_mid', 'psi_post',
                 'mu', 'fullmod', 'resid']
 
     def jags_data(self, y, n_region, n_weeks, regions):

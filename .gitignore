@@ -44,3 +44,8 @@ May_Presentation/tables/*.tex
 thesis/ThesisDraft_v*_files
 
 May_Presentation/tables/rendered
+
+# D3 viz experiment
+viz/
+_*
+tmp*

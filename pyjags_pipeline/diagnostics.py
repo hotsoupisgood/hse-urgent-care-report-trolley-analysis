@@ -101,7 +101,7 @@ def trace_with_dist(pyjags_samples, var_names, save_dir=None, frac=0.1):
             for i, (label, data) in enumerate(panels):
                 fig, axes = plt.subplots(
                     1, 2,
-                    figsize=(12, 3),
+                    figsize=(12, 2),
                     gridspec_kw={'width_ratios': [3, 1]},
                     layout='constrained',
                 )
@@ -113,7 +113,7 @@ def trace_with_dist(pyjags_samples, var_names, save_dir=None, frac=0.1):
         for i, (label, data) in enumerate(panels):
             fig, axes = plt.subplots(
                 1, 2,
-                figsize=(12, 3),
+                figsize=(12, 2),
                 gridspec_kw={'width_ratios': [3, 1]},
                 layout='constrained',
             )

@@ -625,7 +625,7 @@ def _load_version_ranks(scale, version):
 
 
 def _load_ranks_table():
-    """Load ranks.csv for v4.1 across all three scales; return a merged DataFrame."""
+    """Load ranks.csv for v3.1 across all three scales; return a merged DataFrame."""
     base = os.path.join(os.path.dirname(__file__), "..", "data", "models")
     frames = {}
     for key, folder in _SCALE_DATA_DIRS.items():

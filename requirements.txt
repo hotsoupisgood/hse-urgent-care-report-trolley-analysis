@@ -2,6 +2,7 @@ pandas
 requests
 beautifulsoup4
 lxml
+html5lib
 numpy
 pyjags
 nbformat>=4.2.0

@@ -197,9 +197,9 @@ y_{i,t} \sim \mathcal{N}\!\left(\mu_{i,t} + \mathcal{E}^{1}_{i,t},\ \tau_i^{-1}\
 <p>The Mid West reset captures a three week window around August 8th 2024, where numerous cases were deferred.</p>
 <p><span class="math display">\[\begin{equation}
 \begin{aligned}
-\mathcal{W}_{i,t} = \mathbf{1}(i = \text{HSE Mid West})\cdot\bigl(&amp;\sigma_{\text{pre}}\,\mathbf{1}(t = 86) \\
-  +\,&amp;\sigma_{\text{mid}}\,\mathbf{1}(t = 87) \\
-  +\,&amp;\sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)
+\mathcal{W}_{i,t} = \mathbf{1}(i = \text{HSE Mid West})\cdot\bigl(&amp;\psi_{\text{pre}}\,\mathbf{1}(t = 86) \\
+  +\,&amp;\psi_{\text{mid}}\,\mathbf{1}(t = 87) \\
+  +\,&amp;\psi_{\text{post}}\,\mathbf{1}(t = 88)\bigr)
 \end{aligned}
 \label{eq:base-mwreset}
 \end{equation}\]</span></p>
@@ -383,9 +383,9 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
            &amp;\quad + \delta_{\text{pre},i}\,\mathbf{1}(t \bmod 52 = 0)
               + \delta_{\text{mid},i}\,\mathbf{1}(t \bmod 52 = 1)
               + \delta_{\text{post},i}\,\mathbf{1}(t \bmod 52 = 2) \\[4pt]
-           &amp;\quad + \bigl(\sigma_{\text{pre}}\,\mathbf{1}(t = 86)
-              + \sigma_{\text{mid}}\,\mathbf{1}(t = 87)
-              + \sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
+           &amp;\quad + \bigl(\psi_{\text{pre}}\,\mathbf{1}(t = 86)
+              + \psi_{\text{mid}}\,\mathbf{1}(t = 87)
+              + \psi_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
 y_{i,1} &amp;\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
 y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t &gt; 1
 \end{aligned}
@@ -395,7 +395,7 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
 \begin{aligned}
 \alpha_i,\ \beta_i,\ \gamma_i &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
-\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\psi_{\text{pre}},\ \psi_{\text{mid}},\ \psi_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
 \phi   &amp;\sim \mathrm{Uniform}(-1,\ 1)
 \end{aligned}
@@ -468,9 +468,9 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
 \mu_{i,t} &amp;= \alpha_i
               + \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right)
               + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right) \\[4pt]
-           &amp;\quad + \bigl(\sigma_{\text{pre}}\,\mathbf{1}(t = 86)
-              + \sigma_{\text{mid}}\,\mathbf{1}(t = 87)
-              + \sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
+           &amp;\quad + \bigl(\psi_{\text{pre}}\,\mathbf{1}(t = 86)
+              + \psi_{\text{mid}}\,\mathbf{1}(t = 87)
+              + \psi_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
 y_{i,1} &amp;\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
 y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t &gt; 1
 \end{aligned}
@@ -479,7 +479,7 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
 <p><span class="math display">\[
 \begin{aligned}
 \alpha_i,\ \beta_i,\ \gamma_i &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
-\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\psi_{\text{pre}},\ \psi_{\text{mid}},\ \psi_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
 \phi   &amp;\sim \mathrm{Uniform}(-1,\ 1)
 \end{aligned}
@@ -501,9 +501,9 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
            &amp;\quad + \delta_{\text{pre},i}\,\mathbf{1}(t \bmod 52 = 0)
               + \delta_{\text{mid},i}\,\mathbf{1}(t \bmod 52 = 1)
               + \delta_{\text{post},i}\,\mathbf{1}(t \bmod 52 = 2) \\[4pt]
-           &amp;\quad + \bigl(\sigma_{\text{pre}}\,\mathbf{1}(t = 86)
-              + \sigma_{\text{mid}}\,\mathbf{1}(t = 87)
-              + \sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
+           &amp;\quad + \bigl(\psi_{\text{pre}}\,\mathbf{1}(t = 86)
+              + \psi_{\text{mid}}\,\mathbf{1}(t = 87)
+              + \psi_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
 y_{i,1} &amp;\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
 y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t &gt; 1
 \end{aligned}
@@ -513,7 +513,7 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
 \begin{aligned}
 \alpha_i,\ \beta_i,\ \gamma_i,\ \beta_{2,i},\ \gamma_{2,i} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
-\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\psi_{\text{pre}},\ \psi_{\text{mid}},\ \psi_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
 \phi   &amp;\sim \mathrm{Uniform}(-1,\ 1)
 \end{aligned}
@@ -535,9 +535,9 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
            &amp;\quad + \delta_{\text{pre},i}\,\mathbf{1}(t \bmod 52 = 0)
               + \delta_{\text{mid},i}\,\mathbf{1}(t \bmod 52 = 1)
               + \delta_{\text{post},i}\,\mathbf{1}(t \bmod 52 = 2) \\[4pt]
-           &amp;\quad + \bigl(\sigma_{\text{pre}}\,\mathbf{1}(t = 86)
-              + \sigma_{\text{mid}}\,\mathbf{1}(t = 87)
-              + \sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
+           &amp;\quad + \bigl(\psi_{\text{pre}}\,\mathbf{1}(t = 86)
+              + \psi_{\text{mid}}\,\mathbf{1}(t = 87)
+              + \psi_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
 y_{i,1} &amp;\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
 y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1}),\ \tau_i^{-1}\right), \quad t &gt; 1
 \end{aligned}
@@ -547,7 +547,7 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
 \begin{aligned}
 \alpha_i,\ \beta_i,\ \gamma_i,\ \beta_{2,i},\ \gamma_{2,i} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
-\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\psi_{\text{pre}},\ \psi_{\text{mid}},\ \psi_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
 \phi   &amp;\sim \mathrm{Uniform}(-1,\ 1)
 \end{aligned}
@@ -567,9 +567,9 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi\,(y_{i,t-1} - \mu_{i,t-1})
            &amp;\quad + \delta_{\text{pre},i}\,\mathbf{1}(t \bmod 52 = 0)
               + \delta_{\text{mid},i}\,\mathbf{1}(t \bmod 52 = 1)
               + \delta_{\text{post},i}\,\mathbf{1}(t \bmod 52 = 2) \\[4pt]
-           &amp;\quad + \bigl(\sigma_{\text{pre}}\,\mathbf{1}(t = 86)
-              + \sigma_{\text{mid}}\,\mathbf{1}(t = 87)
-              + \sigma_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
+           &amp;\quad + \bigl(\psi_{\text{pre}}\,\mathbf{1}(t = 86)
+              + \psi_{\text{mid}}\,\mathbf{1}(t = 87)
+              + \psi_{\text{post}}\,\mathbf{1}(t = 88)\bigr)\cdot\mathrm{mw}_i \\[4pt]
 y_{i,1} &amp;\sim \mathcal{N}(\mu_{i,1},\ \tau_i^{-1}) \\[4pt]
 y_{i,2} &amp;\sim \mathcal{N}\!\left(\mu_{i,2} + \phi_1\,(y_{i,1} - \mu_{i,1}),\ \tau_i^{-1}\right) \\[4pt]
 y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi_1\,(y_{i,t-1} - \mu_{i,t-1})
@@ -581,7 +581,7 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi_1\,(y_{i,t-1} - \mu_{i,t-1
 \begin{aligned}
 \alpha_i,\ \beta_i,\ \gamma_i &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \delta_{\text{pre},i},\ \delta_{\text{mid},i},\ \delta_{\text{post},i} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
-\sigma_{\text{pre}},\ \sigma_{\text{mid}},\ \sigma_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
+\psi_{\text{pre}},\ \psi_{\text{mid}},\ \psi_{\text{post}} &amp;\sim \mathcal{N}(0,\ 0.001) \\[4pt]
 \tau_i &amp;\sim \Gamma(0.001,\ 0.001) \\[4pt]
 \phi_1,\ \phi_2 &amp;\sim \mathcal{N}(0,\ 0.01)
 \end{aligned}
@@ -606,43 +606,43 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi_1\,(y_{i,t-1} - \mu_{i,t-1
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">v4.1</td>
-<td style="text-align: left;">V3.1 + Partial Pooling</td>
-<td style="text-align: right;">19858.4</td>
-<td style="text-align: right;">79.8</td>
-<td style="text-align: right;">19938.1</td>
+<td style="text-align: left;">v2.5</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle + Regional New Year + MW Reset</td>
+<td style="text-align: right;">19897.6</td>
+<td style="text-align: right;">79.6</td>
+<td style="text-align: right;">19977.2</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">v2.1</td>
-<td style="text-align: left;">V1.1 + Global New Year</td>
-<td style="text-align: right;">19920.3</td>
-<td style="text-align: right;">54.9</td>
-<td style="text-align: right;">19975.3</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle + Regional New Year + MW Reset</td>
+<td style="text-align: right;">19899.9</td>
+<td style="text-align: right;">79.4</td>
+<td style="text-align: right;">19979.3</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">v3.1</td>
-<td style="text-align: left;">V2.2 + Mid West Reset</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle + Regional New Year + MW Reset + 2-Month Cycle</td>
 <td style="text-align: right;">19899.9</td>
 <td style="text-align: right;">79.4</td>
 <td style="text-align: right;">19979.3</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">v2.2</td>
-<td style="text-align: left;">V1.1 + Regional New Year</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle + Global New Year</td>
 <td style="text-align: right;">19908.3</td>
 <td style="text-align: right;">77.4</td>
 <td style="text-align: right;">19985.7</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">v2.3</td>
-<td style="text-align: left;">V1.1 + Mid West Reset</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle + Regional New Year</td>
 <td style="text-align: right;">20169.5</td>
 <td style="text-align: right;">50.4</td>
 <td style="text-align: right;">20219.9</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">v1.1</td>
-<td style="text-align: left;">V0.1 + Annual Cycle</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle</td>
 <td style="text-align: right;">20176.0</td>
 <td style="text-align: right;">48.6</td>
 <td style="text-align: right;">20224.6</td>
@@ -663,7 +663,7 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi_1\,(y_{i,t-1} - \mu_{i,t-1
 </tr>
 <tr class="odd">
 <td style="text-align: left;">v0.1</td>
-<td style="text-align: left;">AR(1) Only</td>
+<td style="text-align: left;">Baseline + AR(1)</td>
 <td style="text-align: right;">20253.9</td>
 <td style="text-align: right;">27.0</td>
 <td style="text-align: right;">20280.9</td>
@@ -707,43 +707,43 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi_1\,(y_{i,t-1} - \mu_{i,t-1
 </thead>
 <tbody>
 <tr class="odd">
+<td style="text-align: left;">v2.5</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle + Regional New Year + MW Reset</td>
+<td style="text-align: right;">11432.2</td>
+<td style="text-align: right;">93.1</td>
+<td style="text-align: right;">11525.3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">v2.1</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle + Regional New Year + MW Reset</td>
+<td style="text-align: right;">11448.9</td>
+<td style="text-align: right;">93.0</td>
+<td style="text-align: right;">11541.9</td>
+</tr>
+<tr class="odd">
 <td style="text-align: left;">v3.1</td>
-<td style="text-align: left;">V2.2 + Mid West Reset</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle + Regional New Year + MW Reset + 2-Month Cycle</td>
 <td style="text-align: right;">11448.9</td>
 <td style="text-align: right;">93.0</td>
 <td style="text-align: right;">11541.9</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">v4.1</td>
-<td style="text-align: left;">V3.1 + Partial Pooling</td>
-<td style="text-align: right;">11449.1</td>
-<td style="text-align: right;">93.3</td>
-<td style="text-align: right;">11542.4</td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">v2.2</td>
-<td style="text-align: left;">V1.1 + Regional New Year</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle + Global New Year</td>
 <td style="text-align: right;">11470.0</td>
 <td style="text-align: right;">87.3</td>
 <td style="text-align: right;">11557.3</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">v2.1</td>
-<td style="text-align: left;">V1.1 + Global New Year</td>
-<td style="text-align: right;">11510.1</td>
-<td style="text-align: right;">57.2</td>
-<td style="text-align: right;">11567.3</td>
-</tr>
 <tr class="odd">
 <td style="text-align: left;">v2.3</td>
-<td style="text-align: left;">V1.1 + Mid West Reset</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle + Regional New Year</td>
 <td style="text-align: right;">11738.6</td>
 <td style="text-align: right;">56.7</td>
 <td style="text-align: right;">11795.3</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">v1.1</td>
-<td style="text-align: left;">V0.1 + Annual Cycle</td>
+<td style="text-align: left;">Baseline + AR(1) + Annual Cycle</td>
 <td style="text-align: right;">11756.7</td>
 <td style="text-align: right;">51.0</td>
 <td style="text-align: right;">11807.7</td>
@@ -764,7 +764,7 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi_1\,(y_{i,t-1} - \mu_{i,t-1
 </tr>
 <tr class="odd">
 <td style="text-align: left;">v0.1</td>
-<td style="text-align: left;">AR(1) Only</td>
+<td style="text-align: left;">Baseline + AR(1)</td>
 <td style="text-align: right;">11828.7</td>
 <td style="text-align: right;">26.6</td>
 <td style="text-align: right;">11855.3</td>
@@ -802,9 +802,252 @@ y_{i,t} &amp;\sim \mathcal{N}\!\left(\mu_{i,t} + \phi_1\,(y_{i,t-1} - \mu_{i,t-1
 <h2 class="anchored" data-anchor-id="app:mu-plots">Posterior Mean Fit</h2>
 <p></p>
 </section>
-<section id="app:gelman" class="level2">
-<h2 class="anchored" data-anchor-id="app:gelman">Gelman-Rubin Convergence Summary</h2>
-<p></p>
+<section id="app:traces" class="level2">
+<h2 class="anchored" data-anchor-id="app:traces">Trace Plots and Convergence</h2>
+<p>We illustrate MCMC convergence with the v2.1 fit (response scaled per 10,000 catchment population). Trace plots are shown for the region-specific parameters of HSE Dublin and Midlands (<span class="math inline">\(i=1\)</span>) plus the global AR(1) coefficient <span class="math inline">\(\phi\)</span>. The four chains are well mixed, hairy, and overlap throughout sampling; the marginal densities (right) coincide across chains.</p>
+<p>The Gelman-Rubin <span class="math inline">\(\hat{R}\)</span> for every monitored scalar is reported in Table <span class="math inline">\(\ref{tab:gelman-v2-1}\)</span>. All values sit at or below 1.001, well under the conventional 1.1 threshold <span class="citation" data-cites="gelman_inference_1992">(<a href="#ref-gelman_inference_1992" role="doc-biblioref"><strong>gelman_inference_1992?</strong></a>)</span>, indicating between-chain variance is negligible relative to within-chain variance.</p>
+<table class="table caption-top">
+<caption>Gelman-Rubin $\hat{R}$ for all monitored scalar parameters of model v2.1.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Parameter</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Point est.</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Upper C.I.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">phi</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta[1]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">beta[2]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta[3]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">beta[4]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">beta[5]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">beta[6]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">gamma[1]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">gamma[2]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">gamma[3]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">gamma[4]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">gamma[5]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">gamma[6]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">delta_mid[1]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">delta_mid[2]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">delta_mid[3]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">delta_mid[4]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">delta_mid[5]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">delta_mid[6]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">psi_mid</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">psi_pre</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">delta_pre[1]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">delta_pre[2]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">delta_pre[3]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">delta_pre[4]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">delta_pre[5]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">delta_pre[6]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">alpha[1]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">alpha[2]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">alpha[3]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">alpha[4]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">alpha[5]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">alpha[6]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tau[1]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">tau[2]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tau[3]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">tau[4]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">tau[5]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">tau[6]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">psi_post</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">delta_post[1]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">delta_post[2]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">delta_post[3]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">delta_post[4]</td>
+<td style="text-align: right;">1.0001</td>
+<td style="text-align: right;">1.0001</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">delta_post[5]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">delta_post[6]</td>
+<td style="text-align: right;">1.0000</td>
+<td style="text-align: right;">1.0000</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="app:posteriors" class="level2">
 <h2 class="anchored" data-anchor-id="app:posteriors">Posterior Parameter Estimates</h2>

@@ -1,0 +1,1571 @@
+---
+output:
+  bookdown::pdf_document2:
+    toc: no
+    number_sections: true
+  bookdown::html_document2:
+    number_sections: true
+bibliography: thesis.bib
+csl: apa.csl
+header-includes:
+  - \usepackage{amsmath, amssymb}
+  - \usepackage{graphicx}
+  - \usepackage{float}
+  - \usepackage{placeins}
+  - \usepackage{booktabs}
+  - \usepackage{xcolor}
+  - \usepackage{caption}
+  - \captionsetup[table]{position=below,skip=6pt}
+  - \usepackage{tikz}
+  - \usetikzlibrary{arrows.meta,positioning,shadows,calc}
+  - \setlength{\parindent}{1.5em}
+  - \usepackage{indentfirst}
+---
+
+\begin{titlepage}
+\begin{center}
+	\includegraphics[width=7cm]{./logo.jpg}
+\vspace{0.5in}
+
+	\LARGE{MSc Thesis for Health Data Science}
+
+	\Huge{A Bayesian Time-Series Framework for Comparing On Trolley Counts Across Irish HSE Health Regions}
+
+	\Large{Lucas Henry, Evan Bergin}
+
+	\Large{Supervisors: Dr. Carl Scarrott, Dr. John Ferguson}
+
+	\Large{XXXX 2026}
+
+\end{center}
+\end{titlepage}
+
+\clearpage
+\newpage
+
+\underline{Declaration}
+
+We hereby certify that this material, which we now submit for assessment on the programme of study leading to the award of Master of Science is entirely our own work and had not been taken from the work of others or Artificial Intelligence, save and to the extent that such work has been cited and acknowledged within the text of our work.
+
+ID: 25252089
+
+Date:
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+```{r setup, include=FALSE}
+fig_dir <- file.path(tempdir(), "thesis-fig/")
+dir.create(fig_dir, showWarnings = FALSE, recursive = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
+                      fig.pos = "H", out.width = "75%", fig.align = "center",
+                      fig.path = fig_dir)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(readxl)
+library(forecast)
+library(scales)
+library(patchwork)
+
+# Selected base model output directories (per 10,000 population)
+base_model <- "../data/models/wide_weekly_scaledPer10k/v4.6"   # AR(2), reported base
+ar1_model  <- "../data/models/wide_weekly_scaledPer10k/v4.5"   # AR(1), comparison only
+
+weekly <- read_csv("../data/raw data/weekly_by_region_202604082051.csv",
+                   show_col_types = FALSE) |>
+  mutate(week_start = as.Date(week_start))
+
+region_palette <- c(
+  "HSE Dublin and North East" = "#1f77b4",
+  "HSE Dublin and Midlands"   = "#ff7f0e",
+  "HSE Dublin and South East" = "#2ca02c",
+  "HSE West and North West"   = "#d62728",
+  "HSE South West"            = "#9467bd",
+  "HSE Mid West"              = "#8c564b"
+)
+
+# JAGS indexes alpha[i] etc. by the row order of the model input CSV
+# (regions are rows, dates are columns). Derive that ordering once so
+# downstream chunks can map index -> region.
+region_by_idx <- read_csv(
+  "../data/wide_weekly_scaledPer10k.csv",
+  col_select = 1, show_col_types = FALSE
+)[[1]]
+idx_by_region <- setNames(seq_along(region_by_idx), region_by_idx)
+```
+
+# Introduction \label{chap:intro}
+
+# Data \label{chap:data}
+This section covers the data used in the analysis: the sourcing of the raw data, the scraping process, the preparation of the data for modelling, and the exploration of the series to identify the features the model must capture. Sourcing the raw data involves understanding how the data can be extracted, how much data is available, and which of the reported metrics best measures trolley burden. The scraping process includes a description of how exactly the data is stored in the report, and how it is pulled. Data preparation is the cleaning steps and transformations that need be applied before it is ready as a model input.
+
+\begin{figure}[h]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  node distance=0.7cm,
+  box/.style={
+    rectangle, rounded corners=4pt,
+    draw=black!60, fill=gray!10,
+    text width=2.9cm, minimum height=1.1cm,
+    align=center, font=\small
+  },
+  arr/.style={->, line width=1.8pt, >=Stealth, shorten >=2pt, shorten <=2pt}
+]
+  \node[box] (src)   {Urgent \&\\ Emergency Care\\ Report};
+  \node[box, right=of src]   (db)    {Scrape to\\ raw CSV};
+  \node[box, right=of db]    (agg)   {Aggregate\\ to Weeks};
+  \node[box, right=of agg]   (scale) {Scale counts\\ to rates};
+  \node[box, right=of scale] (csv)   {CSV};
+
+  \draw[arr] (src)   -- (db);
+  \draw[arr] (db)    -- (agg);
+  \draw[arr] (agg)   -- (scale);
+  \draw[arr] (scale) -- (csv);
+\end{tikzpicture}%
+}% end resizebox
+\caption{Data pipeline from source to model input.}
+\label{fig:data-pipeline}
+\end{figure}
+
+
+## Data Sources \label{sect:data-source}
+Daily on trolley counts are sourced from the publicly available HSE Urgent and Emergency Care daily report [@HSE2026]. This report is published daily as an HTML page with no known API. The report has been published daily since 1 January 2023 and remains ongoing. This analysis uses data up to April 5th 2026. The report contains counts of patients on ED trolleys, ward trolleys, surge capacity in use, delayed transfers of care, number of total waiting over 24 hours, and number of those over 75 year olds waiting over 24 hours. Our analysis uses only the total on trolley counts; a sum of ED and ward trolleys. The total on trolley count is the most direct measure of the burden of patients on trolleys in each region, and it is the most widely reported metric in the media and by the HSE itself [@HSE2026].
+
+Region populations, age structure, and hospital discharge counts used for scaling and context are from the Central Statistics Office [-@CSO_HHR01; -@CSO_HHR02; -@CSO_FY006B; -@CSO_DHA74].
+
+## Scraping \label{sect:data-pipeline}
+Each daily report is scraped from the URL: `https://uec.hse.ie/uec/TGAR.php?EDDATE=DD%2FMM%2FYYYY`. Where `EDDATE` is the date in `DD/MM/YYYY` (day/month/year) format, with `%2F` being encoded slashes. On this report page, data is displayed in the `<table>` tag, which produces a structured HTML table. Where rows are coded inside of `<tr>` tags, and cells are coded inside `<td>` tags. The scraper extracts the date, region, and total daily on trolley count from the table, and saves it to a CSV file for further processing covered in the following section.
+
+## Preprocessing \label{sect:data-preprocessing}
+Preprocessing involves validating, cleaning, and transforming the raw daily hospital counts into the weekly regional counts. When validating the raw counts, negative observations were found. When asked, a hospital employee explained that the counts are inputted by hand, and negative values were likely due to data entry errors, and they should be positive. To correct this potential data entry error, the absolute value is calculated for these counts. 
+
+The daily counts are then summed into weekly counts, with Monday designated as the first day of the week. Hospital counts are summed into regional weekly totals and a final CSV is produced which is explored in the following section. 
+  
+
+## Exploratory Data Analysis \label{sect:data-EDA}
+The first step in exploring the preprocessed weekly trolley counts is to identify key patterns in the time series. The second step is to gather further evidence for the patterns with more rigorous plots (Figures \@ref(fig:eda-newyear), \@ref(fig:eda-midwest), \@ref(fig:eda-psd), \@ref(fig:eda-pacf)). In Figure \@ref(fig:eda-weekly-overview) each region is a different colored line. The horizontal axis is time from inception of the report (1 January 2023) to 5 April 2026. The figure suggests three key features: an annual cycle peaking near winter; a sharp dip each New Year, marked by light blue bands; and an isolated dip in HSE Mid West during August 2024, marked by the light red band (the 8--18 August reset window). Each feature is examined with supporting evidence and sources in the following paragraphs.
+
+\FloatBarrier
+
+```{r eda-weekly-overview, fig.cap="Weekly total on trolley counts by HSE region from 2023 to 2026. Light blue bands mark the New Year weeks across all regions; the light red band marks the Mid West reset window (8--18 August 2024).", fig.width=9, fig.height=4.5, fig.pos="H"}
+# set 1 week before and after ny 
+ny_anchors <- as.Date(c("2023-01-01", "2024-01-01", "2025-01-01", "2026-01-01"))
+ny_bands <- data.frame(xmin = ny_anchors - 7, xmax = ny_anchors + 7)
+# mw effect band
+mw_band <- data.frame(xmin = as.Date("2024-08-08"), xmax = as.Date("2024-08-18"))
+
+ggplot(weekly, aes(week_start, total_trolleys, color = region)) +
+  geom_rect(data = ny_bands, inherit.aes = FALSE,
+            aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+            fill = "lightblue", alpha = 0.35) +
+  geom_rect(data = mw_band, inherit.aes = FALSE,
+            aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+            fill = "lightcoral", alpha = 0.35) +
+  geom_line(linewidth = 0.5) +
+  scale_color_manual(values = region_palette) +
+  scale_x_date(date_breaks = "6 months", date_labels = "%b %Y") +
+  labs(x = NULL, y = "Weekly on trolley counts", color = "Region") +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 30, hjust = 1))
+```
+
+\FloatBarrier
+### New Year Dip \label{sect:data-EDA-nydip}
+
+Figure \@ref(fig:eda-newyear) shows the New Year dip in HSE Dublin and Midlands (a representative region) for 2024, 2025, and 2026 as traces, with the dip falling in the week before the New Year week. The dashed line at week 0 marks 1 January, and each point is positioned by its Monday's distance in weeks from that date. Because weeks start on Monday and 1 January falls on a different weekday each year, the holiday is split unevenly across adjacent weekly bins, a limitation of weekly aggregation. Notably, 2026 has the lowest dip in the series; the remaining regions follow the same pattern, except HSE Dublin and South East where 2026 has the highest dip across available years. The dip aligns with the HSE practice of discharging patients over Christmas to prepare for a January surge driven by increased respiratory illness [@department_of_health_minister_2023] and delayed hospital visits [@noauthor_hse_2026]. 
+
+```{r eda-newyear, fig.cap="New Year for HSE Dublin and Midlands, weekly total trolleys in the 8 weeks either side of 1 January for each year in the series.", fig.width=8, fig.height=3.8}
+# 2024 onward only: the 2023 New Year has no pre-Christmas 2022 data for the 8-week-before window
+ny_anchors <- as.Date(c("2024-01-01", "2025-01-01", "2026-01-01"))
+
+ny_close <- weekly |>
+  filter(region == "HSE Dublin and Midlands") |>
+  rowwise() |>
+  mutate(closest_ny = ny_anchors[which.min(abs(as.numeric(week_start - ny_anchors)))],
+         weeks_from_ny = as.numeric(week_start - closest_ny) / 7,
+         year = format(closest_ny, "%Y")) |>
+  ungroup() |>
+  filter(abs(weeks_from_ny) <= 8)
+
+ggplot(ny_close, aes(weeks_from_ny, total_trolleys, color = year)) +
+  geom_line(linewidth = 0.6) +
+  geom_point(size = 1.6) +
+  geom_vline(xintercept = 0, linetype = "dashed", alpha = 0.4) +
+  scale_x_continuous(breaks = seq(-8, 8, 2)) +
+  labs(title = "New Year dip: HSE Dublin and Midlands",
+       x = "Weeks relative to New Year", y = "Weekly on trolley counts", color = "Year") +
+  theme_minimal(base_size = 11)
+```
+
+### Mid West Reset \label{sect:data-EDA-MWReset}
+
+In contrast to the New Year dip, the Mid West dip is not observed in other regions, and does not align with a known seasonal effect. In Figure \@ref(fig:eda-midwest), the red shaded period shows the HSE Mid West region during during what is known as a reset period. In response to high demand, HSE Mid West delayed scheduled care to focus on unscheduled care from the 8th to 18th of August 2024 [@michelle_norris_et_al_advice_2025]. This reset period overlaps with the dip in on trolley counts in the Mid West region. The dip is not observed in the other regions, seen by comparing the non-Mid West grey lines in Figure \@ref(fig:eda-midwest) with the Mid West red line, suggesting the dip is from the reset rather than an effect common to all regions. While the New Year dip and Mid West reset both don't have obvious parametric forms, and will require a block effect model which will be discussed in Section \ref{sect:model-development}. In the following sections we will examine the spectral and autocorrelation properties of the series to determine how to capture these parametric effects.
+
+```{r eda-midwest, fig.cap="HSE Mid West weekly trolley totals from May to November 2024. The shaded period marks the 8--18 August Mid West reset period. The grey lines are non-Mid West regions over the same time span.", fig.width=8, fig.height=3.8}
+# mw_band (reset window) is defined in the eda-weekly-overview chunk above
+mw_window <- weekly |>
+  filter(week_start >= as.Date("2024-05-01"),
+         week_start <= as.Date("2024-11-01"))
+
+mw_df <- mw_window |> filter(region == "HSE Mid West")
+mw_others <- mw_window |> filter(region != "HSE Mid West")
+
+ggplot(mw_df, aes(week_start, total_trolleys)) +
+  geom_rect(data = mw_band, inherit.aes = FALSE,
+            aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+            fill = "lightcoral", alpha = 0.4) +
+  geom_line(data = mw_others, aes(group = region), color = "grey50",
+            linewidth = 0.4, alpha = 0.35) +
+  geom_point(data = mw_others, aes(group = region), color = "grey50",
+             size = 1.2, alpha = 0.35) +
+  geom_line(color = "firebrick", linewidth = 0.6) +
+  geom_point(color = "firebrick", size = 1.6) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
+  labs(title = "Mid West reset: Aug 2024",
+       x = NULL, y = "Weekly on trolley counts") +
+  theme_minimal(base_size = 11)
+```
+
+### Spectral Analysis \label{sect:data-EDA-PSD}
+
+The spectral analysis is performed using a power spectral density (PSD), estimated by the periodogram. The Fourier transform represents a signal as a sum of sinusoids, each with an amplitude and phase; the PSD reports the power, the squared amplitude, at each frequency and discards phase. The transform is computed via the fast Fourier transform (FFT). On the vertical axis, high power indicates a strong cycle at that frequency. The periodogram in Figure \@ref(fig:eda-psd) shows high power particularly in the 52 week period; and also spikes in power in many regions near the 26, 8, and 4 week marks. 
+
+There is high power at roughly 52 weeks and regions fit into two clusters; where HSE South West, Dublin and North East, and Dublin and Midlands group with the highest power; at the lowest power HSE Dublin and South East, Mid West, and West and North West group together. The annual cycle is the most notable cycle in the series. But given we only have three full years of New Year data (2024, 2025, and 2026) any estimates of the annual cycle will be sensitive to new data and imprecise. 
+
+In HSE West and North West there is an additional peak at around 26 weeks, made more noticeable by the region's low annual power. HSE Dublin and Midlands also has high power at 26 weeks, which is less noticeable given the region's strong annual cycle. There are additional spikes near the 8 week mark, where HSE Dublin and Midlands has the highest peaks of the regions, just before and after 8 weeks. HSE West and North West, Dublin and North East, Mid West, and South West also have peaks right after the 8 week mark. HSE Dublin and South East has a peak later, at approximately 10 weeks. The 4 week cycle is the weakest of the marked cycles. Most regions peak just above 4 weeks, with HSE West and North West and HSE Dublin and Midlands the strongest and HSE Dublin and South East the weakest. The peaks near the 4 and 8 week marks may be picking up the brief New Year dip rather than separate short cycles.
+
+```{r eda-psd, fig.cap="Periodogram of weekly trolley counts for each HSE region. Dashed lines mark reference periods at 4, 8, 26, and 52 weeks.", fig.width=8, fig.height=4}
+psd_df <- weekly |>
+  group_by(region) |>
+  group_modify(~ {
+    s <- spec.pgram(.x$total_trolleys, plot = FALSE, spans = c(3, 3))
+    data.frame(period = 1 / s$freq, power = s$spec)
+  }) |>
+  ungroup() |>
+  filter(period <= 60)
+
+ggplot(psd_df, aes(period, power, color = region)) +
+  geom_line(linewidth = 0.5) +
+  scale_color_manual(values = region_palette) +
+  geom_vline(xintercept = c(4, 8, 26, 52), linetype = "dashed", alpha = 0.5) +
+  annotate("text", x = c(4, 8, 26, 52), y = Inf,
+           label = c("1 month (4 wk)", "2 month (8 wk)", "6 month (26 wk)", "Annual (52 wk)"),
+           hjust = -0.1, vjust = c(2.8, 1.4, 1.4, 1.4), size = 3.2, color = "grey30") +
+  scale_x_log10(breaks = c(2, 4, 8, 12, 26, 52)) +
+  labs(x = "Weeks (log)", y = "Power", color = "Region") +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+```
+
+
+### Autocorrelation \label{sect:data-EDA-ACF}
+The autocorrelation function (ACF) and partial autocorrelation function (PACF) are used to analyse the temporal dependencies in the weekly trolley counts. The vertical axis is the autocorrelation, the horizontal axis is the lag in weeks, and the dashed lines mark the 95% confidence band; bars beyond it are significant. Figure \@ref(fig:eda-pacf) shows the ACF (a) and PACF (b) for HSE Dublin and Midlands. The ACF decays slowly and remains significant across many lags, consistent with the annual cycle and persistence. The PACF is dominated by a large lag 1 value that drops off sharply, indicating an AR(1) effect. The PACF also has significant peaks at 3, 4, and 5 weeks indicating an additionally monthly cycle. 
+
+```{r eda-pacf, fig.cap="(a) Autocorrelation and (b) partial autocorrelation functions of weekly trolley totals for HSE Dublin and Midlands. Dashed lines mark the 95\\% confidence band.", fig.width=8, fig.height=6}
+dm_ts <- weekly |>
+  filter(region == "HSE Dublin and Midlands") |>
+  arrange(week_start) |>
+  pull(total_trolleys)
+
+acf_p <- ggAcf(dm_ts, lag.max = 60) +
+  labs(title = NULL, x = "Lag (weeks)", y = "ACF") +
+  theme_minimal(base_size = 11)
+
+pacf_p <- ggPacf(dm_ts, lag.max = 60) +
+  labs(title = NULL, x = "Lag (weeks)", y = "PACF") +
+  theme_minimal(base_size = 11)
+
+(acf_p / pacf_p) + plot_annotation(tag_levels = "a")
+```
+
+
+### Scaling \label{sect:data-EDA-scale}
+The figures thus far use weekly on trolley counts. But regions with larger populations are expected to have higher on trolley counts. Scaling by population ensures that comparisons between regions are not confounded by size. Counts are scaled to rates using $\text{scaled count} = \frac{\text{Raw Count}}{\text{Population}} \times 10{,}000$ [@CSO_HHR01]. Four scalings are used:
+
+- per 10,000 population, 2022 (primary; Figure \@ref(fig:eda-region-pop)a)
+- per 100 inpatient beds, 2025 (Figure \@ref(fig:eda-region-pop)b)
+- per €1 billion of regional budget, 2026 (Figure \@ref(fig:eda-region-pop)c)
+- per 1,000 population aged 65+, 2022 (Figure \@ref(fig:eda-region-pop)d)
+
+The population scaling is the primary approach; our results focus on it as the most direct comparison. Details for all scalings are in Section \@ref(sect:standardisation).
+
+```{r eda-region-pop, fig.cap="HSE health region characteristics: (a) 2022 health region population, (b) 2025 available inpatient beds, (c) 2026 region budgets, (d) 2022 count of population aged 65+ (thousands). Regions are ordered by population (largest first) and shared across panels so each region occupies the same column.", fig.width=11, fig.height=9, fig.pos="H", dev="cairo_pdf"}
+.add_hse <- function(x) paste("HSE", x)
+
+pop_df <- read_csv("../supplementary data/2022_hr_population.csv",
+                   show_col_types = FALSE) |>
+  rename(Region = `HSE Health Regions`, Population = `Number of persons`) |>
+  distinct(Region, .keep_all = TRUE) |>
+  mutate(Region = .add_hse(Region), Population_k = Population / 1000) |>
+  arrange(desc(Population))
+
+pop_order <- pop_df$Region
+
+beds_df <- read_csv("../supplementary data/2025_hr_beds_per_hospital.csv",
+                    show_col_types = FALSE) |>
+  group_by(region) |>
+  summarise(total_inpatient  = sum(tx_inpatient,       na.rm = TRUE),
+            closed_inpatient = sum(closures_inpatient, na.rm = TRUE),
+            .groups = "drop") |>
+  mutate(Region = .add_hse(region),
+         available_inpatient = total_inpatient - closed_inpatient) |>
+  select(Region, available_inpatient)
+
+budget_df <- read_excel("../supplementary data/2026_hr_budget.xlsx") |>
+  pivot_longer(everything(), names_to = "Region", values_to = "Budget") |>
+  mutate(Budget_m = Budget / 1000)   # source is in EUR thousands → millions
+
+age_df <- read_csv("../supplementary data/2022_hr_age_dist.csv",
+                   show_col_types = FALSE) |>
+  filter(`Age Group` != "All ages") |>
+  group_by(`HSE Regions`, `Age Group`) |>
+  summarise(VALUE = mean(VALUE), .groups = "drop") |>
+  filter(`Age Group` %in% c("65 - 69 years", "70 - 74 years",
+                            "75 - 79 years", "80 - 84 years",
+                            "85 years and over")) |>
+  group_by(`HSE Regions`) |>
+  summarise(Pct_65plus = sum(VALUE), .groups = "drop") |>
+  mutate(Region = .add_hse(`HSE Regions`)) |>
+  select(Region, Pct_65plus)
+
+combined <- tibble(Region = pop_order) |>
+  left_join(pop_df    |> select(Region, Population_k), by = "Region") |>
+  left_join(beds_df,                                   by = "Region") |>
+  left_join(budget_df |> select(Region, Budget_m),     by = "Region") |>
+  left_join(age_df,                                    by = "Region") |>
+  mutate(Pop_65plus_k = Population_k * Pct_65plus / 100,
+         Region = factor(Region, levels = pop_order))
+
+.bar <- function(df, col, ylab, title, fmt) {
+  ggplot(df, aes(Region, .data[[col]], fill = Region)) +
+    geom_col(width = 0.6) +
+    geom_text(aes(label = fmt(.data[[col]])),
+              vjust = -0.5, size = 2.6) +
+    scale_fill_manual(values = region_palette, guide = "none") +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
+    labs(x = NULL, y = ylab, title = title) +
+    theme_minimal(base_size = 10) +
+    theme(axis.text.x  = element_text(angle = 30, hjust = 1, size = 7),
+          plot.title   = element_text(size = 10))
+}
+
+p1 <- .bar(combined, "Population_k",
+           "Population (thousands)",     "(a) 2022 health region population",
+           \(v) sprintf("%.0fk", v))
+p2 <- .bar(combined, "available_inpatient",
+           "Available inpatient beds",   "(b) 2025 available inpatient beds",
+           \(v) format(v, big.mark = ","))
+p3 <- .bar(combined, "Budget_m",
+           "Budget (€ millions)",   "(c) 2026 region budgets",
+           \(v) sprintf("€%.0fm", v))
+p4 <- .bar(combined, "Pop_65plus_k",
+           "Population aged 65+ (thousands)", "(d) 2022 population aged 65+ (count)",
+           \(v) sprintf("%.0fk", v))
+
+(p1 | p2) / (p3 | p4)
+```
+
+
+\FloatBarrier
+
+# Methods \label{chap:methods} 
+This section covers the four steps that take the explored series to a regional
+ranking: scaling the response, developing the model, fitting it with Bayesian
+inference, and ranking the regions. Scaling expresses the weekly counts as rates
+per 10,000 population, per €1 billion of budget, per 100 inpatient beds, and per
+1,000 population aged 65+. Model development adds components according to EDA and
+residual patterns: a regional level, an annual cycle, a New Year effect, the
+Mid West reset, and an AR(1) term, with further cycles and an AR(2) term fitted
+as extensions. Bayesian inference sets the priors and likelihood and draws the
+posterior with JAGS across four chains. Ranking ranks the posterior level
+draws within each draw, then averages to a posterior mean rank per region.
+
+## Response Scaling \label{sect:standardisation}
+Ranking regions by the raw on trolley counts would be misleading, as ranks would primarily reflect the population size of each region. For example, HSE Dublin and North East has the largest population and the highest raw on trolley counts, but this does not necessarily mean it is performing worse than other regions. To investigate other values contributing to our ranking, several denominators are used to scale the response. Scaling allows comparisons of the regions on an equal level, as the raw counts are influenced by factors such as population size, funding and bed capacity. The per 10,000 population scaling is the primary measure used throughout, as it most directly controls for differences in region size. Sensitivity to the alternative denominators (budget, beds, and population aged 65+) is examined in Section \@ref(sect:results-sensitivity).
+
+
+### Per 10,000 population
+
+The primary denominator used is the population of each health region in 2022.
+The weekly on trolley count is then divided by this population and scaled to a 
+rate per 10,000 population:
+
+$$
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region population}_i} \times 10{,}000.
+$$
+
+Per 10,000 population is the primary scaling as it is the most direct way to
+control for differences in demand between regions. So our results default to
+this scaling. The scales below largely follow similar distributions to
+population size.
+
+### Per €1 billion of regional budget
+To control for funding differentials, on trolley counts are scaled by the
+2026 HSE regional budget allocation, expressing the outcome as trolleys per
+€1 billion of regional budget.
+
+$$
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{health region budget in billion (€)}_i}.
+$$
+
+Regions with lower on trolley counts per €1 billion of regional budget may
+be considered more efficient.
+
+
+### Per 100 inpatient beds
+
+A similar efficiency measure is applied to inpatient beds in each region in 2025.
+The number of inpatient beds is used as a proxy for the space capacity of each region.
+Regions that have a lower on trolley count per 100 inpatient beds may be considered
+more efficient at handling patients within their allocated space.
+The outcome is expressed as trolleys per 100 inpatient beds:
+
+$$
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{number of health region inpatient beds}_i} \times 100.
+$$
+
+### Per 1,000 population aged 65+
+
+People aged 65+ disproportionately utilize hospitals [@brick_projections_2025]. 65+ make up `r round(subset(read.csv("../supplementary data/discharge_age_65plus_vs_under65.csv"), metric=="65plus_pop_share_pct")$value)`% of the population but `r round(subset(read.csv("../supplementary data/discharge_age_65plus_vs_under65.csv"), metric=="65plus_discharge_share_pct")$value)`% of discharges [@CSO_FY006B; @CSO_DHA74]. Scaling by region
+population aged 65+ controls for differences in age structure between regions [@CSO_HHR01; @CSO_HHR02].
+
+$$
+\text{population aged 65+}_i = \text{health region population}_i \times \frac{\%~\text{aged 65+}_i}{100}.
+$$
+
+The scaling is then expressed as trolleys per 1,000 population aged 65+:
+
+$$
+y_{i,t} = \frac{\text{weekly trolley count}_{i,t}}{\text{population aged 65+}_i} \times 1{,}000.
+$$
+
+## Model Development \label{sect:model-development}
+
+The model is developed iteratively with increasing complexity, as in @gelman_exploratory_2004, adding components from EDA and residual patterns. Each observation is modelled as a regional mean $\mu_{i,t}$ plus an AR(1) term $\mathcal{E}^{1}_{i,t}$. The mean carries the level and cycle structure; the AR(1) term carries week-to-week residual autocorrelation. The first week initialises without the AR(1) term, which then enters for $t>1$:
+
+$$
+y_{i,1} \sim \mathcal{N}\!\left(\mu_{i,1},\ \tau_i^{-1}\right); \qquad
+y_{i,t} \sim \mathcal{N}\!\left(\mu_{i,t} + \mathcal{E}^{1}_{i,t},\ \tau_i^{-1}\right), \quad t > 1.
+$$
+
+Here $y_{i,t}$ is the scaled trolley count for region $i$ at week $t$, $\tau_i$ is the region-specific precision, and $\mathcal{E}^{1}_{i,t}$ uses a single AR(1) coefficient $\phi$ shared across all regions.
+
+The mean ($\mu_{i,t}$) component is composed of: a regional level
+($\alpha_i$), an annual cycle ($\mathcal{C}_{i,t}^{52}$),
+a regional New Year effect ($\mathcal{R}_{i,t}$), and the Mid West 
+reset effect ($\mathcal{MW}_t$). The mean component is fitted
+for each region, $i$, and week, $t$: $\mu_{i,t} = \alpha_i + \mathcal{C}_{i,t}^{52} + \mathcal{R}_{i,t} + \mathbf{1}(i = \text{MW})\,\mathcal{MW}_t.$
+
+$\beta_i$ and $\gamma_i$ are the cosine and sine coefficients for region $i$.
+Together they set the amplitude, $A_i = \sqrt{\beta_i^2 + \gamma_i^2}$, and phase of
+the cycle:
+$$\mathcal{C}_{i,t}^{52} = \beta_i \cos\!\left(\tfrac{2\pi t}{52}\right) + \gamma_i \sin\!\left(\tfrac{2\pi t}{52}\right).$$
+The phase, expressed as a peak week, is
+$$\text{peak}_i = \frac{52}{2\pi}\left(\arctan\!\left(\frac{\gamma_i}{\beta_i}\right) + k\right), \qquad \text{wrapped to } [-26, 26)$$
+relative to the New Year. The correction $k$ places the angle in the correct half
+of the cycle from the signs of the coefficients: $k = 0$ when $\beta_i > 0$;
+$k = +\pi$ when $\beta_i < 0$ and $\gamma_i \ge 0$; and $k = -\pi$ when
+$\beta_i < 0$ and $\gamma_i < 0$.
+
+Because there is no obvious parametric form, the regional New Year effect is modelled 
+as a block effect spanning the week containing January 1st, the two weeks before, 
+and one week after:
+
+\begin{equation}
+\begin{aligned}
+\mathcal{R}_{i,t} &= \delta_{i,t}\,\mathbf{1}(t = \text{New Year week} - 2) \\
+                  &+ \delta_{i,t}\,\mathbf{1}(t = \text{New Year week} - 1) \\
+                  &+ \delta_{i,t}\,\mathbf{1}(t = \text{New Year week}) \\
+                  &+ \delta_{i,t}\,\mathbf{1}(t = \text{New Year week} + 1).
+\end{aligned}
+\label{eq:base-newyear}
+\end{equation}
+
+In the Mid West region, from August 8th to August 18th 2024, scheduled care is deferred to focus on unscheduled care. Weeks are referenced by their Monday start date, so the deferral falls in the week beginning Monday August 5th 2024. The reset period also has no obvious parametric form, so it is also modelled as a block effect. It is captured with the $\mathcal{MW}_t$ component, which spans the weeks of the Mid West reset period, and three weeks after to capture a return to the regional level. The region gate $\mathbf{1}(i = \text{MW})$ in the mean restricts the effect to the Mid West, so $\mathcal{MW}_t$ is indexed by week alone:
+
+\begin{equation}
+\begin{aligned}
+\mathcal{MW}_t &= \kappa_t\,\mathbf{1}(t = \text{Aug 5 2024 week}) \\
+               &+ \kappa_t\,\mathbf{1}(t = \text{Aug 12 2024 week}) \\
+               &+ \kappa_t\,\mathbf{1}(t = \text{Aug 19 2024 week}) \\
+               &+ \kappa_t\,\mathbf{1}(t = \text{Aug 26 2024 week}) \\
+               &+ \kappa_t\,\mathbf{1}(t = \text{Sep 2 2024 week}).
+\end{aligned}
+\label{eq:base-mwreset}
+\end{equation}
+
+The AR(1) ($\mathcal{E}^{1}_{i,t}$) term captures week-to-week autocorrelation 
+in the residuals: $\mathcal{E}^{1}_{i,t} = \phi\,(y_{i,t-1} - \mu_{i,t-1}).$
+
+Additional models are fitted to capture secondary effects: an AR(2)
+component, $\mathcal{E}^{2}_{i,t}$, and 6-month and 2-month cycles
+($\mathcal{C}_{i,t}^{26}$ and $\mathcal{C}_{i,t}^{8}$ respectively).
+
+## Bayesian Inference \label{sect:bayesian-inference}
+Bayesian inference is used to estimate the parameters of the model.
+Parameters are estimated as posterior distributions, which represent 
+uncertainty in the parameter estimates given the observed data and the 
+model.
+
+### Priors \label{sect:priors}
+
+Priors are specified for all parameters in the model.
+
+\[
+\alpha_i,\; \beta_i,\; \gamma_i,\; \delta_{i,t},\; \kappa_t \sim \mathcal{N}(0,\; 0.001)
+\]
+\[
+\tau_i \sim \Gamma(0.001,\; 0.001) \qquad \phi \sim \mathrm{Uniform}(-1,\; 1).
+\]
+
+The Normal priors are written in the precision parameterization used by JAGS: the second argument is precision, not variance. A precision of 0.001 corresponds to a variance of 1000 (standard deviation $\approx 31.6$), so these are vague priors.
+
+### Likelihood \label{sect:likelihood}
+
+Since the response variable is continuous, and summing days into weeks and hospitals into regions aggregates many smaller counts, the normality assumption becomes more reasonable at this scale. The likelihood is therefore modelled as a
+Normal distribution:
+$$y_{i,t} \sim \mathcal{N}\!\left(\mu_{i,t} + \mathcal{E}^{1}_{i,t},\ \tau_i^{-1}\right), \quad t > 1.$$
+
+
+### Posterior \label{sect:posterior}
+
+Posterior sampling is performed using *Just another Gibbs sampler* (*JAGs*)[@Plummer2003],  implemented by pyJAGS [@Nowotny2024pyjags], a Python interface to JAGS.  Sampling uses 4 chains, each sampled independently. Each chain runs 30,000 iterations: the first 10,000 are discarded as burn-in, leaving 20,000 retained per chain. No thinning is applied. Pooling the 4 chains gives 80,000 posterior draws. Convergence is assessed using the Gelman-Rubin diagnostic and trace plots; all R-hat values were at or below 1.0002, with full diagnostics in Appendix \@ref(app:traces).
+
+## Bayesian Ranking \label{sect:ranking}
+Health region levels, $\alpha^s_j$, are used for ranking, where $j$ is one of the 6
+HSE health regions, $j\in\{1,...,6\}$, and $s$ is the draw index, $s\in\{1,...,n\}$,
+where the total number of pooled posterior draws is $n=80{,}000$ (4 chains $\times$ 20,000 retained).
+$$
+  A =
+  \left[ {\begin{array}{ccccc}
+    \alpha_1^1 & \cdots & \alpha_j^1 & \cdots & \alpha_6^1\\
+    \vdots  &        & \vdots\\
+    \alpha_1^s & \cdots & \alpha_j^s& \cdots & \alpha_6^s\\
+    \vdots  &        & \vdots\\
+    \alpha_1^n & \cdots & \alpha_j^n & \cdots & \alpha_6^n\\
+  \end{array} } \right].
+$$
+Ranks follow the posterior ranking approach of @Laird1989. Each
+posterior sample is ranked to form the rank distribution, $R$:
+$$
+  R =
+  \left[ {\begin{array}{ccccc}
+    r_1^1 & \cdots & r_j^1 & \cdots & r_6^1\\
+    \vdots  &        & \vdots\\
+    r_1^s & \cdots & r_j^s& \cdots & r_6^s\\
+    \vdots  &        & \vdots\\
+    r_1^n & \cdots & r_j^n & \cdots & r_6^n\\
+  \end{array} } \right],
+$$
+where $r_j^s=\text{rank}(\alpha_j^s)=\sum^6_{i=1}I(\alpha_j^s>\alpha_i^s)$.
+When a tie occurs, the average rank is assigned to the tied values.
+
+The posterior mean rank, $\hat{r}_j$, is calculated by taking the mean across the $n$ posterior samples for each region $j$:
+
+$$
+\hat{r}_j = \frac{1}{n} \sum_{s=1}^{n} r_j^s.
+$$
+
+Collecting the mean ranks across the six regions gives the vector:
+$$
+  \hat{R} =
+  \left(\hat{r}_1, \hat{r}_2, \hat{r}_3, \hat{r}_4, \hat{r}_5,  \hat{r}_6 \right).
+$$
+Then the posterior mean rank is ranked, resulting in the ranked mean.
+$$
+  R^* =
+    \left(r^*_1, r^*_2, r^*_3, r^*_4, r^*_5, r^*_6\right),
+$$
+where $r_j^*=rank(\hat{r}_j)=\sum^6_{i=1}I(\hat{r}_j>\hat{r}_i)$.
+
+# Results \label{chap:results}
+In this Section we explore the posterior samples of the parameters, quantities that are derived from those, and model fit diagnostics. The posteriror samples are used to calculate the posterior mean and 95% credible intervals (CIs) for the parameters. The posterior mean is the average of the parameter values across all posterior samples, and represents a point estimate of the parameter. The 95% CI is calculated as the 2.5th and 97.5th percentiles of the posterior distribution, and represents the range that has a 95% probability of containing the true parameter value, given the observed data, prior, and model. 
+
+The models mean component, composed of the level, annual cycle, New Year effect, and Mid West reset effect, is presented first. Followed by model extensions such as the 6, 2, and 1 month cycles. Posterior means, and 95% credible intervals (CIs) are shown below when applicable.
+
+## Mean Component \label{sect:results-mean}
+
+The mean component of the model, $\mu_{i,t}$, additively captures the regional level, annual cycle, New Year effect, and Mid West reset effect for each region and week. The level differences between regions are captured by the $\alpha_i$ parameters. They are apparent in the aggregate mean component, seen in Figure \@ref(fig:results-mu-ribbon), where the regions with higher levels have higher mean component values across the series.
+
+The annual cycle term peaks in winter and troughs in summer for every region. The New Year effect, a block term, appears as the sharp dips spanning Christmas and the New Year. The Mid West reset, also a block term, appears as the isolated dip in the HSE Mid West component in August 2024. Posterior means and 95% credible intervals for each component are reported below.
+
+```{r results-mu-ribbon, fig.cap="Posterior mean component by week. Colours indicate HSE regions; shaded bands are 95\\% credible intervals.", fig.width=9, fig.height=4.5, out.width="62%"}
+mu_dir <- base_model
+mu    <- read_csv(file.path(mu_dir, "mu.csv"),       show_col_types = FALSE)
+mu_lo <- read_csv(file.path(mu_dir, "mu_lower.csv"), show_col_types = FALSE)
+mu_hi <- read_csv(file.path(mu_dir, "mu_upper.csv"), show_col_types = FALSE)
+
+dates <- as.Date(names(read_csv(
+  "../data/wide_weekly_scaledPer10k.csv",
+  n_max = 0, show_col_types = FALSE
+))[-1])
+
+to_long <- function(df, value_col) {
+  df |>
+    mutate(week_start = dates) |>
+    pivot_longer(-week_start, names_to = "region", values_to = value_col)
+}
+
+mu_df <- to_long(mu, "mu") |>
+  left_join(to_long(mu_lo, "lo"), by = c("week_start", "region")) |>
+  left_join(to_long(mu_hi, "hi"), by = c("week_start", "region"))
+
+ggplot(mu_df, aes(week_start, mu, colour = region, fill = region)) +
+  geom_ribbon(aes(ymin = lo, ymax = hi), colour = NA, alpha = 0.15) +
+  geom_line(linewidth = 0.5) +
+  scale_colour_manual(values = region_palette) +
+  scale_fill_manual(values = region_palette, guide = "none") +
+  scale_x_date(
+    breaks = as.Date(c(
+      "2023-01-01", "2023-08-01",
+      "2024-01-01", "2024-08-01",
+      "2025-01-01", "2025-08-01",
+      "2026-01-01"
+    )),
+    date_labels = "%b %Y"
+  ) +
+  labs(x = NULL, y = "Trolleys per 10,000 population", colour = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 30, hjust = 1))
+```
+
+\FloatBarrier
+
+### Regional Levels \label{sect:results-baselines}
+
+```{r}
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+midwest_idx     <- idx_by_region[["HSE Mid West"]]
+midwestposmean  <- round(mean(raw[[paste0("alpha[", midwest_idx, "]")]]), 2)
+```
+The regional levels, $\alpha_i$, capture the expected level for each region; they estimate the rate of the region absent any time varying effects. Level parameters are of interest for ranking, as they capture the underlying level for each region, controlling for the other components in the model.
+
+Across regions, the level posterior mean rate per 10,000 population is highest in HSE Mid West (`r midwestposmean`, 95% CI [`r round(quantile(raw[[paste0("alpha[", midwest_idx, "]")]], 0.025), 2)`, `r round(quantile(raw[[paste0("alpha[", midwest_idx, "]")]], 0.975), 2)`]) and lowest in HSE Dublin and North East (`r round(mean(raw[[paste0("alpha[", idx_by_region[["HSE Dublin and North East"]], "]")]]), 2)`, 95% CI [`r round(quantile(raw[[paste0("alpha[", idx_by_region[["HSE Dublin and North East"]], "]")]], 0.025), 2)`, `r round(quantile(raw[[paste0("alpha[", idx_by_region[["HSE Dublin and North East"]], "]")]], 0.975), 2)`]). Every pairwise difference between regional levels excludes zero (Table \@ref(tab:results-alpha-pairwise)), so the ranking is well determined. In particular, three western regions (HSE Mid West, HSE South West, HSE West and North West) all have higher levels than the three eastern regions (HSE Dublin and Midlands, HSE Dublin and North East, HSE Dublin and South East), consistent with an East-West divide in demand and service provision. Figure \@ref(fig:results-alpha-map) shows the spatial distribution of regional levels, visually confirming East-West differences. Because the levels separate cleanly, their ordering is stable. In the next section this is formalised with the rank distribution.
+
+```{r results-alpha-map, fig.cap="Regional Levels (\\(\\alpha_i\\)) per 10,000 population.", fig.width=6, fig.height=6, out.width="55%", fig.pos="ht"}
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+regions <- c(
+  "HSE Dublin and Midlands", "HSE Dublin and North East",
+  "HSE Dublin and South East", "HSE Mid West",
+  "HSE South West", "HSE West and North West"
+)
+alpha_means <- tibble(
+  region = regions,
+  alpha  = sapply(seq_along(regions),
+                  function(i) mean(raw[[paste0("alpha[", i, "]")]])),
+  lo     = sapply(seq_along(regions),
+                  function(i) quantile(raw[[paste0("alpha[", i, "]")]], 0.025)),
+  hi     = sapply(seq_along(regions),
+                  function(i) quantile(raw[[paste0("alpha[", i, "]")]], 0.975))
+)
+
+name_map <- c(
+  "HSE Dublin and Midlands HR"   = "HSE Dublin and Midlands",
+  "HSE Dublin and North East HR" = "HSE Dublin and North East",
+  "HSE Dublin and South East HR" = "HSE Dublin and South East",
+  "HSE Midwest HR"               = "HSE Mid West",
+  "HSE South West HR"            = "HSE South West",
+  "HSE West and North West HR"   = "HSE West and North West"
+)
+shp <- sf::read_sf("../data/mapping/hse_regions.geojson") |>
+  mutate(region = name_map[HR_operational_name]) |>
+  left_join(alpha_means, by = "region")
+
+ni <- rnaturalearth::ne_states(country = "united kingdom", returnclass = "sf") |>
+  dplyr::filter(geonunit == "Northern Ireland") |>
+  sf::st_transform(sf::st_crs(shp))
+
+ie_counties <- rnaturalearth::ne_states(country = "Ireland", returnclass = "sf") |>
+  sf::st_transform(sf::st_crs(shp))
+
+wnw_label  <- shp |> dplyr::filter(region == "HSE West and North West")
+other_label <- shp |> dplyr::filter(region != "HSE West and North West")
+
+ggplot() +
+  geom_sf(data = ni, fill = "grey92", colour = "grey60", linewidth = 0.2) +
+  geom_sf(data = shp, aes(fill = alpha), colour = "grey40", linewidth = 0.2) +
+  geom_sf(data = ie_counties, fill = NA, colour = "grey40", linewidth = 0.15) +
+  geom_sf_label(data = other_label,
+                aes(label = sprintf("%s\n%.2f [%.2f, %.2f]", region, alpha, lo, hi)),
+                size = 2.6, fill = "white", label.size = 0,
+                label.padding = unit(0.15, "lines")) +
+  geom_sf_label(data = wnw_label,
+                aes(label = sprintf("%s\n%.2f [%.2f, %.2f]", region, alpha, lo, hi)),
+                size = 2.6, fill = "white", label.size = 0,
+                label.padding = unit(0.15, "lines"),
+                nudge_x = -0.3, nudge_y = -0.5) +
+  scale_fill_gradient(low = "#f7fcf5", high = "#005a32",
+                      name = expression(alpha)) +
+  theme_void(base_size = 11)
+```
+
+```{r east-west-setup, include=FALSE}
+east_regions <- c("HSE Dublin and Midlands",
+                  "HSE Dublin and North East",
+                  "HSE Dublin and South East")
+west_regions <- c("HSE Mid West",
+                  "HSE South West",
+                  "HSE West and North West")
+east_draws <- rowSums(sapply(east_regions,
+                             function(r) raw[[paste0("alpha[", idx_by_region[[r]], "]")]]))
+west_draws <- rowSums(sapply(west_regions,
+                             function(r) raw[[paste0("alpha[", idx_by_region[[r]], "]")]]))
+diff_draws <- west_draws - east_draws
+```
+
+```{r alpha-helpers, include=FALSE}
+alpha_ci <- function(i) {
+  col <- paste0("alpha[", i, "]")
+  sprintf("%.2f [%.2f, %.2f]",
+          mean(raw[[col]]),
+          quantile(raw[[col]], 0.025),
+          quantile(raw[[col]], 0.975))
+}
+```
+
+```{r results-alpha-pairwise}
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+regions <- c(
+  "HSE Dublin and Midlands", "HSE Dublin and North East",
+  "HSE Dublin and South East", "HSE Mid West",
+  "HSE South West", "HSE West and North West"
+)
+alpha_mat <- sapply(seq_along(regions),
+                    function(i) raw[[paste0("alpha[", i, "]")]])
+colnames(alpha_mat) <- regions
+
+pairs <- combn(regions, 2, simplify = FALSE)
+pair_rows <- lapply(pairs, function(p) {
+  d <- alpha_mat[, p[1]] - alpha_mat[, p[2]]
+  if (mean(d) < 0) { d <- -d; p <- rev(p) }
+  q <- quantile(d, c(0.025, 0.975))
+  tibble(
+    Comparison  = p[1],
+    vs          = p[2],
+    `Mean diff` = mean(d),
+    `95% CI`    = sprintf("[%.2f, %.2f]", q[1], q[2]),
+    `Contains 0`= ifelse(q[1] <= 0 & q[2] >= 0, "Yes", "No")
+  )
+})
+pair_tab <- bind_rows(pair_rows) |> arrange(desc(`Mean diff`))
+
+knitr::kable(pair_tab, digits = 2, booktabs = TRUE, linesep = "", caption = "Pairwise comparison of regional levels (\\(\\alpha_i\\)) per 10,000 population.")
+```
+
+\FloatBarrier
+
+## Regional Rankings \label{sect:results-rank}
+
+The rank distribution follows Section \@ref(sect:ranking). The primary scaling is per 10,000 population; a sensitivity analysis refits the model under three alternative denominators: per 100 inpatient beds, per €1 billion of regional budget, and per 1,000 population aged 65+ to more fully explore the factors impacting the on trolley rates.
+
+### Per 10,000 Population
+
+Across all six regions, the mean rank, median rank, ranked mean, and 95% CI bounds coincide on a single integer (Table \@ref(tab:results-rank-table)). The ordering is HSE Mid West (1), HSE West and North West (2), HSE South West (3), HSE Dublin and Midlands (4), HSE Dublin and South East (5), HSE Dublin and North East (6). Because every posterior samples of the ranks agree and the 95% CI has zero width, per 10,000 population yields the most clear cut ranking among the four denominators considered.
+
+### Sensitivity to Scaling \label{sect:results-sensitivity}
+
+The ranking is broadly robust to scale choice (Table \@ref(tab:results-rank-table)). All four scalings agree on HSE Mid West first, HSE West and North West second, and the two Dublin regions at the bottom (HSE Dublin and South East 5th, HSE Dublin and North East 6th). The middle two positions are less stable. Under per €1 billion of regional budget scaling, HSE Dublin and Midlands and HSE Dublin and South East have rank CIs of [4, 5]. Under per 1,000 population aged 65+ scaling, HSE Dublin and Midlands and HSE South West swap into ranks 3 and 4 respectively, both with CIs [3, 4].
+
+```{r results-rank-table}
+regions <- c(
+  "HSE Dublin and Midlands", "HSE Dublin and North East",
+  "HSE Dublin and South East", "HSE Mid West",
+  "HSE South West", "HSE West and North West"
+)
+
+scaling_paths <- list(
+  "Per 10,000 population"             = "../data/models/wide_weekly_scaledPer10k/v4.6/raw_samples.csv",
+  "Per 100 inpatient beds"            = "../data/models/wide_weekly_scaledPerBed/v4.6/raw_samples.csv",
+  "Per €1 billion of regional budget" = "../data/models/wide_weekly_scaledPerBudgetThousands/v4.6/raw_samples.csv",
+  "Per 1,000 population aged 65+"     = "../data/models/wide_weekly_scaledPer1kOver65/v4.6/raw_samples.csv"
+)
+
+rank_section <- function(path) {
+  raw <- read_csv(path, show_col_types = FALSE)
+  alpha_mat <- sapply(seq_along(regions),
+                      function(i) raw[[paste0("alpha[", i, "]")]])
+  ranks_mat <- t(apply(alpha_mat, 1,
+                       function(row) rank(-row, ties.method = "average")))
+  colnames(ranks_mat) <- regions
+  mean_rank   <- colMeans(ranks_mat)
+  ranked_mean <- rank(mean_rank, ties.method = "average")
+  p_off_rank  <- sapply(seq_along(regions),
+                        function(j) mean(ranks_mat[, j] != ranked_mean[j]))
+  tibble(
+    Region        = regions,
+    `Ranked Mean` = ranked_mean,
+    `Mean Rank`   = mean_rank,
+    `Median Rank` = apply(ranks_mat, 2, median),
+    Lo            = apply(ranks_mat, 2, quantile, 0.025),
+    Hi            = apply(ranks_mat, 2, quantile, 0.975),
+    `P(off rank)` = p_off_rank
+  ) |>
+    mutate(
+      `95% CI`      = sprintf("[%g, %g]", Lo, Hi),
+      `Mean Rank`   = sprintf("%.1f", `Mean Rank`),
+      `Median Rank` = sprintf("%.1f", `Median Rank`),
+      `P(off rank)` = sprintf("%.3f", `P(off rank)`)
+    ) |>
+    arrange(Region) |>
+    select(Region, `Ranked Mean`, `Mean Rank`, `Median Rank`, `95% CI`, `P(off rank)`)
+}
+
+combined <- bind_rows(lapply(scaling_paths, rank_section))
+
+tbl <- kableExtra::kbl(combined, booktabs = TRUE, linesep = "",
+                       caption = "Posterior ranks (1 = highest burden) across response scalings. Consistent ranks across sections indicate the ordering is robust to denominator choice. P(off rank) is the posterior probability that a draw places the region at a rank other than its Ranked Mean.")
+scaling_names <- names(scaling_paths)
+for (i in seq_along(scaling_names)) {
+  tbl <- kableExtra::pack_rows(tbl, scaling_names[i],
+                               (i - 1) * 6 + 1, i * 6)
+}
+kableExtra::kable_styling(tbl, latex_options = "hold_position")
+```
+
+\FloatBarrier
+
+## Annual Cycle \label{sect:results-cycle}
+In this section, the annual cycle is analysed in terms of its phase and amplitude. The phase captures the timing of the cycle, while the amplitude captures the strength of the cycle. Both are derived from the cosine and sine coefficents of the annual cycle, $\beta_i$ and $\gamma_i$, as described in Section \@ref(sect:model-development). This section continues to use the primary scaling of per 10,000 population. Sensitivity analyses for the annual cycle are not performed, as the cycle is a relative effect that should be less sensitive to scaling than the level and ranking.
+
+```{r results-phase-inline, include=FALSE}
+# Phase stats are computed by thesis/phase_table.py -> phase_table.csv
+phase_tab <- read_csv("phase_table.csv", show_col_types = FALSE)
+regions <- c(
+  "HSE Dublin and Midlands", "HSE Dublin and North East",
+  "HSE Dublin and South East", "HSE Mid West",
+  "HSE South West", "HSE West and North West"
+)
+phase_row   <- function(i) phase_tab[match(regions[i], phase_tab$region), ]
+phase_val   <- function(i) {
+  r <- phase_row(i)
+  sprintf("%+.1f wk, 95%% CI [%+.1f, %+.1f]", r$mean_pk, r$ci_lo, r$ci_hi)
+}
+phase_width <- function(i) sprintf("%.1f", phase_row(i)$width)
+phase_prob  <- function(i) sprintf("%.1f%%", 100 * phase_row(i)$p_winter)
+```
+### Annual Cycle Phase \label{sect:results-cycle-phase}
+Five of six regions have 95% CI widths narrower than 3 months: HSE Dublin and
+Midlands (`r phase_width(1)` weeks), HSE Dublin and North East (`r phase_width(2)` weeks),
+HSE Dublin and South East (`r phase_width(3)` weeks), HSE South West
+(`r phase_width(5)` weeks), and HSE West and North West (`r phase_width(6)` weeks).
+HSE Mid West is the exception with `r phase_width(4)` weeks. The narrow CIs cluster
+close to the New Year, seen in Figure \@ref(fig:results-phase-plot), indicating a
+consistent annual cycle with winter peaks.
+
+Five of the six regions place most of their posterior mass on a peak in winter,
+where winter spans December to February [@MetEireann_Climate]. HSE Dublin and North East (`r phase_prob(2)`),
+HSE Dublin and South East (`r phase_prob(3)`), and HSE South West
+(`r phase_prob(5)`) are most concentrated in winter; HSE Dublin and Midlands
+(`r phase_prob(1)`) and HSE West and North West (`r phase_prob(6)`) are weaker;
+HSE Mid West (`r phase_prob(4)`) is the outlier with its wide distribution. Credible intervals,
+probabilities, and posterior means can be found in Table \@ref(tab:results-phase-table).
+
+```{r results-phase-plot, fig.cap="Peak phases forest plot. Shaded blue region represents winter (1 December to end of February). Black points are the regional posterior means. Bars are the 95% credible interval.", fig.width=8, fig.height=4}
+# raw is loaded here for the amplitude inline that follows this chunk;
+# phase stats come from thesis/phase_table.py -> phase_table.csv
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+phase_tab <- read_csv("phase_table.csv", show_col_types = FALSE)
+
+xmax <- ceiling(max(abs(c(phase_tab$ci_lo, phase_tab$ci_hi))) / 4) * 4
+
+ggplot(phase_tab,
+       aes(y = factor(region, levels = rev(phase_tab$region)))) +
+  # Meteorological winter (Met Eireann): Dec 1 to end of Feb, relative to New Year.
+  # Dec 1 = -31 days = -31/7 weeks; end of Feb = +59 days = +59/7 weeks.
+  annotate("rect", xmin = -31/7, xmax = 59/7, ymin = -Inf, ymax = Inf,
+           fill = "lightblue", alpha = 0.35) +
+  geom_pointrange(aes(x = mean_pk, xmin = ci_lo, xmax = ci_hi)) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey50") +
+  scale_x_continuous(breaks = seq(-xmax, xmax, 4), limits = c(-xmax, xmax)) +
+  labs(x = "Weeks from New Year (0 = year change)", y = NULL) +
+  theme_minimal(base_size = 11)
+```
+
+\FloatBarrier
+
+### Annual Cycle Amplitude \label{sect:results-cycle-amplitude}
+
+The posterior means of the amplitude range from 0.62 in HSE Mid West to 1.24 in
+HSE South West. The amplitude posterior means add a large trolley burden to
+some regions. For instance, the cycle in HSE Dublin and North East swings
+`r {r2 <- sqrt(raw[["beta[2]"]]^2 + raw[["gamma[2]"]]^2) / raw[["alpha[2]"]]; q <- quantile(r2, c(0.025, 0.975)); sprintf("±%.0f%% (95%% CI [±%.0f%%, ±%.0f%%])", 100*mean(r2), 100*q[1], 100*q[2])}`
+around the regional level: winter peaks sit that fraction above the regional mean and
+summer troughs sit the same fraction below. All 95% credible intervals are wide.
+The pairwise test in Table \@ref(tab:results-amplitude-pairwise) shows the
+regions are not comparable as all region combinations have a 95% CI which
+contains 0.
+
+\newpage
+
+```{r results-phase-table}
+# Phase stats are computed by thesis/phase_table.py -> phase_table.csv
+phase_tab <- read_csv("phase_table.csv", show_col_types = FALSE) |>
+  transmute(
+    Region                    = region,
+    `Mean peak (wk from NY)`  = mean_pk,
+    `95% CI (wk from NY)`     = sprintf("[%+.1f, %+.1f]", ci_lo, ci_hi),
+    `P(winter)`               = p_winter
+  )
+
+knitr::kable(phase_tab, digits = c(0, 1, 0, 3),
+             booktabs = TRUE, linesep = "", caption = "Peak week of the annual cycle relative to New Year")
+```
+
+```{r results-amplitude-table}
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+regions <- c(
+  "HSE Dublin and Midlands", "HSE Dublin and North East",
+  "HSE Dublin and South East", "HSE Mid West",
+  "HSE South West", "HSE West and North West"
+)
+
+amp_tab <- bind_rows(lapply(seq_along(regions), function(i) {
+  A <- sqrt(raw[[paste0("beta[", i, "]")]]^2 +
+            raw[[paste0("gamma[", i, "]")]]^2)
+  q <- quantile(A, c(0.025, 0.975))
+  tibble(
+    Region       = regions[i],
+    Mean         = mean(A),
+    `95% CI`     = sprintf("[%.2f, %.2f]", q[1], q[2]),
+    `Contains 0` = ifelse(q[1] <= 0 & q[2] >= 0, "Yes", "No")
+  )
+})) |> arrange(Region)
+
+knitr::kable(amp_tab, digits = 2, booktabs = TRUE, linesep = "", caption = "Annual Cycle Amplitude")
+```
+
+
+```{r results-amplitude-pairwise}
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+regions <- c( 
+  "HSE Dublin and Midlands", "HSE Dublin and North East",
+  "HSE Dublin and South East", "HSE Mid West",
+  "HSE South West", "HSE West and North West"
+)
+A_mat <- sapply(seq_along(regions), function(i) {
+  sqrt(raw[[paste0("beta[", i, "]")]]^2 +
+       raw[[paste0("gamma[", i, "]")]]^2)
+})
+colnames(A_mat) <- regions
+
+pairs <- combn(regions, 2, simplify = FALSE)
+amp_pair <- bind_rows(lapply(pairs, function(p) {
+  d <- A_mat[, p[1]] - A_mat[, p[2]]
+  if (mean(d) < 0) { d <- -d; p <- rev(p) }
+  q <- quantile(d, c(0.025, 0.975))
+  tibble(
+    Comparison  = p[1],
+    vs          = p[2],
+    `Mean diff` = mean(d),
+    `95% CI`    = sprintf("[%.2f, %.2f]", q[1], q[2]),
+    `Contains 0`= ifelse(q[1] <= 0 & q[2] >= 0, "Yes", "No")
+  )
+})) |> arrange(desc(`Mean diff`))
+
+knitr::kable(amp_pair, digits = 2, booktabs = TRUE, linesep = "", caption = "Annual Cycle Amplitude Pairwise")
+```
+
+## New Year Effect \label{sect:results-ny}
+
+```{r ny-helpers, include=FALSE}
+ny_ci <- function(i, period = "mid") {
+  col <- paste0("delta_", period, "[", i, "]")
+  sprintf("%.2f [%.2f, %.2f]",
+          mean(raw[[col]]),
+          quantile(raw[[col]], 0.025),
+          quantile(raw[[col]], 0.975))
+}
+```
+
+Based on Figure \@ref(fig:results-ny-effect), the New Year effect
+on all regions has a roughly similar shape. HSE Dublin and North East and HSE Dublin
+and South East have the narrowest CIs, suggesting their New Year effects
+are the most consistent across observed years. During the New Year
+week, there are discrepancies between regions which return to the regional level
+in their intervals versus don't. For instance HSE South West (`r ny_ci(5)`),
+and HSE West and North West (`r ny_ci(6)`) return to the regional level. One week after the
+New Year, HSE Dublin and North East (`r ny_ci(2, "post")`), HSE South West
+(`r ny_ci(5, "post")`), and HSE West and North West (`r ny_ci(6, "post")`) have
+CI lower bounds above the level. The remaining three span the level. HSE West
+and North West has the highest posterior mean.
+
+```{r results-ny-effect, fig.cap="New Year effect by region. Points are posterior means; bars are 95\\% credible intervals. Each point is annotated with its posterior mean and 95\\% CI. Dashed line at zero.", fig.width=9, fig.height=6, fig.pos="ht"}
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+regions <- c(
+  "HSE Dublin and Midlands", "HSE Dublin and North East",
+  "HSE Dublin and South East", "HSE Mid West",
+  "HSE South West", "HSE West and North West"
+)
+periods <- c("NY-2", "NY-1", "NY", "NY+1")
+params  <- c("delta_pm1", "delta_pre", "delta_mid", "delta_post")
+
+ny_all <- bind_rows(lapply(seq_along(regions), function(i) {
+  bind_rows(lapply(seq_along(periods), function(j) {
+    col <- paste0(params[j], "[", i, "]")
+    tibble(
+      Region = regions[i],
+      Period = factor(periods[j], levels = periods),
+      Mean   = mean(raw[[col]]),
+      Lo     = quantile(raw[[col]], 0.025),
+      Hi     = quantile(raw[[col]], 0.975)
+    )
+  }))
+})) |>
+  mutate(Label = sprintf("%.2f\n[%.2f, %.2f]", Mean, Lo, Hi))
+
+ggplot(ny_all, aes(Period, Mean)) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey60") +
+  geom_pointrange(aes(ymin = Lo, ymax = Hi), colour = "#1f77b4") +
+  geom_line(aes(group = 1), colour = "#1f77b4") +
+  ggrepel::geom_text_repel(aes(label = Label, y = Hi), size = 2.2,
+                           lineheight = 0.85, colour = "grey25",
+                           segment.colour = "grey75", min.segment.length = 0,
+                           box.padding = 0.3, nudge_y = 0.9, direction = "y",
+                           seed = 1) +
+  facet_wrap(~ Region, ncol = 3) +
+  scale_y_continuous(expand = expansion(mult = c(0.05, 0.16))) +
+  labs(x = "NY period", y = "Effect (weekly trolleys per 10,000 population)") +
+  theme_minimal(base_size = 11)
+```
+
+
+## Mid West Reset \label{sect:results-mw}
+
+```{r mw-helpers, include=FALSE}
+mw_ci <- function(w) {
+  col <- paste0("sigma_w", w)
+  sprintf("%.2f [%.2f, %.2f]",
+          mean(raw[[col]]),
+          quantile(raw[[col]], 0.025),
+          quantile(raw[[col]], 0.975))
+}
+```
+
+The HSE Mid West deferral period runs from August 8th to 18th, 2024,
+falling within the weeks of August 5th (`r mw_ci(1)`) and 12th
+(`r mw_ci(2)`), shown in Figure \@ref(fig:results-mw-reset).
+By posterior mean, the minimum is the week of August 19th (`r mw_ci(3)`).
+The week of September 2nd (`r mw_ci(5)`) shows a return to the regional level.
+
+
+```{r results-mw-reset, fig.cap="Mid West reset effect for the five weeks from 5 August 2024. Points are posterior means, bars are 95\\% credible intervals, with each point annotated with its mean and 95\\% CI. Dashed line at zero.", fig.width=7, fig.height=4}
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+mw_tab <- tibble(
+  Week  = factor(c("W1\n(Aug 5)", "W2\n(Aug 12)", "W3\n(Aug 19)",
+                   "W4\n(Aug 26)", "W5\n(Sep 2)"),
+                 levels = c("W1\n(Aug 5)", "W2\n(Aug 12)", "W3\n(Aug 19)",
+                            "W4\n(Aug 26)", "W5\n(Sep 2)")),
+  Phase = c("reset", "reset", "post", "post", "post"),
+  col   = paste0("sigma_w", 1:5)
+) |>
+  rowwise() |>
+  mutate(
+    Mean = mean(raw[[col]]),
+    Lo   = quantile(raw[[col]], 0.025),
+    Hi   = quantile(raw[[col]], 0.975)
+  ) |>
+  ungroup() |>
+  mutate(
+    Label = sprintf("%.2f\n[%.2f, %.2f]", Mean, Lo, Hi),
+    # W1 label sits below its CI; the rest above, W3 pushed highest
+    LabY  = if_else(row_number() == 1, Lo, Hi),
+    Nudge = c(-1.6, 0.9, 2.6, 0.9, 0.9)
+  )
+
+ggplot(mw_tab, aes(Week, Mean)) +
+  geom_hline(yintercept = 0, linetype = "dashed", colour = "grey60") +
+  geom_pointrange(aes(ymin = Lo, ymax = Hi), colour = "#1f77b4") +
+  geom_line(aes(group = 1), colour = "#1f77b4") +
+  ggrepel::geom_text_repel(aes(label = Label, y = LabY), size = 2.6,
+                           lineheight = 0.85, colour = "grey25",
+                           segment.colour = "grey75", min.segment.length = 0,
+                           box.padding = 0.4, nudge_y = mw_tab$Nudge,
+                           direction = "y", seed = 1) +
+  scale_y_continuous(expand = expansion(mult = c(0.12, 0.10))) +
+  labs(x = "Week (start date, 2024)",
+       y = "Effect (weekly trolleys per 10,000 population)") +
+  theme_minimal(base_size = 11)
+```
+
+## Model Extensions \label{sect:results-dic}
+
+The model is extended with four secondary components: a 4 week cycle, an 8 week cycle and a 26 week cycle. As discussed in the spectral analysis (Section \@ref(sect:data-EDA-PSD)), the periodogram in Figure \@ref(fig:eda-psd) shows elevated power near the 4, 8, and 26 week periods across regions; the extensions are specified in Section \@ref(sect:model-development). By Table \@ref(tab:results-dic-table), the 4 and 8 week cycles decrease deviance but increase DIC; the components fit better but add too much complexity. The 26 week cycle increases both deviance and DIC; meaning the additional component worsens fit. The AR(2) extension modestly improves both deviance and DIC over the baseline (DIC `r round(read_csv(file.path(base_model, "dic.csv"), show_col_types = FALSE)$DIC, 1)` vs `r round(read_csv(file.path(ar1_model, "dic.csv"), show_col_types = FALSE)$DIC, 1)`), the only extension to do so.
+
+```{r results-dic-table}
+base   <- "../data/models/wide_weekly_scaledPer10k"
+labels <- c(
+  v4.6 = "Base model",
+  v4.7 = "Base + 4 week cycle",
+  v4.8 = "Base + 8 week cycle",
+  v4.9 = "Base + 26 week cycle"
+)
+dic_tab <- bind_rows(lapply(names(labels), function(v) {
+  d <- read_csv(file.path(base, v, "dic.csv"), show_col_types = FALSE)
+  tibble(
+    Description = labels[[v]],
+    Deviance    = d$deviance,
+    pD          = d$penalty,
+    DIC         = d$DIC
+  )
+}))
+
+knitr::kable(dic_tab, digits = 1, booktabs = TRUE, linesep = "", caption = "Cycle extensions added to the base model (per 10,000 population).")
+```
+
+
+
+## Residuals \label{sect:results-resid}
+
+The residual is the gap between the observation and the full one-step prediction, $r_{i,t} = y_{i,t} - (\mu_{i,t} + \mathcal{E}^{1}_{i,t})$. Since the observation variance is $\tau_i^{-1}$, dividing by the standard deviation, $\tau_i^{-1/2}$, gives the standardised residual
+$$z_{i,t} = r_{i,t}\sqrt{\tau_i}.$$
+Under a well-specified model the residuals already have mean 0. Dividing by the standard deviation $\tau_i^{-1/2}$ is what brings them to variance 1, on a common scale across regions.
+
+Shown in \@ref(fig:results-resid), the model residuals are not white noise. There are clear cycles, however, the 4, 8 and 26 week cycles tested in \@ref(sect:results-dic) do not result in a better model. There is visible regional dependence  which can be seen when regions move in step; appearing to synchronise. This is shown to be meaningful in the  following section, \@ref(sect:results-ccf).
+
+```{r results-resid, fig.cap="Standardised posterior mean residuals from the baseline model, by week. Colour indicates region.", fig.width=9, fig.height=4}
+res <- read_csv(
+  file.path(base_model, "residuals_posterior_mean.csv"),
+  show_col_types = FALSE
+)
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+regions <- names(res)
+tau_mean <- sapply(seq_along(regions),
+                   function(i) mean(raw[[paste0("tau[", i, "]")]]))
+dates <- as.Date(names(read_csv(
+  "../data/wide_weekly_scaledPer10k.csv",
+  n_max = 0, show_col_types = FALSE
+))[-1])
+
+resid_long <- res |>
+  mutate(week_start = dates) |>
+  pivot_longer(-week_start, names_to = "region", values_to = "r") |>
+  mutate(
+    tau = tau_mean[match(region, regions)],
+    std = r * sqrt(tau)
+  )
+
+ggplot(resid_long, aes(week_start, std, colour = region)) +
+  geom_hline(yintercept = 0, colour = "grey40") +
+  geom_line(linewidth = 0.4) +
+  scale_colour_manual(values = region_palette) +
+  labs(x = NULL, y = "Standardised residual", colour = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "bottom")
+```
+
+\FloatBarrier
+
+### Cross-Correlation \label{sect:results-ccf}
+
+All 15 region pairs show a cross-correlation 0 lag exceeding the significance band (Figure \@ref(fig:results-ccf)). This provides evidence for regional dependence.
+
+```{r results-ccf, fig.cap="Cross-correlation of posterior mean residuals for all 15 HSE region pairs. Dashed lines mark the 95\\% confidence band.", fig.width=9, fig.height=13}
+res <- read_csv(
+  file.path(base_model, "residuals_posterior_mean.csv"),
+  show_col_types = FALSE
+)
+regions <- names(res)
+
+ccf_to_df <- function(x, y, lag.max = 26, label) {
+  c <- ccf(x, y, lag.max = lag.max, plot = FALSE)
+  tibble(lag = as.numeric(c$lag), ccf = as.numeric(c$acf), pair = label)
+}
+
+pairs <- combn(regions, 2, simplify = FALSE)
+ccf_df <- bind_rows(lapply(pairs, function(p) {
+  ccf_to_df(res[[p[1]]], res[[p[2]]],
+            label = paste0(p[1], "\nvs\n", p[2]))
+}))
+ci <- qnorm(0.975) / sqrt(nrow(res))
+
+ggplot(ccf_df, aes(lag, ccf)) +
+  geom_hline(yintercept = 0) +
+  geom_hline(yintercept = c(-ci, ci),
+             linetype = "dashed", colour = "steelblue") +
+  geom_segment(aes(xend = lag, yend = 0)) +
+  facet_wrap(~ pair, ncol = 3) +
+  labs(x = "Lag (weeks)", y = "CCF",
+       subtitle = "Dashed lines are the significance band") +
+  theme_minimal(base_size = 11)
+```
+
+\newpage
+
+# Discussion \label{chap:Discussion}
+
+
+\newpage
+
+# References
+
+<div id="refs"></div>
+
+\newpage
+
+# Appendix
+
+## Raw Weekly Counts by Region
+
+```{r app-raw-boxplot, fig.cap="Distribution of weekly on trolley counts by HSE region across the full series (Jan 2023 -- Apr 2026). Box shows the IQR, central line the median, whiskers extend to 1.5 x IQR; points beyond are individual weeks.", fig.width=8, fig.height=4.5, fig.pos="H"}
+ggplot(weekly, aes(x = reorder(region, total_trolleys, FUN = median, decreasing = TRUE),
+                   y = total_trolleys, fill = region)) +
+  geom_boxplot(width = 0.6, alpha = 0.85, outlier.size = 1) +
+  scale_fill_manual(values = region_palette, guide = "none") +
+  labs(x = NULL, y = "Weekly on trolley counts") +
+  theme_minimal(base_size = 11) +
+  theme(axis.text.x = element_text(angle = 25, hjust = 1))
+```
+
+\FloatBarrier
+
+## Region Demographics
+
+```{r app-region-demographics, fig.cap="TODO", fig.width=8, fig.height=6}
+pop <- read_csv("../supplementary data/2022_hr_population.csv",
+                show_col_types = FALSE) |>
+  distinct() |>
+  rename(region = `HSE Health Regions`,
+         value  = `Number of persons`) |>
+  mutate(region = paste0("HSE ", region),
+         metric = "Population (2022)",
+         value  = value / 1000)   # thousands of people
+
+beds <- read_csv("../supplementary data/2025_hr_beds_per_hospital.csv",
+                 show_col_types = FALSE) |>
+  group_by(region) |>
+  summarise(value = sum(tx_inpatient, na.rm = TRUE), .groups = "drop") |>
+  mutate(region = paste0("HSE ", region),
+         metric = "Inpatient beds (2025)")
+
+budget <- read_excel("../supplementary data/2026_hr_budget.xlsx") |>
+  pivot_longer(everything(), names_to = "region", values_to = "value") |>
+  mutate(value  = value / 1000,    # convert thousands -> millions of euro
+         metric = "Budget (2026, EUR millions)")
+
+age <- read_csv("../supplementary data/2022_hr_age_dist.csv",
+                show_col_types = FALSE)
+over65 <- age |>
+  filter(`Age Group` %in% c("65 - 69 years", "70 - 74 years",
+                             "75 - 79 years", "80 - 84 years",
+                             "85 years and over")) |>
+  group_by(`HSE Regions`, Sex) |>
+  summarise(pct_sex = sum(VALUE), .groups = "drop") |>
+  group_by(`HSE Regions`) |>
+  summarise(value = mean(pct_sex), .groups = "drop") |>
+  mutate(region = paste0("HSE ", `HSE Regions`),
+         metric = "Population aged 65+ (%)") |>
+  select(region, value, metric)
+
+demo <- bind_rows(pop |> select(region, value, metric),
+                  beds, budget, over65) |>
+  mutate(metric = factor(metric, levels = c(
+    "Population (2022)", "Inpatient beds (2025)",
+    "Budget (2026, EUR millions)", "Population aged 65+ (%)"
+  )))
+
+ggplot(demo, aes(x = reorder(region, -value), y = value, fill = region)) +
+  geom_col() +
+  facet_wrap(~ metric, scales = "free_y") +
+  scale_fill_manual(values = region_palette, guide = "none") +
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 10) +
+  theme(axis.text.x = element_text(angle = 35, hjust = 1))
+```
+
+\FloatBarrier
+
+## Alternative Response Scales \label{sect:alt-scales}
+
+The primary analysis uses population-scaled trolley counts (per 10,000 population). Two sensitivity scalings are also 
+fitted to assess robustness of model selection and regional rankings to the choice of denominator.
+
+### Per €1 billion of regional budget
+
+```{r spine-dic-budget, results='asis'}
+dic_dir <- "../data/models/wide_weekly_scaledPerBudgetThousands"
+dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full.names = TRUE)
+dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
+dic <- dic[order(dic$DIC), ]
+
+selected <- c("v0.1", "v1.1", "v2.1")
+
+kableExtra::kbl(
+  dic[, c("version", "description", "deviance", "penalty", "DIC")],
+  booktabs  = TRUE,
+  digits    = 1,
+  row.names = FALSE,
+  linesep   = "",
+  col.names = c("Model", "Description", "Deviance", "pD", "DIC"),
+  caption   = "DIC comparison across the models (response scaled per €1 billion of regional budget, 2026)."
+) |>
+  kableExtra::kable_styling(latex_options = "hold_position")
+```
+
+### Per 100 inpatient beds
+
+```{r spine-dic-bed-count, results='asis'}
+dic_dir <- "../data/models/wide_weekly_scaledPerBed"
+dic_files <- list.files(dic_dir, pattern = "^dic\\.csv$", recursive = TRUE, full.names = TRUE)
+dic <- do.call(rbind, lapply(dic_files, read.csv, stringsAsFactors = FALSE))
+dic <- dic[order(dic$DIC), ]
+
+selected <- c("v0.1", "v1.1", "v2.1")
+
+kableExtra::kbl(
+  dic[, c("version", "description", "deviance", "penalty", "DIC")],
+  booktabs  = TRUE,
+  digits    = 1,
+  row.names = FALSE,
+  linesep   = "",
+  col.names = c("Model", "Description", "Deviance", "pD", "DIC"),
+  caption   = "DIC comparison across models (response scaled per 100 inpatient beds, June 2025)."
+) |>
+  kableExtra::kable_styling(latex_options = "hold_position")
+```
+
+## Residual Normality Checks {#app:residuals}
+
+```{r app-resid-qq, fig.cap="TODO", fig.width=9, fig.height=5}
+res <- read_csv(
+  file.path(base_model, "residuals_posterior_mean.csv"),
+  show_col_types = FALSE
+)
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+regions <- names(res)
+tau_mean <- sapply(seq_along(regions),
+                   function(i) mean(raw[[paste0("tau[", i, "]")]]))
+
+resid_long <- res |>
+  pivot_longer(everything(), names_to = "region", values_to = "r") |>
+  mutate(tau = tau_mean[match(region, regions)],
+         std = r * sqrt(tau))
+
+ggplot(resid_long, aes(sample = std, colour = region)) +
+  stat_qq(size = 0.7) +
+  stat_qq_line(colour = "red") +
+  facet_wrap(~ region, ncol = 3) +
+  scale_colour_manual(values = region_palette, guide = "none") +
+  labs(x = "Theoretical quantile (N(0,1))",
+       y = "Standardised innovation residual") +
+  theme_minimal(base_size = 10)
+```
+
+```{r app-resid-hist, fig.cap="TODO", fig.width=9, fig.height=5}
+res <- read_csv(
+  file.path(base_model, "residuals_posterior_mean.csv"),
+  show_col_types = FALSE
+)
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+regions <- names(res)
+tau_mean <- sapply(seq_along(regions),
+                   function(i) mean(raw[[paste0("tau[", i, "]")]]))
+
+resid_long <- res |>
+  pivot_longer(everything(), names_to = "region", values_to = "r") |>
+  mutate(tau = tau_mean[match(region, regions)],
+         std = r * sqrt(tau))
+
+ggplot(resid_long, aes(std, fill = region)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 30, colour = "white", linewidth = 0.2) +
+  stat_function(fun = dnorm, colour = "black", linewidth = 0.5) +
+  facet_wrap(~ region, ncol = 3) +
+  scale_fill_manual(values = region_palette, guide = "none") +
+  labs(x = "Standardised residual", y = "Density") +
+  theme_minimal(base_size = 10)
+```
+
+\FloatBarrier
+
+## Residual Cycles
+
+```{r app-resid-psd, fig.cap="TODO", fig.width=8, fig.height=4}
+res <- read_csv(
+  file.path(base_model, "residuals_posterior_mean.csv"),
+  show_col_types = FALSE
+)
+
+psd_one <- function(x, label) {
+  s <- spectrum(x, plot = FALSE, detrend = TRUE)
+  tibble(period = 1 / s$freq, power = s$spec, region = label)
+}
+psd_df <- bind_rows(lapply(names(res),
+                           function(r) psd_one(res[[r]], r)))
+
+ggplot(psd_df, aes(period, power, colour = region)) +
+  geom_line(linewidth = 0.5) +
+  scale_x_log10(breaks = c(2, 3, 4, 6, 10, 13, 17, 22, 30, 40, 52)) +
+  scale_colour_manual(values = region_palette) +
+  labs(x = "Period (weeks, log scale)", y = "Power", colour = NULL) +
+  theme_minimal(base_size = 10) +
+  theme(legend.position = "bottom")
+```
+
+```{r app-resid-pacf, fig.cap="TODO", fig.width=9, fig.height=5}
+res <- read_csv(
+  file.path(base_model, "residuals_posterior_mean.csv"),
+  show_col_types = FALSE
+)
+
+pacf_one <- function(x, label) {
+  p <- pacf(x, plot = FALSE, lag.max = 52)
+  tibble(lag = as.numeric(p$lag), pacf = as.numeric(p$acf),
+         region = label)
+}
+pacf_df <- bind_rows(lapply(names(res),
+                            function(r) pacf_one(res[[r]], r)))
+ci <- qnorm(0.975) / sqrt(nrow(res))
+
+ggplot(pacf_df, aes(lag, pacf, colour = region)) +
+  geom_hline(yintercept = 0) +
+  geom_hline(yintercept = c(-ci, ci),
+             linetype = "dashed", colour = "steelblue") +
+  geom_segment(aes(xend = lag, yend = 0)) +
+  facet_wrap(~ region, ncol = 3) +
+  scale_colour_manual(values = region_palette, guide = "none") +
+  labs(x = "Lag (weeks)", y = "PACF") +
+  theme_minimal(base_size = 10)
+```
+
+\FloatBarrier
+
+## Posterior Mean Fit {#app:mu-plots}
+
+\textit{[Posterior mean $\mu_{i,t}$ overlaid on observed $y_{i,t}$ for each spine model.]}
+
+## Trace Plots and Convergence {#app:traces}
+
+Convergence diagnostics for the main model (AR(2) baseline with the date-anchored New Year effect). Trace plots show all monitored parameters across the four chains after burn-in; the Gelman-Rubin table reports the potential scale reduction factor (R-hat) for every parameter.
+
+```{r app-trace-setup, include=FALSE}
+raw <- read_csv(
+  file.path(base_model, "raw_samples.csv"),
+  show_col_types = FALSE
+)
+
+params <- sort(setdiff(names(raw), "chain"))
+family <- sub("\\[.*$", "", params)
+family <- sub("^(sigma_w)[0-9]+$", "\\1", family)
+family <- sub("^(phi)[0-9]+$", "\\1", family)
+groups <- split(params, factor(family, levels = unique(family)))
+
+long <- raw |>
+  group_by(chain) |>
+  mutate(iter = row_number()) |>
+  ungroup() |>
+  mutate(chain = factor(chain)) |>
+  filter(iter %% 10 == 0) |>
+  pivot_longer(all_of(params), names_to = "param", values_to = "value")
+
+trace_panel <- function(p) {
+  d <- dplyr::filter(long, param == p)
+  tr <- ggplot(d, aes(iter, value, colour = chain)) +
+    geom_line(alpha = 0.35, linewidth = 0.15) +
+    geom_smooth(se = FALSE, method = "loess", span = 0.2, linewidth = 0.4) +
+    labs(title = p, x = NULL, y = NULL) +
+    theme_minimal(base_size = 7) +
+    theme(legend.position = "none",
+          plot.title = element_text(size = 7))
+  kd <- ggplot(d, aes(value, colour = chain)) +
+    geom_density(linewidth = 0.4) +
+    coord_flip() +
+    labs(x = NULL, y = NULL) +
+    theme_minimal(base_size = 7) +
+    theme(legend.position = "none",
+          axis.text  = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = element_blank())
+  tr + kd + plot_layout(widths = c(3, 1))
+}
+
+trace_caps <- paste0(
+  "Trace with LOWESS fit (left) and per-chain posterior density (right) for the ",
+  gsub("_", "\\\\_", names(groups)),
+  " parameters of the main model; four chains overlaid after burn-in, every 10th retained draw shown."
+)
+```
+
+```{r app-trace, fig.width=9, fig.height=3.6, fig.cap=trace_caps}
+for (g in names(groups)) {
+  print(patchwork::wrap_plots(lapply(groups[[g]], trace_panel), ncol = 3))
+}
+```
+
+\FloatBarrier
+
+```{r app-gelman, results='asis'}
+gelman <- read.csv(
+  file.path(base_model, "gelman.csv"),
+  stringsAsFactors = FALSE,
+  check.names = FALSE
+)
+gelman <- gelman[order(gelman$param), c("param", "Point est.")]
+names(gelman) <- c("Parameter", "R-hat")
+
+# split into two halves laid side by side to save vertical space
+n    <- nrow(gelman)
+half <- ceiling(n / 2)
+left  <- gelman[1:half, ]
+right <- gelman[(half + 1):n, ]
+if (nrow(right) < nrow(left)) {
+  right <- rbind(right, data.frame(Parameter = "", `R-hat` = NA, check.names = FALSE))
+}
+two_col <- cbind(left, right)
+
+options(knitr.kable.NA = "")
+kableExtra::kbl(
+  two_col,
+  booktabs  = TRUE,
+  digits    = 4,
+  row.names = FALSE,
+  linesep   = "",
+  col.names = c("Parameter", "R-hat", "Parameter", "R-hat"),
+  caption   = "Gelman-Rubin potential scale reduction factor (R-hat) for every monitored parameter of the main model. Values at or near 1.00 indicate convergence; the maximum observed was 1.0002."
+) |>
+  kableExtra::kable_styling(latex_options = c("hold_position"))
+```
+
+## Posterior Parameter Estimates {#app:posteriors}
+
+\textit{[Posterior means and 95\% credible intervals for each spine model.]}

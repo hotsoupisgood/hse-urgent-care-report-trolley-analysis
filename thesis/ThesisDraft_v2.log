@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025/Homebrew) (preloaded format=pdflatex 2025.3.15)  20 APR 2026 20:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025/Homebrew) (preloaded format=pdflatex 2025.3.15)  18 MAY 2026 12:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -87,6 +87,7 @@ Package: iftex 2024/12/12 v1.0g TeX engine tests
 math.sty
 Package: amsmath 2024/11/05 v2.17t AMS math features
 \@mathmargin=\skip51
+
 For additional information on amsmath, use the `?' option.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/amsmath/ams
@@ -378,6 +379,19 @@ Package graphics Info: Driver file: pdftex.def on input line 106.
 \cslhangindent=\skip64
 \csllabelwidth=\skip65
 
+(/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/float/float
+.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count301
+\float@exts=\toks31
+\float@box=\box64
+\@float@everytoks=\toks32
+\@floatcapt=\box65
+)
+(/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/placeins/pl
+aceins.sty
+Package: placeins 2005/04/18  v 2.2
+)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/caption/cap
 tion.sty
 Package: caption 2023/08/05 v3.6o Customizing captions (AR)
@@ -395,8 +409,9 @@ Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
 \caption@hangindent=\dimen188
 Package caption Info: Standard document class detected.
 )
-\c@caption@flags=\count301
-\c@continuedfloat=\count302
+\c@caption@flags=\count302
+\c@continuedfloat=\count303
+Package caption Info: float package is loaded.
 Package caption Info: longtable package is loaded.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/caption/ltc
@@ -411,13 +426,13 @@ yer/pgf.sty
 es/pgfrcs.sty
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/utili
 ties/pgfutil-common.tex
-\pgfutil@everybye=\toks31
+\pgfutil@everybye=\toks33
 \pgfutil@tempdima=\dimen189
 \pgfutil@tempdimb=\dimen190
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/utili
 ties/pgfutil-latex.def
-\pgfutil@abb=\box64
+\pgfutil@abb=\box66
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/utili
 ties/pgfrcs.code.tex
@@ -437,12 +452,12 @@ Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/utili
 ties/pgfkeys.code.tex
-\pgfkeys@pathtoks=\toks32
-\pgfkeys@temptoks=\toks33
+\pgfkeys@pathtoks=\toks34
+\pgfkeys@temptoks=\toks35
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/utili
 ties/pgfkeyslibraryfiltered.code.tex
-\pgfkeys@tmptoks=\toks34
+\pgfkeys@tmptoks=\toks36
 ))
 \pgf@x=\dimen191
 \pgf@y=\dimen192
@@ -456,14 +471,14 @@ ties/pgfkeyslibraryfiltered.code.tex
 \pgf@yd=\dimen256
 \w@pgf@writea=\write3
 \r@pgf@reada=\read2
-\c@pgf@counta=\count303
-\c@pgf@countb=\count304
-\c@pgf@countc=\count305
-\c@pgf@countd=\count306
-\t@pgf@toka=\toks35
-\t@pgf@tokb=\toks36
-\t@pgf@tokc=\toks37
-\pgf@sys@id@count=\count307
+\c@pgf@counta=\count304
+\c@pgf@countb=\count305
+\c@pgf@countc=\count306
+\c@pgf@countd=\count307
+\t@pgf@toka=\toks37
+\t@pgf@tokb=\toks38
+\t@pgf@tokc=\toks39
+\pgf@sys@id@count=\count308
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/syste
 mlayer/pgf.cfg
@@ -482,8 +497,8 @@ File: pgfsys-common-pdf.def 2023-01-15 v3.1.10 (3.1.10)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/syste
 mlayer/pgfsyssoftpath.code.tex
 File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfsyssoftpath@smallbuffer@items=\count308
-\pgfsyssoftpath@bigbuffer@items=\count309
+\pgfsyssoftpath@smallbuffer@items=\count309
+\pgfsyssoftpath@bigbuffer@items=\count310
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/syste
 mlayer/pgfsysprotocol.code.tex
@@ -500,11 +515,11 @@ pgfmathutil.code.tex)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/math/
 pgfmathparser.code.tex
 \pgfmath@dimen=\dimen257
-\pgfmath@count=\count310
-\pgfmath@box=\box65
-\pgfmath@toks=\toks38
-\pgfmath@stack@operand=\toks39
-\pgfmath@stack@operation=\toks40
+\pgfmath@count=\count311
+\pgfmath@box=\box67
+\pgfmath@toks=\toks40
+\pgfmath@stack@operand=\toks41
+\pgfmath@stack@operation=\toks42
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/math/
 pgfmathfunctions.code.tex)
@@ -528,7 +543,7 @@ pgfmathfunctions.integerarithmetics.code.tex)
 pgfmathcalc.code.tex)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/math/
 pgfmathfloat.code.tex
-\c@pgfmathroundto@lastzeros=\count311
+\c@pgfmathroundto@lastzeros=\count312
 ))
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/math/
 pgfint.code.tex)
@@ -565,10 +580,10 @@ File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/basic
 layer/pgfcorescopes.code.tex
 File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfpic=\box66
-\pgf@hbox=\box67
-\pgf@layerbox@main=\box68
-\pgf@picture@serial@count=\count312
+\pgfpic=\box68
+\pgf@hbox=\box69
+\pgf@layerbox@main=\box70
+\pgf@picture@serial@count=\count313
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/basic
 layer/pgfcoregraphicstate.code.tex
@@ -603,8 +618,8 @@ File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
 layer/pgfcoreshade.code.tex
 File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@max=\dimen281
-\pgf@sys@shading@range@num=\count313
-\pgf@shadingcount=\count314
+\pgf@sys@shading@range@num=\count314
+\pgf@shadingcount=\count315
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/basic
 layer/pgfcoreimage.code.tex
@@ -613,7 +628,7 @@ File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/basic
 layer/pgfcoreexternal.code.tex
 File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfexternal@startupbox=\box69
+\pgfexternal@startupbox=\box71
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/basic
 layer/pgfcorelayers.code.tex
@@ -634,7 +649,7 @@ File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/modul
 es/pgfmoduleshapes.code.tex
 File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfnodeparttextbox=\box70
+\pgfnodeparttextbox=\box72
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/modul
 es/pgfmoduleplot.code.tex
@@ -665,8 +680,8 @@ ties/pgffor.code.tex
 Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
 \pgffor@iter=\dimen284
 \pgffor@skip=\dimen285
-\pgffor@stack=\toks41
-\pgffor@toks=\toks42
+\pgffor@stack=\toks43
+\pgffor@toks=\toks44
 ))
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/front
 endlayer/tikz/tikz.code.tex
@@ -675,7 +690,7 @@ Package: tikz 2023-01-15 v3.1.10 (3.1.10)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/libra
 ries/pgflibraryplothandlers.code.tex
 File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@plot@mark@count=\count315
+\pgf@plot@mark@count=\count316
 \pgfplotmarksize=\dimen286
 )
 \tikz@lastx=\dimen287
@@ -686,23 +701,23 @@ File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \tikz@lastmovetoy=\dimen292
 \tikzleveldistance=\dimen293
 \tikzsiblingdistance=\dimen294
-\tikz@figbox=\box71
-\tikz@figbox@bg=\box72
-\tikz@tempbox=\box73
-\tikz@tempbox@bg=\box74
-\tikztreelevel=\count316
-\tikznumberofchildren=\count317
-\tikznumberofcurrentchild=\count318
-\tikz@fig@count=\count319
+\tikz@figbox=\box73
+\tikz@figbox@bg=\box74
+\tikz@tempbox=\box75
+\tikz@tempbox@bg=\box76
+\tikztreelevel=\count317
+\tikznumberofchildren=\count318
+\tikznumberofcurrentchild=\count319
+\tikz@fig@count=\count320
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/modul
 es/pgfmodulematrix.code.tex
 File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfmatrixcurrentrow=\count320
-\pgfmatrixcurrentcolumn=\count321
-\pgf@matrix@numberofcolumns=\count322
+\pgfmatrixcurrentrow=\count321
+\pgfmatrixcurrentcolumn=\count322
+\pgf@matrix@numberofcolumns=\count323
 )
-\tikz@expandcount=\count323
+\tikz@expandcount=\count324
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/front
 endlayer/tikz/libraries/tikzlibrarytopaths.code.tex
@@ -740,7 +755,7 @@ File: tikzlibrarycalc.code.tex 2023-01-15 v3.1.10 (3.1.10)
 ltirow.sty
 Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
 \multirow@colwidth=\skip66
-\multirow@cntb=\count324
+\multirow@cntb=\count325
 \multirow@dima=\skip67
 \bigstrutjot=\dimen299
 )
@@ -748,19 +763,10 @@ Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
 pfig.sty
 \wrapoverhang=\dimen300
 \WF@size=\dimen301
-\c@WF@wrappedlines=\count325
-\WF@box=\box75
-\WF@everypar=\toks43
+\c@WF@wrappedlines=\count326
+\WF@box=\box77
+\WF@everypar=\toks45
 Package: wrapfig 2003/01/31  v 3.6
-)
-(/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/float/float
-.sty
-Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count326
-\float@exts=\toks44
-\float@box=\box76
-\@float@everytoks=\toks45
-\@floatcapt=\box77
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/colortbl/co
 lortbl.sty
@@ -1017,7 +1023,7 @@ ty
 Package: xurl 2022/01/09 v 0.10 modify URL breaks
 )
 LaTeX Font Info:    Trying to load font information for T1+lmr on input line 13
-4.
+6.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
@@ -1030,24 +1036,24 @@ File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 ) (./ThesisDraft_v2.aux)
 \openout1 = `ThesisDraft_v2.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 136.
+LaTeX Font Info:    ... okay on input line 136.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/context/base/mkii
 /supp-pdf.mkii
@@ -1112,20 +1118,20 @@ e
 Package microtype Info: Patching varwidth to enable character protrusion.
 \MT@vwid@leftmargin=\dimen323
 \MT@vwid@rightmargin=\dimen324
-LaTeX Info: Redefining \microtypecontext on input line 134.
-Package microtype Info: Applying patch `item' on input line 134.
-Package microtype Info: Applying patch `toc' on input line 134.
-Package microtype Info: Applying patch `eqnum' on input line 134.
-Package microtype Info: Applying patch `footnote' on input line 134.
-Package microtype Info: Applying patch `verbatim' on input line 134.
-LaTeX Info: Redefining \microtypesetup on input line 134.
+LaTeX Info: Redefining \microtypecontext on input line 136.
+Package microtype Info: Applying patch `item' on input line 136.
+Package microtype Info: Applying patch `toc' on input line 136.
+Package microtype Info: Applying patch `eqnum' on input line 136.
+Package microtype Info: Applying patch `footnote' on input line 136.
+Package microtype Info: Applying patch `verbatim' on input line 136.
+LaTeX Info: Redefining \microtypesetup on input line 136.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 134.
+LaTeX Info: Redefining \showhyphens on input line 136.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -1136,59 +1142,72 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 (RS)
 )
 Package caption Info: Begin \AtBeginDocument code.
-Package caption Info: float package is loaded.
 Package caption Info: hyperref package is loaded.
 Package caption Info: threeparttable package is loaded.
 Package caption Info: wrapfig package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring OFF on input line 134.
-<./logo.jpg, id=31, 284.5029pt x 87.4467pt>
-File: ./logo.jpg Graphic file (type jpg)
-<use ./logo.jpg>
-Package pdftex.def Info: ./logo.jpg  used on input line 138.
-(pdftex.def)             Requested size: 199.16928pt x 61.21759pt.
+Package hyperref Info: Link coloring OFF on input line 136.
+
+No file ThesisDraft_v2.toc.
+\tf@toc=\write4
+\openout4 = `ThesisDraft_v2.toc'.
+
 
 
 [1
 
 {/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/map/pdftex/updm
 ap/pdftex.map}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/e
-nc/dvips/lm/lm-ec.enc} <./logo.jpg>]
+nc/dvips/lm/lm-ec.enc}]
+<./logo.jpg, id=39, 284.5029pt x 87.4467pt>
+File: ./logo.jpg Graphic file (type jpg)
+<use ./logo.jpg>
+Package pdftex.def Info: ./logo.jpg  used on input line 144.
+(pdftex.def)             Requested size: 199.16928pt x 61.21759pt.
+
+
+
+pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
+been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.158 \end{titlepage}
+                      [1 <./logo.jpg>]
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
-57.
+63.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/ot1lmr.f
 d
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
-57.
+63.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/omllmm.f
 d
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-157.
+163.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/omslmsy.
 fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-157.
+163.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/omxlmex.
 fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 157.
+(Font)              <10> on input line 163.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 157.
+(Font)              <7> on input line 163.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 157.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 157
+(Font)              <5> on input line 163.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 163
 .
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/amsfonts/um
@@ -1199,7 +1218,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 t-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 157
+LaTeX Font Info:    Trying to load font information for U+msb on input line 163
 .
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/amsfonts/um
@@ -1216,50 +1235,166 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.165 \newpage
+l.171 \newpage
                [1
 
 ] (./ThesisDraft_v2.toc)
-\tf@toc=\write4
-\openout4 = `ThesisDraft_v2.toc'.
+\tf@toc=\write5
+\openout5 = `ThesisDraft_v2.toc'.
 
 
 
 [2]
 
+LaTeX Warning: Reference `fig:eda-weekly-overview' on page 3 undefined on input
+ line 226.
+
+
+LaTeX Warning: Reference `fig:eda-events' on page 3 undefined on input line 227
+.
+
+
+LaTeX Warning: File `ThesisDraft_v2_files/figure-latex/eda-weekly-overview-1.pd
+f' not found on input line 230.
+
+
+! Package pdftex.def Error: File `ThesisDraft_v2_files/figure-latex/eda-weekly-
+overview-1.pdf' not found: using draft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.230 .../figure-latex/eda-weekly-overview-1.pdf}}
+                                                  
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 2
+30.
+
+(/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/t1lmtt.f
+d
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+
+LaTeX Warning: Reference `fig:eda-events' on page 3 undefined on input line 235
+.
+
+
+LaTeX Warning: File `ThesisDraft_v2_files/figure-latex/eda-events-1.pdf' not fo
+und on input line 240.
+
+
+! Package pdftex.def Error: File `ThesisDraft_v2_files/figure-latex/eda-events-
+1.pdf' not found: using draft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.240 ..._v2_files/figure-latex/eda-events-1.pdf}}
+                                                  
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+LaTeX Warning: File `ThesisDraft_v2_files/figure-latex/eda-psd-1.pdf' not found
+ on input line 246.
+
+
+! Package pdftex.def Error: File `ThesisDraft_v2_files/figure-latex/eda-psd-1.p
+df' not found: using draft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.246 ...aft_v2_files/figure-latex/eda-psd-1.pdf}}
+                                                  
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+LaTeX Warning: File `ThesisDraft_v2_files/figure-latex/eda-pacf-1.pdf' not foun
+d on input line 252.
+
+
+! Package pdftex.def Error: File `ThesisDraft_v2_files/figure-latex/eda-pacf-1.
+pdf' not found: using draft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.252 ...ft_v2_files/figure-latex/eda-pacf-1.pdf}}
+                                                  
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+LaTeX Warning: File `ThesisDraft_v2_files/figure-latex/eda-region-pop-1.pdf' no
+t found on input line 258.
+
+
+! Package pdftex.def Error: File `ThesisDraft_v2_files/figure-latex/eda-region-
+pop-1.pdf' not found: using draft setting.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.258 ...files/figure-latex/eda-region-pop-1.pdf}}
+                                                  
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+
 [3]
 
-LaTeX Warning: Reference `(' on page 4 undefined on input line 214.
-
-
-LaTeX Warning: Reference `tab:spine-dic-hrpop' on page 4 undefined on input lin
-e 217.
-
-
-
-[4{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/lm/
-lm-mathit.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/e
-nc/dvips/lm/lm-rm.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist
-/fonts/enc/dvips/lm/lm-mathsy.enc}{/opt/homebrew/Cellar/texlive/20250308_1/shar
-e/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}]
-
-[5]
-
-[6]
-
-[7]
-
-[8]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 4
-69.
+[4]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 2
+83.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/ts1lmr.f
 d
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 
-[9{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/lm/
-lm-ts1.enc}]
+LaTeX Warning: Reference `fig:model-inheritance' on page 5 undefined on input l
+ine 300.
+
+
+LaTeX Warning: Reference `eq:base-likelihood' on page 5 undefined on input line
+ 300.
+
+
+
+[5
+
+{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/lm/lm
+-mathit.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc
+/dvips/lm/lm-rm.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/f
+onts/enc/dvips/lm/lm-mathsy.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/
+texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/opt/homebrew/Cellar/texlive/20250308
+_1/share/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}]
+
+[6]
+
+[7]
+
+[8]
+Overfull \hbox (0.17952pt too wide) in paragraph at lines 455--456
+\T1/lmr/m/n/10 (+15) r e l e a s e s / m i n i s t e r -[] f o r -[] h e a l th
+ -[] t h a n ks -[] h e a l t h c a re -[] w o r k e r s -[] f o r -[] d e l i 
+v e r i ng -[] 20 -[] r e d u c t i o n -[] in -[] t r o l l e y -[] n u m b e 
+r s -[]
+ []
+
+
+
+[9]
 
 [10]
 
@@ -1268,27 +1403,68 @@ lm-ts1.enc}]
 [12]
 
 [13]
+Overfull \hbox (173.99753pt too wide) in paragraph at lines 919--940
+ [][] 
+ []
 
-Package caption Warning: Unused \captionsetup[table] on input line 107.
-See the caption package documentation for explanation.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+Overfull \hbox (178.99753pt too wide) in paragraph at lines 948--969
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
 
-[14] (./ThesisDraft_v2.aux)
+[14]
+<../data/models/wide_weekly_scaledPer10k/v2.1/plots/traces_region1.png, id=194,
+ 794.97pt x 614.295pt>
+File: ../data/models/wide_weekly_scaledPer10k/v2.1/plots/traces_region1.png Gra
+phic file (type png)
+<use ../data/models/wide_weekly_scaledPer10k/v2.1/plots/traces_region1.png>
+Package pdftex.def Info: ../data/models/wide_weekly_scaledPer10k/v2.1/plots/tra
+ces_region1.png  used on input line 985.
+(pdftex.def)             Requested size: 469.75502pt x 363.00267pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: Reference `tab:gelman-v2-1' on page 15 undefined on input line 9
+90.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+
+[15]
+
+[16 <../data/models/wide_weekly_scaledPer10k/v2.1/plots/traces_region1.png>]
+
+[17] (./ThesisDraft_v2.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 
+
 LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
  ) 
 Here is how much of TeX's memory you used:
- 27594 strings out of 473190
- 517181 string characters out of 5704335
- 929909 words of memory out of 5000000
- 50154 multiletter control sequences out of 15000+600000
- 635327 words of font info for 131 fonts, out of 8000000 for 9000
+ 27897 strings out of 473190
+ 529660 string characters out of 5704335
+ 936620 words of memory out of 5000000
+ 50385 multiletter control sequences out of 15000+600000
+ 638144 words of font info for 155 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,11n,93p,1011b,955s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/
@@ -1309,11 +1485,12 @@ are/texmf-dist/fonts/type1/public/lm/lmr9.pfb></opt/homebrew/Cellar/texlive/202
 brew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmri9.pfb
 ></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/l
 m/lmsy10.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/ty
-pe1/public/lm/lmsy7.pfb>
-Output written on ThesisDraft_v2.pdf (15 pages, 556144 bytes).
+pe1/public/lm/lmsy7.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-di
+st/fonts/type1/public/lm/lmtt10.pfb>
+Output written on ThesisDraft_v2.pdf (19 pages, 1119035 bytes).
 PDF statistics:
- 420 PDF objects out of 1000 (max. 8388607)
- 346 compressed objects within 4 object streams
- 66 named destinations out of 1000 (max. 500000)
- 45466 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 387 PDF objects out of 1000 (max. 8388607)
+ 305 compressed objects within 4 object streams
+ 86 named destinations out of 1000 (max. 500000)
+ 49439 words of extra memory for PDF output out of 51595 (max. 10000000)
 

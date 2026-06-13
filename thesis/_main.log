@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025/Homebrew) (preloaded format=pdflatex 2025.3.15)  22 APR 2026 22:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025/Homebrew) (preloaded format=pdflatex 2025.3.15)  14 JUN 2026 00:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -378,6 +378,19 @@ Package graphics Info: Driver file: pdftex.def on input line 106.
 \cslhangindent=\skip64
 \csllabelwidth=\skip65
 
+(/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/float/float
+.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count301
+\float@exts=\toks31
+\float@box=\box64
+\@float@everytoks=\toks32
+\@floatcapt=\box65
+)
+(/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/placeins/pl
+aceins.sty
+Package: placeins 2005/04/18  v 2.2
+)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/caption/cap
 tion.sty
 Package: caption 2023/08/05 v3.6o Customizing captions (AR)
@@ -395,8 +408,9 @@ Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
 \caption@hangindent=\dimen188
 Package caption Info: Standard document class detected.
 )
-\c@caption@flags=\count301
-\c@continuedfloat=\count302
+\c@caption@flags=\count302
+\c@continuedfloat=\count303
+Package caption Info: float package is loaded.
 Package caption Info: longtable package is loaded.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/caption/ltc
@@ -411,13 +425,13 @@ yer/pgf.sty
 es/pgfrcs.sty
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/utili
 ties/pgfutil-common.tex
-\pgfutil@everybye=\toks31
+\pgfutil@everybye=\toks33
 \pgfutil@tempdima=\dimen189
 \pgfutil@tempdimb=\dimen190
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/utili
 ties/pgfutil-latex.def
-\pgfutil@abb=\box64
+\pgfutil@abb=\box66
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/utili
 ties/pgfrcs.code.tex
@@ -437,12 +451,12 @@ Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/utili
 ties/pgfkeys.code.tex
-\pgfkeys@pathtoks=\toks32
-\pgfkeys@temptoks=\toks33
+\pgfkeys@pathtoks=\toks34
+\pgfkeys@temptoks=\toks35
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/utili
 ties/pgfkeyslibraryfiltered.code.tex
-\pgfkeys@tmptoks=\toks34
+\pgfkeys@tmptoks=\toks36
 ))
 \pgf@x=\dimen191
 \pgf@y=\dimen192
@@ -456,14 +470,14 @@ ties/pgfkeyslibraryfiltered.code.tex
 \pgf@yd=\dimen256
 \w@pgf@writea=\write3
 \r@pgf@reada=\read2
-\c@pgf@counta=\count303
-\c@pgf@countb=\count304
-\c@pgf@countc=\count305
-\c@pgf@countd=\count306
-\t@pgf@toka=\toks35
-\t@pgf@tokb=\toks36
-\t@pgf@tokc=\toks37
-\pgf@sys@id@count=\count307
+\c@pgf@counta=\count304
+\c@pgf@countb=\count305
+\c@pgf@countc=\count306
+\c@pgf@countd=\count307
+\t@pgf@toka=\toks37
+\t@pgf@tokb=\toks38
+\t@pgf@tokc=\toks39
+\pgf@sys@id@count=\count308
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/syste
 mlayer/pgf.cfg
@@ -482,8 +496,8 @@ File: pgfsys-common-pdf.def 2023-01-15 v3.1.10 (3.1.10)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/syste
 mlayer/pgfsyssoftpath.code.tex
 File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfsyssoftpath@smallbuffer@items=\count308
-\pgfsyssoftpath@bigbuffer@items=\count309
+\pgfsyssoftpath@smallbuffer@items=\count309
+\pgfsyssoftpath@bigbuffer@items=\count310
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/syste
 mlayer/pgfsysprotocol.code.tex
@@ -500,11 +514,11 @@ pgfmathutil.code.tex)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/math/
 pgfmathparser.code.tex
 \pgfmath@dimen=\dimen257
-\pgfmath@count=\count310
-\pgfmath@box=\box65
-\pgfmath@toks=\toks38
-\pgfmath@stack@operand=\toks39
-\pgfmath@stack@operation=\toks40
+\pgfmath@count=\count311
+\pgfmath@box=\box67
+\pgfmath@toks=\toks40
+\pgfmath@stack@operand=\toks41
+\pgfmath@stack@operation=\toks42
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/math/
 pgfmathfunctions.code.tex)
@@ -528,7 +542,7 @@ pgfmathfunctions.integerarithmetics.code.tex)
 pgfmathcalc.code.tex)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/math/
 pgfmathfloat.code.tex
-\c@pgfmathroundto@lastzeros=\count311
+\c@pgfmathroundto@lastzeros=\count312
 ))
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/math/
 pgfint.code.tex)
@@ -565,10 +579,10 @@ File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/basic
 layer/pgfcorescopes.code.tex
 File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfpic=\box66
-\pgf@hbox=\box67
-\pgf@layerbox@main=\box68
-\pgf@picture@serial@count=\count312
+\pgfpic=\box68
+\pgf@hbox=\box69
+\pgf@layerbox@main=\box70
+\pgf@picture@serial@count=\count313
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/basic
 layer/pgfcoregraphicstate.code.tex
@@ -603,8 +617,8 @@ File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
 layer/pgfcoreshade.code.tex
 File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgf@max=\dimen281
-\pgf@sys@shading@range@num=\count313
-\pgf@shadingcount=\count314
+\pgf@sys@shading@range@num=\count314
+\pgf@shadingcount=\count315
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/basic
 layer/pgfcoreimage.code.tex
@@ -613,7 +627,7 @@ File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/basic
 layer/pgfcoreexternal.code.tex
 File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfexternal@startupbox=\box69
+\pgfexternal@startupbox=\box71
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/basic
 layer/pgfcorelayers.code.tex
@@ -634,7 +648,7 @@ File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/modul
 es/pgfmoduleshapes.code.tex
 File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfnodeparttextbox=\box70
+\pgfnodeparttextbox=\box72
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/modul
 es/pgfmoduleplot.code.tex
@@ -665,8 +679,8 @@ ties/pgffor.code.tex
 Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
 \pgffor@iter=\dimen284
 \pgffor@skip=\dimen285
-\pgffor@stack=\toks41
-\pgffor@toks=\toks42
+\pgffor@stack=\toks43
+\pgffor@toks=\toks44
 ))
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/front
 endlayer/tikz/tikz.code.tex
@@ -675,7 +689,7 @@ Package: tikz 2023-01-15 v3.1.10 (3.1.10)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/libra
 ries/pgflibraryplothandlers.code.tex
 File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@plot@mark@count=\count315
+\pgf@plot@mark@count=\count316
 \pgfplotmarksize=\dimen286
 )
 \tikz@lastx=\dimen287
@@ -686,23 +700,23 @@ File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \tikz@lastmovetoy=\dimen292
 \tikzleveldistance=\dimen293
 \tikzsiblingdistance=\dimen294
-\tikz@figbox=\box71
-\tikz@figbox@bg=\box72
-\tikz@tempbox=\box73
-\tikz@tempbox@bg=\box74
-\tikztreelevel=\count316
-\tikznumberofchildren=\count317
-\tikznumberofcurrentchild=\count318
-\tikz@fig@count=\count319
+\tikz@figbox=\box73
+\tikz@figbox@bg=\box74
+\tikz@tempbox=\box75
+\tikz@tempbox@bg=\box76
+\tikztreelevel=\count317
+\tikznumberofchildren=\count318
+\tikznumberofcurrentchild=\count319
+\tikz@fig@count=\count320
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/modul
 es/pgfmodulematrix.code.tex
 File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfmatrixcurrentrow=\count320
-\pgfmatrixcurrentcolumn=\count321
-\pgf@matrix@numberofcolumns=\count322
+\pgfmatrixcurrentrow=\count321
+\pgfmatrixcurrentcolumn=\count322
+\pgf@matrix@numberofcolumns=\count323
 )
-\tikz@expandcount=\count323
+\tikz@expandcount=\count324
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/generic/pgf/front
 endlayer/tikz/libraries/tikzlibrarytopaths.code.tex
@@ -736,11 +750,15 @@ File: pgflibraryfadings.code.tex 2023-01-15 v3.1.10 (3.1.10)
 endlayer/tikz/libraries/tikzlibrarycalc.code.tex
 File: tikzlibrarycalc.code.tex 2023-01-15 v3.1.10 (3.1.10)
 )
+(/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/tools/inden
+tfirst.sty
+Package: indentfirst 2023/07/02 v1.03 Indent first paragraph (DPC)
+)
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/multirow/mu
 ltirow.sty
 Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
 \multirow@colwidth=\skip66
-\multirow@cntb=\count324
+\multirow@cntb=\count325
 \multirow@dima=\skip67
 \bigstrutjot=\dimen299
 )
@@ -748,19 +766,10 @@ Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
 pfig.sty
 \wrapoverhang=\dimen300
 \WF@size=\dimen301
-\c@WF@wrappedlines=\count325
-\WF@box=\box75
-\WF@everypar=\toks43
+\c@WF@wrappedlines=\count326
+\WF@box=\box77
+\WF@everypar=\toks45
 Package: wrapfig 2003/01/31  v 3.6
-)
-(/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/float/float
-.sty
-Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count326
-\float@exts=\toks44
-\float@box=\box76
-\@float@everytoks=\toks45
-\@floatcapt=\box77
 )
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/colortbl/co
 lortbl.sty
@@ -1017,7 +1026,7 @@ ty
 Package: xurl 2022/01/09 v 0.10 modify URL breaks
 )
 LaTeX Font Info:    Trying to load font information for T1+lmr on input line 13
-4.
+8.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
@@ -1030,24 +1039,24 @@ File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
 ) (./_main.aux)
 \openout1 = `_main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 134.
-LaTeX Font Info:    ... okay on input line 134.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 138.
+LaTeX Font Info:    ... okay on input line 138.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 138.
+LaTeX Font Info:    ... okay on input line 138.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 138.
+LaTeX Font Info:    ... okay on input line 138.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 138.
+LaTeX Font Info:    ... okay on input line 138.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 138.
+LaTeX Font Info:    ... okay on input line 138.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 138.
+LaTeX Font Info:    ... okay on input line 138.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 138.
+LaTeX Font Info:    ... okay on input line 138.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 138.
+LaTeX Font Info:    ... okay on input line 138.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 138.
+LaTeX Font Info:    ... okay on input line 138.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/context/base/mkii
 /supp-pdf.mkii
@@ -1112,20 +1121,20 @@ e
 Package microtype Info: Patching varwidth to enable character protrusion.
 \MT@vwid@leftmargin=\dimen323
 \MT@vwid@rightmargin=\dimen324
-LaTeX Info: Redefining \microtypecontext on input line 134.
-Package microtype Info: Applying patch `item' on input line 134.
-Package microtype Info: Applying patch `toc' on input line 134.
-Package microtype Info: Applying patch `eqnum' on input line 134.
-Package microtype Info: Applying patch `footnote' on input line 134.
-Package microtype Info: Applying patch `verbatim' on input line 134.
-LaTeX Info: Redefining \microtypesetup on input line 134.
+LaTeX Info: Redefining \microtypecontext on input line 138.
+Package microtype Info: Applying patch `item' on input line 138.
+Package microtype Info: Applying patch `toc' on input line 138.
+Package microtype Info: Applying patch `eqnum' on input line 138.
+Package microtype Info: Applying patch `footnote' on input line 138.
+Package microtype Info: Applying patch `verbatim' on input line 138.
+LaTeX Info: Redefining \microtypesetup on input line 138.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 134.
+LaTeX Info: Redefining \showhyphens on input line 138.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -1136,16 +1145,15 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 (RS)
 )
 Package caption Info: Begin \AtBeginDocument code.
-Package caption Info: float package is loaded.
 Package caption Info: hyperref package is loaded.
 Package caption Info: threeparttable package is loaded.
 Package caption Info: wrapfig package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring OFF on input line 134.
+Package hyperref Info: Link coloring OFF on input line 138.
 <./logo.jpg, id=31, 284.5029pt x 87.4467pt>
 File: ./logo.jpg Graphic file (type jpg)
 <use ./logo.jpg>
-Package pdftex.def Info: ./logo.jpg  used on input line 138.
+Package pdftex.def Info: ./logo.jpg  used on input line 142.
 (pdftex.def)             Requested size: 199.16928pt x 61.21759pt.
 
 
@@ -1155,40 +1163,40 @@ Package pdftex.def Info: ./logo.jpg  used on input line 138.
 ap/pdftex.map}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/e
 nc/dvips/lm/lm-ec.enc} <./logo.jpg>]
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
-57.
+61.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/ot1lmr.f
 d
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
-57.
+61.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/omllmm.f
 d
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-157.
+161.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/omslmsy.
 fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-157.
+161.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/omxlmex.
 fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 157.
+(Font)              <10> on input line 161.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 157.
+(Font)              <7> on input line 161.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 157.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 157
+(Font)              <5> on input line 161.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 161
 .
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/amsfonts/um
@@ -1199,7 +1207,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 t-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 157
+LaTeX Font Info:    Trying to load font information for U+msb on input line 161
 .
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/amsfonts/um
@@ -1216,94 +1224,331 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.165 \newpage
+l.169 \newpage
                [1
 
-] (./_main.toc)
-\tf@toc=\write4
-\openout4 = `_main.toc'.
-
-
-
-[2]
-
-[3]
-
-[4{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/lm/
-lm-mathit.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/e
-nc/dvips/lm/lm-rm.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist
-/fonts/enc/dvips/lm/lm-mathsy.enc}{/opt/homebrew/Cellar/texlive/20250308_1/shar
-e/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}]
-
-[5]
-
-[6]
-
-[7]
-
-[8]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 4
-94.
+] (./_main.toc
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1
+5.
 
 (/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/ts1lmr.f
 d
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 
-[9{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/lm/
-lm-ts1.enc}]
+[2{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/lm/
+lm-ts1.enc}])
+\tf@toc=\write4
+\openout4 = `_main.toc'.
 
-[10]
+
+
+[3]
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
+89.
+
+(/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/tex/latex/lm/t1lmtt.f
+d
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+Overfull \hbox (15.03148pt too wide) in paragraph at lines 189--190
+\T1/lmr/m/n/10 (-20) April 2026. The re-port is scraped from the URL: \T1/lmtt/
+m/n/10 https://uec.hse.ie/uec/TGAR.php?EDDATE=DD%2FMM%2FYYYY\T1/lmr/m/n/10 (-20
+) ,
+ []
+
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-weekly-overview-1.pdf, id=159, 613.2
+9124pt x 304.13625pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-weekly-overview-1.pdf Graphic f
+ile (type pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-weekly-overview-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-weekly-overv
+iew-1.pdf  used on input line 203.
+(pdftex.def)             Requested size: 446.26582pt x 221.30757pt.
+
+
+[4]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-newyear-1.pdf, id=171, 562.1pt x 262
+.9825pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-newyear-1.pdf Graphic file (typ
+e pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-newyear-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-newyear-1.pd
+f  used on input line 218.
+(pdftex.def)             Requested size: 446.26582pt x 208.78918pt.
+
+
+[5 </tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-weekly-overview-1.pdf>]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-midwest-1.pdf, id=190, 573.14125pt x
+ 264.99pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-midwest-1.pdf Graphic file (typ
+e pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-midwest-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-midwest-1.pd
+f  used on input line 231.
+(pdftex.def)             Requested size: 446.26582pt x 206.3315pt.
+
+
+[6 </tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-newyear-1.pdf>]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-psd-1.pdf, id=208, 568.1225pt x 268.
+00125pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-psd-1.pdf Graphic file (type pd
+f)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-psd-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-psd-1.pdf  u
+sed on input line 248.
+(pdftex.def)             Requested size: 446.26582pt x 210.52455pt.
+
+
+[7 </tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-midwest-1.pdf>]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-pacf-1.pdf, id=227, 557.08125pt x 40
+9.53pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-pacf-1.pdf Graphic file (type p
+df)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-pacf-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-pacf-1.pdf  
+used on input line 261.
+(pdftex.def)             Requested size: 446.26582pt x 328.07436pt.
+
+
+[8{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/lm/
+lm-mathit.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/e
+nc/dvips/lm/lm-rm.enc}{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist
+/fonts/enc/dvips/lm/lm-mathsy.enc} </tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-p
+sd-1.pdf>]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-region-pop-1.pdf, id=253, 765.86125p
+t x 628.3475pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-region-pop-1.pdf Graphic file (
+type pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-region-pop-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-region-pop-1
+.pdf  used on input line 288.
+(pdftex.def)             Requested size: 446.26582pt x 366.13884pt.
+
+
+[9 </tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-pacf-1.pdf>]
+
+[10 </tmp/claude-501/Rtmp14lv9h/thesis-fig/eda-region-pop-1.pdf>]
 
 [11]
 
-[12]
+[12{/opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/enc/dvips/lm
+/lm-mathex.enc}]
+
+[13]
+
+[14]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/results-mu-ribbon-1.pdf, id=319, 700.617
+5pt x 328.22626pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-mu-ribbon-1.pdf Graphic fil
+e (type pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-mu-ribbon-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-mu-ribbo
+n-1.pdf  used on input line 505.
+(pdftex.def)             Requested size: 469.75502pt x 220.07571pt.
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/results-alpha-map-1.pdf, id=322, 354.323
+75pt x 395.4775pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-alpha-map-1.pdf Graphic fil
+e (type pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-alpha-map-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-alpha-ma
+p-1.pdf  used on input line 522.
+(pdftex.def)             Requested size: 258.36668pt x 288.38237pt.
+
+
+[15 </tmp/claude-501/Rtmp14lv9h/thesis-fig/results-mu-ribbon-1.pdf>]
+
+[16 </tmp/claude-501/Rtmp14lv9h/thesis-fig/results-alpha-map-1.pdf>]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
 
-[13]
+[17
 
-[14]
+]
 
-[15] (./_main.aux)
+[18]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/results-phase-plot-1.pdf, id=371, 551.05
+875pt x 279.0425pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-phase-plot-1.pdf Graphic fi
+le (type pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-phase-plot-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-phase-pl
+ot-1.pdf  used on input line 634.
+(pdftex.def)             Requested size: 446.26582pt x 225.98486pt.
+
+
+[19 </tmp/claude-501/Rtmp14lv9h/thesis-fig/results-phase-plot-1.pdf>]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/results-ny-effect-1.pdf, id=392, 640.392
+5pt x 418.56375pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-ny-effect-1.pdf Graphic fil
+e (type pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-ny-effect-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-ny-effec
+t-1.pdf  used on input line 716.
+(pdftex.def)             Requested size: 446.26582pt x 291.68333pt.
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/results-mw-reset-1.pdf, id=394, 492.8412
+5pt x 274.02374pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-mw-reset-1.pdf Graphic file
+ (type pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-mw-reset-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-mw-reset
+-1.pdf  used on input line 733.
+(pdftex.def)             Requested size: 446.26582pt x 248.14107pt.
+
+
+[20]
+
+[21 </tmp/claude-501/Rtmp14lv9h/thesis-fig/results-ny-effect-1.pdf> </tmp/claud
+e-501/Rtmp14lv9h/thesis-fig/results-mw-reset-1.pdf>]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/results-resid-1.pdf, id=427, 640.3925pt 
+x 258.9675pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-resid-1.pdf Graphic file (t
+ype pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-resid-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-resid-1.
+pdf  used on input line 770.
+(pdftex.def)             Requested size: 446.26582pt x 180.46593pt.
+
+
+[22 </tmp/claude-501/Rtmp14lv9h/thesis-fig/results-resid-1.pdf>]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/results-ccf-1.pdf, id=443, 334.24875pt x
+ 292.09125pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-ccf-1.pdf Graphic file (typ
+e pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-ccf-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/results-ccf-1.pd
+f  used on input line 785.
+(pdftex.def)             Requested size: 446.26582pt x 390.00964pt.
+
+
+[23 </tmp/claude-501/Rtmp14lv9h/thesis-fig/results-ccf-1.pdf>]
+
+[24]
+Overfull \hbox (0.17952pt too wide) in paragraph at lines 818--819
+\T1/lmr/m/n/10 (+15) r e l e a s e s / m i n i s t e r -[] f o r -[] h e a l th
+ -[] t h a n ks -[] h e a l t h c a re -[] w o r k e r s -[] f o r -[] d e l i 
+v e r i ng -[] 20 -[] r e d u c t i o n -[] in -[] t r o l l e y -[] n u m b e 
+r s -[]
+ []
+
+
+
+[25]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/app-raw-boxplot-1.pdf, id=503, 548.0475p
+t x 303.1325pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-raw-boxplot-1.pdf Graphic file 
+(type pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-raw-boxplot-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-raw-boxplot-
+1.pdf  used on input line 900.
+(pdftex.def)             Requested size: 446.26582pt x 246.84035pt.
+
+
+[26]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/app-region-demographics-1.pdf, id=508, 5
+67.11874pt x 418.56375pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-region-demographics-1.pdf Graph
+ic file (type pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-region-demographics-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-region-demog
+raphics-1.pdf  used on input line 913.
+(pdftex.def)             Requested size: 446.26582pt x 329.37799pt.
+
+
+[27 </tmp/claude-501/Rtmp14lv9h/thesis-fig/app-raw-boxplot-1.pdf>]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-qq-1.pdf, id=526, 642.4pt x 34
+7.2975pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-qq-1.pdf Graphic file (ty
+pe pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-qq-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-qq-1.p
+df  used on input line 930.
+(pdftex.def)             Requested size: 446.26582pt x 241.26772pt.
+
+
+[28 </tmp/claude-501/Rtmp14lv9h/thesis-fig/app-region-demographics-1.pdf>]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-hist-1.pdf, id=540, 632.3625pt
+ x 346.29375pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-hist-1.pdf Graphic file (
+type pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-hist-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-hist-1
+.pdf  used on input line 939.
+(pdftex.def)             Requested size: 446.26582pt x 244.38547pt.
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-psd-1.pdf, id=541, 545.03625pt
+ x 260.975pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-psd-1.pdf Graphic file (t
+ype pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-psd-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-psd-1.
+pdf  used on input line 952.
+(pdftex.def)             Requested size: 446.26582pt x 213.68231pt.
+
+
+[29 </tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-qq-1.pdf> </tmp/claude-501
+/Rtmp14lv9h/thesis-fig/app-resid-hist-1.pdf>]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-pacf-1.pdf, id=562, 642.4pt x 
+347.2975pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-pacf-1.pdf Graphic file (
+type pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-pacf-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-pacf-1
+.pdf  used on input line 961.
+(pdftex.def)             Requested size: 446.26582pt x 241.26772pt.
+
+
+[30 </tmp/claude-501/Rtmp14lv9h/thesis-fig/app-resid-psd-1.pdf> </tmp/claude-50
+1/Rtmp14lv9h/thesis-fig/app-resid-pacf-1.pdf>]
+</tmp/claude-501/Rtmp14lv9h/thesis-fig/app-trace-1.pdf, id=584, 632.3625pt x 63
+6.3775pt>
+File: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-trace-1.pdf Graphic file (type 
+pdf)
+<use /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-trace-1.pdf>
+Package pdftex.def Info: /tmp/claude-501/Rtmp14lv9h/thesis-fig/app-trace-1.pdf 
+ used on input line 978.
+(pdftex.def)             Requested size: 469.75502pt x 472.74722pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+
+[31 </tmp/claude-501/Rtmp14lv9h/thesis-fig/app-trace-1.pdf>]
+
+[32] (./_main.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 27613 strings out of 473190
- 517327 string characters out of 5704335
- 932403 words of memory out of 5000000
- 50161 multiletter control sequences out of 15000+600000
- 635623 words of font info for 134 fonts, out of 8000000 for 9000
+ 27845 strings out of 473190
+ 530193 string characters out of 5704335
+ 945710 words of memory out of 5000000
+ 50266 multiletter control sequences out of 15000+600000
+ 624707 words of font info for 164 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,11n,93p,1002b,955s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,10n,93p,1175b,488s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/
 lm/lmbx10.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/t
 ype1/public/lm/lmbx12.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-
-dist/fonts/type1/public/lm/lmbx9.pfb></opt/homebrew/Cellar/texlive/20250308_1/s
-hare/texmf-dist/fonts/type1/public/lm/lmex10.pfb></opt/homebrew/Cellar/texlive/
-20250308_1/share/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></opt/homebrew/Cel
-lar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></opt/h
-omebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmr10.
+dist/fonts/type1/public/lm/lmex10.pfb></opt/homebrew/Cellar/texlive/20250308_1/
+share/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></opt/homebrew/Cellar/texlive
+/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></opt/homebrew/Cel
+lar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmr10.pfb></opt/h
+omebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmr12.
 pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/publi
-c/lm/lmr12.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/
-type1/public/lm/lmr17.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-
-dist/fonts/type1/public/lm/lmr7.pfb></opt/homebrew/Cellar/texlive/20250308_1/sh
-are/texmf-dist/fonts/type1/public/lm/lmr9.pfb></opt/homebrew/Cellar/texlive/202
-50308_1/share/texmf-dist/fonts/type1/public/lm/lmri10.pfb></opt/homebrew/Cellar
-/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmri7.pfb></opt/home
-brew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmri9.pfb
-></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/l
-m/lmsy10.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/ty
-pe1/public/lm/lmsy7.pfb>
-Output written on _main.pdf (16 pages, 556657 bytes).
+c/lm/lmr17.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-dist/fonts/
+type1/public/lm/lmr7.pfb></opt/homebrew/Cellar/texlive/20250308_1/share/texmf-d
+ist/fonts/type1/public/lm/lmri10.pfb></opt/homebrew/Cellar/texlive/20250308_1/s
+hare/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></opt/homebrew/Cellar/texlive/
+20250308_1/share/texmf-dist/fonts/type1/public/lm/lmsy7.pfb></opt/homebrew/Cell
+ar/texlive/20250308_1/share/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
+Output written on _main.pdf (33 pages, 18829074 bytes).
 PDF statistics:
- 429 PDF objects out of 1000 (max. 8388607)
- 354 compressed objects within 4 object streams
- 72 named destinations out of 1000 (max. 500000)
- 45458 words of extra memory for PDF output out of 51595 (max. 10000000)
+ 855 PDF objects out of 1000 (max. 8388607)
+ 701 compressed objects within 8 object streams
+ 129 named destinations out of 1000 (max. 500000)
+ 43614 words of extra memory for PDF output out of 51595 (max. 10000000)
 

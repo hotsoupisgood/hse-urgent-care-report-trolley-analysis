@@ -42,7 +42,13 @@ def load_observed(data_path=_DEFAULT_DATA_PATH):
 
 
 def build_event_indicators(n_weeks, regions):
-    """Build time vectors and event indicator arrays matching the R models."""
+    """
+    Build time vectors and event indicator arrays matching the R models.
+    mw: mid west region mask
+    fr1_XX: 3 week mask for mid west reset
+    fr2_XX: 3 week mask for mid west reset moved back 1 week to align with paper
+    fr3_XX: 5 week mask for mid west reset fr1 window + 2 weeks before
+    """
     t_vec = np.arange(1, n_weeks + 1)
     week_mod = t_vec % 52
 
@@ -74,6 +80,33 @@ def build_event_indicators(n_weeks, regions):
         'fr3_w4': (t_vec == 87).astype(float),
         'fr3_w5': (t_vec == 88).astype(float),
         'mw': np.array([1.0 if r == 'HSE Mid West' else 0.0 for r in regions]),
+    }
+
+
+def build_ny_indicators_by_date(dates):
+    """Date-anchored NY indicators (Mon-week containing Dec 25 / Jan 1 / Jan 8).
+
+    Identifies the Mon-week containing Jan 1 via year-crossing (or Mon == Jan 1),
+    then shifts +/- 1 week for the post / pre weeks. The first dataset date is
+    treated as the orphan post-week for the turn-of-year that pre-dates the
+    data range (input is assumed to start near a turn-of-year, as in the
+    frozen research dataset).
+    """
+    idx = pd.DatetimeIndex(dates)
+    ends = idx + pd.Timedelta(days=6)
+
+    ny_mid_dates  = idx[(idx.year != ends.year) | (idx.dayofyear == 1)]
+    ny_pm2_dates  = ny_mid_dates - pd.Timedelta(weeks=3)
+    ny_pm1_dates  = ny_mid_dates - pd.Timedelta(weeks=2)
+    ny_pre_dates  = ny_mid_dates - pd.Timedelta(weeks=1)
+    ny_post_dates = (ny_mid_dates + pd.Timedelta(weeks=1)).insert(0, idx[0])
+
+    return {
+        'ny_pm2':  idx.isin(ny_pm2_dates).astype(float),
+        'ny_pm1':  idx.isin(ny_pm1_dates).astype(float),
+        'ny_pre':  idx.isin(ny_pre_dates).astype(float),
+        'ny_mid':  idx.isin(ny_mid_dates).astype(float),
+        'ny_post': idx.isin(ny_post_dates).astype(float),
     }
 
 

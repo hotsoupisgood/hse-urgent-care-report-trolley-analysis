@@ -248,16 +248,16 @@ class BaseModel(ABC):
         rank_summary['ranked_mean'] = rank_summary['mean'].rank(method='average')
         rank_summary.to_csv(od / 'ranks.csv')
 
-        # amplitude + phase (if model has annual harmonic)
+        # winter (Dec-Feb) peak probability (if model has annual harmonic)
         if any(f'beta[{i}]' in raw_df.columns for i in range(1, 7)):
-            ampl = _sig.compute_amplitude(raw_df, regions)
-            phase = _sig.compute_phase(raw_df, regions)
+            winter_prob = _sig.compute_winter_probability(raw_df, regions)
+            winter_prob.to_csv(od / 'winter_probability.csv', index=False)
 
-        # sigma tests (if model has Mid West reset)
-        if 'sigma_pre' in raw_df.columns:
-            sigma_summary = _sig.summarize_global_parameters(
-                raw_df, ['sigma_pre', 'sigma_mid', 'sigma_post'])
-            sigma_summary.to_csv(od / 'sigma_overall.csv', index=False)
+        # psi tests (if model has Mid West reset)
+        if 'psi_pre' in raw_df.columns:
+            psi_summary = _sig.summarize_global_parameters(
+                raw_df, ['psi_pre', 'psi_mid', 'psi_post'])
+            psi_summary.to_csv(od / 'psi_overall.csv', index=False)
 
         self.extra_significance_tests(result, od)
         print(f'[{self.version}] Significance tests saved to {od}')
