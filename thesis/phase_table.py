@@ -2,7 +2,8 @@
 
 Ports the phase calculation that previously lived inline in ThesisDraft_v2.Rmd
 (chunks results-phase-inline, results-phase-plot, results-phase-table) into a
-single source of truth. Reads the v2.8 per-10k posterior samples, computes the
+single source of truth. Reads the v4.6 per-10k posterior samples (the selected
+model), computes the
 per-region peak week of the annual cycle (relative to the New Year), its 95%
 credible interval, the CI width, and the probability the peak falls in
 meteorological winter (Dec 1 to end of Feb), then writes phase_table.csv.
@@ -13,7 +14,7 @@ The Rmd reads phase_table.csv instead of recomputing.
 import numpy as np
 import pandas as pd
 
-RAW_SAMPLES = "../data/models/wide_weekly_scaledPer10k/v2.8/raw_samples.csv"
+RAW_SAMPLES = "../data/models/wide_weekly_scaledPer10k/v4.6/raw_samples.csv"
 OUT_CSV = "phase_table.csv"
 
 REGIONS = [

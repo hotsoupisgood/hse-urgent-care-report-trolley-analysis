@@ -31,7 +31,14 @@ thesis/_bookdown_files
 out
 .DS_Store
 .mplconfig
-data/
+# data/ — heavy model outputs/plots stay ignored; small analysis inputs are kept
+data/*
+!data/raw data/
+!data/mapping/
+!data/*.csv
+!data/*.txt
+!data/*.json
+!data/*.geojson
 annual_cycle_period_sweep
 pyjags_pipeline/output
 deprecated
@@ -44,6 +51,24 @@ May_Presentation/tables/*.tex
 thesis/ThesisDraft_v*_files
 
 May_Presentation/tables/rendered
+
+# LaTeX build artifacts
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.toc
+*.bbl
+*.blg
+*.out
+*.nav
+*.snm
+*.vrb
+texput.log
+thesis/ThesisDraft_v2.log
+thesis/_main.log
+thesis/model_spec_v2_1.log
+May_Presentation/formula/*.log
 
 # D3 viz experiment
 viz/
