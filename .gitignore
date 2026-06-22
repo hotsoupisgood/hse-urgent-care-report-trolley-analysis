@@ -72,6 +72,9 @@ May_Presentation/formula/*.log
 thesis/_book/
 findings_draft/
 
+# word artifact
+~$c*
+
 # D3 viz experiment
 viz/
 _*
