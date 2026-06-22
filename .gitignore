@@ -69,6 +69,7 @@ thesis/ThesisDraft_v2.log
 thesis/_main.log
 thesis/model_spec_v2_1.log
 May_Presentation/formula/*.log
+thesis/_book/
 
 # D3 viz experiment
 viz/

@@ -21,7 +21,7 @@ from matplotlib.colors import LinearSegmentedColormap
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "findings_draft")
 PHASE_CSV = os.path.join(ROOT, "thesis", "phase_table.csv")
-EVENTS_XLSX = os.path.join(ROOT, "dashboard", "key_events.xlsx")
+EVENTS_XLSX = os.path.join(OUT, "key_events.xlsx")
 V46 = os.path.join(ROOT, "data", "models", "wide_weekly_scaledPer10k", "v4.6")
 
 FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
@@ -58,12 +58,10 @@ if "HSE Mid West" in order:
             fontsize=7, color="#888", fontstyle="italic")
 ax.set_yticks(y_pos)
 ax.set_yticklabels([short_region(r) for r in order])
-ax.set_ylim(-0.6, len(order) - 0.5 + 0.85)  # headroom so the title clears the data
+ax.set_ylim(-0.6, len(order) - 0.5 + 0.4)  # small headroom for the "winter" label
 ax.set_xticks(np.arange(-8, 53, 8))
 ax.set_xlim(XMIN, XMAX)
 ax.set_xlabel("Weeks from New Year (0 = year change)")
-ax.set_title("Trolley waits peak in winter in five of six regions",
-             fontsize=10, fontweight="bold", pad=8)
 for spine in ["top", "right"]:
     ax.spines[spine].set_visible(False)
 fig.tight_layout()
@@ -183,10 +181,8 @@ def _draw_map(value_col, fname, label_fn, title, legend=False, legend_label=None
 
 
 _draw_map("alpha_mean", "model_map_alpha.png",
-          lambda r: f"{short_region(r['region'])}\n{r['alpha_mean']:.1f} "
-                    f"({r['alpha_lo']:.1f}, {r['alpha_hi']:.1f})",
-          "Trolley rates are highest in the Mid West and west",
-          legend=True, legend_label="Rate per 10,000")
+          lambda r: f"{short_region(r['region'])}\n{r['alpha_mean']:.1f}",
+          "", legend=True, legend_label="Rate per 10,000")
 print("wrote", os.path.join(OUT, "model_map_alpha.png"))
 
 # -- Event illustration plots (weekly per-10k series) ------------------------
@@ -296,6 +292,73 @@ _fit_plot(_obs.loc["HSE Mid West"].values, _mu["HSE Mid West"].values,
           ("2024-05-01", "2024-11-30"),
           "The model captures the Aug 2024 reset", "event_midwest_reset_fit.png")
 print("wrote event fit plots")
+
+# -- New Year dip by region (forest of the deepest block-effect week) ---------
+_NY_REGIONS = [
+    "HSE Dublin and Midlands", "HSE Dublin and North East",
+    "HSE Dublin and South East", "HSE Mid West",
+    "HSE South West", "HSE West and North West",
+]
+_dweeks = ["delta_pre", "delta_pm1", "delta_mid", "delta_post"]
+_draw = pd.read_csv(os.path.join(V46, "raw_samples.csv"),
+                    usecols=[f"{p}[{i}]" for p in _dweeks for i in range(1, 7)])
+_rows = []
+for i in range(1, 7):
+    M = np.vstack([_draw[f"{p}[{i}]"].values for p in _dweeks]).T
+    tr = M.min(axis=1)  # deepest of the four New Year weeks, per draw
+    _rows.append((_NY_REGIONS[i - 1], tr.mean(),
+                  np.percentile(tr, 2.5), np.percentile(tr, 97.5)))
+_dip = pd.DataFrame(_rows, columns=["region", "mean", "lo", "hi"]).sort_values("mean")
+_y = np.arange(len(_dip))[::-1]
+fig, ax = plt.subplots(figsize=(8, 3.4), dpi=220)
+ax.axvline(0, linestyle="--", color="grey", linewidth=1, zorder=1)
+ax.errorbar(_dip["mean"], _y,
+            xerr=[_dip["mean"] - _dip["lo"], _dip["hi"] - _dip["mean"]],
+            fmt="o", color="black", ecolor="black", capsize=0, markersize=4, zorder=2)
+ax.set_yticks(_y)
+ax.set_yticklabels([short_region(r) for r in _dip["region"]], fontsize=12)
+ax.set_xlabel("Change in weekly rate per 10,000 at the New Year", fontsize=12)
+ax.tick_params(axis="x", labelsize=11)
+for sp in ["top", "right"]:
+    ax.spines[sp].set_visible(False)
+fig.tight_layout()
+fig.savefig(os.path.join(OUT, "event_newyear_dip.png"), bbox_inches="tight")
+plt.close(fig)
+print("wrote event_newyear_dip.png")
+
+# -- Regions reference map (categorical, for the About tab) -------------------
+_counties_ref = gpd.read_file(os.path.join(_MAPDIR, "ie_counties.geojson"))
+fig, ax = plt.subplots(figsize=(4.8, 5.3), dpi=220)
+_ni.plot(ax=ax, color="#ebebeb", edgecolor="#9aa0a6", linewidth=0.3, zorder=0)
+_gdf.plot(ax=ax, color=_gdf["region"].map(REGION_PALETTE), edgecolor="#555",
+          linewidth=0.5, zorder=1)
+_counties_ref.plot(ax=ax, facecolor="none", edgecolor="white", linewidth=0.3,
+                   alpha=0.6, zorder=2)
+_REGION_LABEL = {
+    "HSE Dublin and Midlands":   "HSE Dublin\nand Midlands",
+    "HSE Dublin and North East": "HSE Dublin\nand North East",
+    "HSE Dublin and South East": "HSE Dublin\nand South East",
+    "HSE Mid West":              "HSE\nMid West",
+    "HSE South West":            "HSE\nSouth West",
+    "HSE West and North West":   "HSE West and\nNorth West",
+}
+for _, r in _gdf.iterrows():
+    geom = r.geometry
+    c = geom.centroid
+    pt = c if geom.contains(c) else geom.representative_point()
+    ax.text(pt.x, pt.y, _REGION_LABEL[r["region"]], ha="center", va="center", zorder=4,
+            fontsize=9, fontweight="bold", linespacing=0.95,
+            bbox=dict(boxstyle="round,pad=0.18", fc="white", ec="none", alpha=0.85))
+ax.set_xlim(*_XLIM)
+ax.set_ylim(*_YLIM)
+ax.set_title("The six HSE Health Regions", fontsize=13, fontweight="bold")
+ax.set_xticks([]); ax.set_yticks([])
+for sp in ax.spines.values():
+    sp.set_visible(False)
+fig.tight_layout()
+fig.savefig(os.path.join(OUT, "model_regions.png"), bbox_inches="tight")
+plt.close(fig)
+print("wrote model_regions.png")
 
 # -- Assemble page -----------------------------------------------------------
 html = f"""<!doctype html>

@@ -1213,9 +1213,19 @@ We expect regional dependence structure to be driven by demographics like age, w
 # Discussion \label{chap:Discussion}
 
 ## Future Work \label{sect:future-work}
-Investigate fixing the phase to a global value and letting the amplitude vary across regions in the annual cycle. The results suggest the regions have a phase clustered in January, so a shared parameter could be a more parsimonious model. 
-Modeling the daily counts instead of the weekly counts. This would give insight into the intra-weekly discharge patterns effects on the trolley rates, and would give more data points to understand new year and mid west reset effects.
-Limitation on the 6 regions.
+This was a limited study, and there is much work yet to be done to explore the data. For example, modeling daily counts, changing to a global new year phase, incorperating respiratory illness data, predictioning future trends, and validating against another dataset are all paths that should be taken.
+
+The estimated peaks cluster in the weeks around the New Year (Appendix Table \@ref(tab:results-phase-table)). A shared phase with region-specific amplitude could lead to a more parsimonious model, testing whether the . It would test whether regions differ in the strength of the winter peak rather than its timing.
+
+Modelling the daily counts rather than the weekly counts would recover detail that weekly aggregation removes. Weekly bins split the New Year holiday unevenly, because the 1st of January falls on a different weekday each year (Section \@ref(sect:data-EDA-nydip)). Daily data would resolve intra-week discharge patterns and give more observations to identify the New Year and Mid West reset effects.
+
+The model captures the New Year dip with a fixed calendar term. Other public holidays plausibly move trolley counts through the same discharge-before-holiday mechanism the HSE applies at Christmas. Indicator covariates for the main bank holidays would let the model account for these shorter discharge cycles rather than leaving them in the residuals.
+
+The annual cycle is currently a calendar term with no external driver. Winter trolley peaks coincide with respiratory illness admissions. Supplementing the cycle with a respiratory surveillance covariate, such as weekly influenza or RSV positivity from national surveillance, would move the model from describing the winter peak to explaining it. It would also let the peak respond to severity that varies year to year.
+
+The model is fit to describe and rank the regions, not to predict. The same structure of regional level, annual cycle, and autoregressive terms can produce short-term forecasts of trolley counts. Forecasts would need out-of-sample evaluation with proper scoring rules, rather than the in-sample DIC used here. A validated forecast would give the HSE advance warning of regional surges.
+
+The trolley counts come from a single source, the HSE daily report. The Irish Nurses and Midwives Organisation publishes an independently collected daily trolley count. Comparing the two series would test the reliability of the reported figures and flag hospitals where the counts diverge, such as the under-reporting observed at one Model 4 hospital.
 
 \newpage
 
