@@ -72,6 +72,15 @@ May_Presentation/formula/*.log
 thesis/_book/
 findings_draft/
 
+# Thesis bookdown/knitr build artifacts
+thesis/_main_cache/
+thesis/_main_files/
+thesis/ThesisDraft_files/
+thesis/_main.tex
+thesis/ThesisDraft_v2.tex
+thesis/model_spec_v2_1.tex
+thesis/arxiv/ThesisDraft_arxiv.tex
+
 # word artifact
 ~$c*
 
@@ -79,3 +88,5 @@ findings_draft/
 viz/
 _*
 tmp*
+thesis/arxiv/arxiv.sty
+thesis/arxiv/ThesisDraft_arxiv.log

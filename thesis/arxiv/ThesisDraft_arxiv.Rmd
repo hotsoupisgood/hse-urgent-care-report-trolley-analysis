@@ -1499,8 +1499,6 @@ ggplot(pacf_df, aes(lag, pacf, colour = region)) +
 
 Convergence diagnostics for the selected model. Trace plots show all monitored parameters across the four chains after burn-in. The Gelman-Rubin table reports the potential scale reduction factor (R-hat) for every parameter.
 
-The bracketed index on a parameter denotes the HSE region: 1 Dublin and Midlands, 2 Dublin and North East, 3 Dublin and South East, 4 Mid West, 5 South West, 6 West and North West. The four New Year window effects are numbered in temporal order: delta_1 the week two weeks before the New Year week, delta_2 the week before, delta_3 the New Year week (containing Jan 1), and delta_4 the week after.
-
 ```{r app-trace-setup, include=FALSE}
 raw <- read_csv(
   file.path(selected_model, "raw_samples.csv"),
@@ -1553,7 +1551,7 @@ trace_panel <- function(p) {
   tr + kd + plot_layout(widths = c(3, 1))
 }
 
-trace_cap <- "Trace with LOWESS fit (left) and posterior density (right) for every monitored parameter of the selected model; panel titles give the parameter. The horizontal axis is the iteration over the 20{,}000 retained draws, shared across all panels. Four chains overlaid after burn-in, all retained draws shown. The bracketed index on a parameter denotes the HSE region: 1 is Dublin and Midlands, 2 is Dublin and North East, 3 is Dublin and South East, 4 is Mid West, 5 is South West, 6 is West and North West."
+trace_cap <- "Trace with LOWESS fit (left) and posterior density (right) for every monitored parameter of the selected model. The horizontal axis is the iteration over the 20{,}000 retained draws, shared across all panels. Four chains overlaid after burn-in, only retained draws shown. The bracketed index on a parameter denotes the HSE region: 1 is Dublin and Midlands, 2 is Dublin and North East, 3 is Dublin and South East, 4 is Mid West, 5 is South West, 6 is West and North West. The four New Year window effects are numbered in temporal order: delta\\_1 the week two weeks before the New Year week, delta\\_2 the week before, delta\\_3 the New Year week (containing Jan 1), and delta\\_4 the week after."
 ```
 
 ```{r app-trace, fig.width=9, fig.height=9, out.width="100%", fig.cap=trace_cap, fig.pos="H"}
