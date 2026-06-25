@@ -218,7 +218,7 @@ These gaps motivate the present study. No published analysis has applied a Bayes
 This section outlines the data used in the analysis: collecting the raw data, preparing it for modelling, and exploring the series to identify important features.
 
 ## Data Sources \label{sect:data-source}
-Daily on trolley counts are scraped from the publicly available HSE Urgent and Emergency Care daily report [@HSE2026]. The report is published as an HTML page with no known API. It has been published daily since 1st of January 2023 and remains actively updated. For our paper, we collected data from the 1st of January 2023 to the 5th of April 2026. The HSE Urgent and Emergency Care daily report contains counts of patients on ED trolleys, ward trolleys, surge capacity in use, delayed transfers of care, the total number waiting over 24 hours, and the number of those over 75 waiting over 24 hours. Our analysis uses the total on trolley counts, a sum of ED and ward trolleys. Total counts are chosen because they are the most direct measure of the burden of patients on trolleys in each region, and they are a widely reported measure of hospital crowding [@HSE2026].
+Daily on trolley counts are scraped from the publicly available HSE Urgent and Emergency Care daily report [@HSE2026]. The report is published as an HTML page with no known API. It has been published daily since 1st of January 2023 and remains actively updated. For our paper, we collected data from the 1st of January 2023 to the 5th of April 2026. The HSE Urgent and Emergency Care daily report contains counts of patients on ED trolleys, ward trolleys, surge capacity in use, delayed transfers of care, the total number waiting over 24 hours, and the number of those over 75 waiting over 24 hours. Our analysis uses the total on trolley counts, a sum of ED and ward trolleys. Total counts are chosen because they are the most direct measure of the burden of patients on trolleys in each region, and they are a widely reported measure of hospital crowding [@HSE2026]. All code for scraping, preprocessing, model fitting, and figure generation is available at https://github.com/hotsoupisgood/hse-urgent-care-report-trolley-analysis, supporting full reproduction of the results.
 
 ## Scraping \label{sect:data-pipeline}
 Scraping is performed using Python, iterating through each day's report from the 1st of January 2023 to the 5th of April 2026. The report is scraped from the URL: `https://uec.hse.ie/uec/TGAR.php?EDDATE=DD%2FMM%2FYYYY`, where `EDDATE` is the date in `DD/MM/YYYY` (day/month/year) format, with `%2F` being encoded slashes. On this report page, data is displayed in the `<table>` tag, which produces a structured HTML table, where rows are coded inside `<tr>` tags, and cells are coded inside `<td>` tags. The scraper extracts the date, region, and total daily on trolley count from the table, and saves it to a CSV file for further processing covered in the following section.
@@ -1205,7 +1205,7 @@ The Mid West reset term was motivated by a known system-wide overcrowding respon
 
 The observation period of approximately three years, while sufficient to identify the main seasonal and calendar features of the data, limits the ability to assess longer-run trends in hospital pressure or to evaluate the stability of the regional ranking over multiple years. As the HSE health region structure was only established in 2023, extending the analysis to future data will be important for confirming whether the west/east divide identified here reflects a stable structural feature of the system or is partly an artefact of the transition period.
 
-Finally, the analysis does not account for structural covariates that may explain some of the observed regional variation, such as differences in bed capacity, staffing levels, population age structure, external facilities that can alleviate pressure or socioeconomic deprivation. Incorporating such covariates within a Bayesian regression framework would allow the analysis to distinguish between variation in trolley pressure attributable to measurable system characteristics and variation that reflects more fundamental differences in regional demand relative to capacity.
+A further limitation is that the analysis does not account for structural covariates that may explain some of the observed regional variation, such as differences in bed capacity, staffing levels, population age structure, external facilities that can alleviate pressure or socioeconomic deprivation. Incorporating such covariates within a Bayesian regression framework would allow the analysis to distinguish between variation in trolley pressure attributable to measurable system characteristics and variation that reflects more fundamental differences in regional demand relative to capacity.
 
 The estimated peaks cluster in the weeks around the New Year (Appendix Table \@ref(tab:results-phase-table)). A shared phase with region-specific amplitude could lead to a more parsimonious model, testing whether regions differ in the strength of the winter peak rather than its timing.
 
@@ -1221,7 +1221,7 @@ This study develops a Bayesian time series framework for analysing weekly hospit
 
 The central finding is a pronounced and statistically credible west/east divide in hospital pressure levels, with HSE Mid West carrying the highest burden and HSE Dublin and North East the lowest. This ordering is robust across all four scaling denominators examined (Table \@ref(tab:results-rank-table)) and is supported by near-certain pairwise posterior comparisons across fourteen of the fifteen region pairs. These findings are entirely invisible in raw regional totals and emerge only through population standardisation, reinforcing the importance of per capita scaling when making regional comparisons within a nationally administered health system. Five of six regions exhibit a winter-peaking annual cycle consistent with respiratory illness demand, and both the New Year dip and the Mid West operational reset are clearly identified as distinct features of the data.
 
-By embedding these dynamics within a Bayesian framework, the analysis propagates uncertainty through to all model parameters and provides a principled basis for probabilistic regional comparison. Future work could explore daily-resolution modelling, region-specific AR parameters, and the incorporation of structural covariates such as bed capacity, staffing, and population age structure to help explain the observed regional disparities. As the HSE six-region structure was only established in 2023, extending the analysis as additional data accumulate will be important for confirming whether the west/east divide is a stable structural feature of the Irish hospital system. More broadly, this study demonstrates that Bayesian time series modelling of routinely collected administrative data can yield substantive, policy relevant insights into the distribution of hospital pressure across a national health system, supporting more evidence-informed approaches to capacity planning and resource allocation.
+By embedding these dynamics within a Bayesian framework, the analysis propagates uncertainty through to all model parameters and provides a principled basis for probabilistic regional comparison. Future work could explore daily-resolution modelling, region-specific AR parameters, and the incorporation of structural covariates such as bed capacity, staffing, and population age structure to help explain the observed regional disparities. As the HSE six-region structure was only established in 2023, extending the analysis as additional data accumulate will be important for confirming whether the west/east divide is a stable structural feature of the Irish hospital system. More broadly, this study demonstrates that Bayesian time series modelling of routinely collected administrative data can yield substantive, policy relevant insights into the distribution of hospital pressure across a national health system, supporting more evidence-informed approaches to capacity planning and resource allocation. An interactive version of these results is available at hsereport.ie.
 
 \newpage
 
@@ -1382,7 +1382,7 @@ knitr::kable(amp_pair, digits = 2, booktabs = TRUE, longtable = TRUE, linesep = 
 
 ## Raw Weekly Counts by Region
 
-```{r app-raw-boxplot, fig.cap="Distribution of weekly on trolley counts by HSE region across the full series (Jan 2023 -- Apr 2026). Box shows the IQR, central line the median, whiskers extend to 1.5 x IQR; points beyond are individual weeks.", fig.width=8, fig.height=3}
+```{r app-raw-boxplot, fig.cap="Distribution of weekly on trolley counts by HSE region across the full series (Jan 2023 -- Apr 2026). Box shows the IQR, central line the median; points beyond are individual weeks.", fig.width=8, fig.height=3}
 ggplot(weekly, aes(x = reorder(region, total_trolleys, FUN = median, decreasing = TRUE),
                    y = total_trolleys, fill = region)) +
   geom_boxplot(width = 0.6, alpha = 0.85, outlier.size = 1) +
@@ -1504,7 +1504,7 @@ ggplot(pacf_df, aes(lag, pacf, colour = region)) +
 
 ## Trace Plots and Convergence {#app:traces}
 
-Convergence diagnostics for the selected model (AR(2) with the date-anchored New Year effect). Trace plots show all monitored parameters across the four chains after burn-in. The Gelman-Rubin table reports the potential scale reduction factor (R-hat) for every parameter.
+Convergence diagnostics for the selected model. Trace plots show all monitored parameters across the four chains after burn-in. The Gelman-Rubin table reports the potential scale reduction factor (R-hat) for every parameter.
 
 Throughout this section the bracketed index on a parameter denotes the HSE region: 1 Dublin and Midlands, 2 Dublin and North East, 3 Dublin and South East, 4 Mid West, 5 South West, 6 West and North West. The four New Year window effects are numbered in temporal order: delta_1 the week two weeks before the New Year week, delta_2 the week before, delta_3 the New Year week (containing Jan 1), and delta_4 the week after.
 
@@ -1560,10 +1560,10 @@ trace_panel <- function(p) {
   tr + kd + plot_layout(widths = c(3, 1))
 }
 
-trace_cap <- "Trace with LOWESS fit (left) and per-chain posterior density (right) for every monitored parameter of the selected model; panel titles give the parameter. The horizontal axis is the iteration over the 20{,}000 retained draws, shared across all panels. Four chains overlaid after burn-in, all retained draws shown."
+trace_cap <- "Trace with LOWESS fit (left) and posterior density (right) for every monitored parameter of the selected model; panel titles give the parameter. The horizontal axis is the iteration over the 20{,}000 retained draws, shared across all panels. Four chains overlaid after burn-in, all retained draws shown. The bracketed index on a parameter denotes the HSE region: 1 is Dublin and Midlands, 2 is Dublin and North East, 3 is Dublin and South East, 4 is Mid West, 5 is South West, 6 is West and North West."
 ```
 
-```{r app-trace, eval=FALSE, fig.width=9, fig.height=9, out.width="100%", fig.cap=trace_cap}
+```{r app-trace, fig.width=9, fig.height=9, out.width="100%", fig.cap=trace_cap, fig.pos="H"}
 all_panels <- lapply(unlist(groups, use.names = FALSE), trace_panel)
 patchwork::wrap_plots(all_panels, ncol = 5)
 ```
@@ -1601,7 +1601,3 @@ kableExtra::kbl(
 ) |>
   kableExtra::kable_styling(latex_options = c("hold_position"))
 ```
-
-## Posterior Parameter Estimates {#app:posteriors}
-
-\textit{[Posterior means and 95\% credible intervals for each spine model.]}
